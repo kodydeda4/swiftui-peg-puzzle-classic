@@ -16,6 +16,7 @@ struct AppReducer: Reducer {
         $0
       }
     )
+    @BindingState var lastMove: String?
     @BindingState var selection: Peg? = nil
   }
   
@@ -31,13 +32,49 @@ struct AppReducer: Reducer {
       
       case let .pegTapped(value):
         if let selection = state.selection {
-//          //pegs[id: [s.row - 1, s.col - 1]]?.done.toggle()
-//          state.selection = nil
-          state.pegs[id: [
-            value.row - 1,
-            value.col - selection.col
-          ]]?.completed.toggle()
-          state.selection = nil
+          if state.availableMoves.contains(value) {
+
+            let direction: String = {
+              if value.row == selection.row, value.col == selection.col - 2 {
+                return "Left"
+              } else if selection.row == value.row + 2, selection.col == value.col + 2 {
+                return "Left+Up"
+              } else if selection.row == value.row - 2, selection.col == value.col {
+                return "Left+Down"
+              } else if value.row == selection.row, value.col == selection.col + 2 {
+                return "Right"
+              } else if selection.row == value.row + 2, selection.col == value.col {
+                return "Right+Up"
+              } else if selection.row == value.row - 2, selection.col == value.col - 2 {
+                return "Right+Down"
+              } else {
+                return ""
+              }
+            }()
+            
+            
+            switch direction {
+            case "Left":
+              state.pegs[id: [selection.row, selection.col-1]]?.completed = true
+            case "Left+Up":
+              state.pegs[id: [selection.row-1, selection.col-1]]?.completed = true
+            case "Left+Down":
+              state.pegs[id: [selection.row+1, selection.col]]?.completed = true
+            case "Right":
+              state.pegs[id: [selection.row, selection.col+1]]?.completed = true
+            case "Right+Up":
+              state.pegs[id: [selection.row-1, selection.col]]?.completed = true
+            case "Right+Down":
+              state.pegs[id: [selection.row+1, selection.col+1]]?.completed = true
+            default:
+              break
+            }
+            
+            state.lastMove = direction
+            state.selection = value
+          } else {
+            state.selection = value
+          }
         } else {
           state.selection = state.selection != value ? value : nil
         }
@@ -52,25 +89,32 @@ struct AppReducer: Reducer {
 }
 
 extension AppReducer.State {
-  var availableForCurrentMove: IdentifiedArrayOf<Peg> {
+  var availableMoves: IdentifiedArrayOf<Peg> {
     guard let selection = selection else { return [] }
     
     return .init(uniqueElements: [
-      pegs[id: [selection.row+2, selection.col]],
-      pegs[id: [selection.row-2, selection.col]],
-      pegs[id: [selection.row, selection.col+2]],
-      pegs[id: [selection.row, selection.col-2]],
-    ].compactMap { $0 })
+      pegs[id: [selection.row+0, selection.col-2]], // left
+      pegs[id: [selection.row+0, selection.col+2]], // right
+      pegs[id: [selection.row-2, selection.col-2]], // up+left
+      pegs[id: [selection.row-2, selection.col+0]], // up+right
+      pegs[id: [selection.row+2, selection.col]],   // down+left
+      pegs[id: [selection.row+2, selection.col+2]], // down+right
+    ]
+      .compactMap { $0 }
+      .filter { !$0.completed }
+    )
   }
   
   var availableForCompletion: IdentifiedArrayOf<Peg> {
     guard let selection = selection else { return [] }
     
     return .init(uniqueElements: [
-      pegs[id: [selection.row+1, selection.col]],
-      pegs[id: [selection.row-1, selection.col]],
-      pegs[id: [selection.row, selection.col+1]],
-      pegs[id: [selection.row, selection.col-1]],
+      pegs[id: [selection.row+0, selection.col-1]], // left
+      pegs[id: [selection.row+0, selection.col+1]], // right
+      pegs[id: [selection.row-1, selection.col-1]], // up+left
+      pegs[id: [selection.row-1, selection.col+0]], // up+right
+      pegs[id: [selection.row+1, selection.col]],   // down+left
+      pegs[id: [selection.row+1, selection.col+1]], // down+right
     ].compactMap { $0 })
   }
 }
@@ -94,10 +138,15 @@ struct AppView: View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       NavigationStack {
         VStack {
-          ForEach(0..<5) { row in
-            HStack {
-              ForEach(0..<row+1) { col in
-                pegView(peg: viewStore.pegs[id: [row, col]]!)
+//          Text(viewStore.lastMove ?? "")
+//            .frame(height: 30)
+          
+          VStack {
+            ForEach(0..<5) { row in
+              HStack {
+                ForEach(0..<row+1) { col in
+                  pegView(peg: viewStore.pegs[id: [row, col]]!)
+                }
               }
             }
           }
@@ -132,22 +181,24 @@ private extension AppView {
           .frame(width: 50, height: 50)
           .overlay {
             if viewStore.selection == peg {
-              Circle().foregroundColor(.accentColor)
+              Circle()
+                .foregroundColor(.accentColor)
+                .overlay { Circle().padding() }
             }
           }
           .overlay {
-            if viewStore.availableForCurrentMove.contains(peg) {
-              Circle().foregroundColor(.accentColor).opacity(0.25)
+            if viewStore.availableMoves.contains(peg) {
+              Circle().foregroundColor(.accentColor).opacity(0.5)
             }
           }
-          .overlay {
-            if viewStore.availableForCompletion.contains(peg) {
-              Circle().foregroundColor(.pink).opacity(0.25)
-            }
-          }
-          .overlay {
-            Text("\(peg.row),\(peg.col)")
-          }
+//          .overlay {
+//            if viewStore.availableForCompletion.contains(peg) {
+//              Circle().foregroundColor(.pink).opacity(0.25)
+//            }
+//          }
+//          .overlay {
+//            Text("\(peg.row), \(peg.col)")
+//          }
           .opacity(!peg.completed ? 1 : 0.25)
       }
       .buttonStyle(.plain)
