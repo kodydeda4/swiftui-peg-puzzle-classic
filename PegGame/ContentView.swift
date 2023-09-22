@@ -1,6 +1,8 @@
 import SwiftUI
 import ComposableArchitecture
 
+
+// 0. First move removes center pig
 // 1. how do you calculate available moves?
 // 2. how do you undo moves?
 // 3. how do you know when it's done?
@@ -16,6 +18,7 @@ struct AppReducer: Reducer {
         $0
       }
     )
+    @BindingState var moves = [String]()
     @BindingState var lastMove: String?
     @BindingState var selection: Peg? = nil
   }
@@ -31,40 +34,46 @@ struct AppReducer: Reducer {
       switch action {
       
       case let .pegTapped(value):
+        // first move.
+        guard !state.pegs.filter(\.completed).isEmpty else {
+          state.pegs[id: value.id]?.completed = true
+          state.selection = nil
+          return .none
+        }
+        guard state.selection != value else {
+          state.selection = nil
+          return .none
+        }
+        
         if let selection = state.selection {
           if state.availableMoves.contains(value) {
+            let i = selection.row
+            let j = selection.col
+            
 
             let direction: String = {
-              if value.row == selection.row, value.col == selection.col - 2 {
-                return "Left"
-              } else if selection.row == value.row + 2, selection.col == value.col + 2 {
-                return "Left+Up"
-              } else if selection.row == value.row - 2, selection.col == value.col {
-                return "Left+Down"
-              } else if value.row == selection.row, value.col == selection.col + 2 {
-                return "Right"
-              } else if selection.row == value.row + 2, selection.col == value.col {
-                return "Right+Up"
-              } else if selection.row == value.row - 2, selection.col == value.col - 2 {
-                return "Right+Down"
-              } else {
-                return ""
-              }
+                   if i == value.row, j == value.col + 2                         { return "Left" }
+              else if i == value.row + 2, j == value.col + 2                     { return "Left+Up" }
+              else if i == value.row - 2, j == value.col                         { return "Left+Down" }
+              else if value.row == selection.row, value.col == selection.col + 2 { return "Right" }
+              else if i == value.row + 2, selection.col == value.col             { return "Right+Up" }
+              else if i == value.row - 2, selection.col == value.col - 2         { return "Right+Down" }
+              else { return "" }
             }()
             
             
             switch direction {
-            case "Left"       : state.pegs[id: [selection.row   ,selection.col-1 ]]?.completed = true
-            case "Left+Up"    : state.pegs[id: [selection.row-1 ,selection.col-1 ]]?.completed = true
-            case "Left+Down"  : state.pegs[id: [selection.row+1 ,selection.col   ]]?.completed = true
-            case "Right"      : state.pegs[id: [selection.row   ,selection.col+1 ]]?.completed = true
-            case "Right+Up"   : state.pegs[id: [selection.row-1 ,selection.col   ]]?.completed = true
-            case "Right+Down" : state.pegs[id: [selection.row+1 ,selection.col+1 ]]?.completed = true
+            case "Left"       : state.pegs[id: [i   ,j-1]]?.completed = true
+            case "Left+Up"    : state.pegs[id: [i-1 ,j-1]]?.completed = true
+            case "Left+Down"  : state.pegs[id: [i+1 ,j  ]]?.completed = true
+            case "Right"      : state.pegs[id: [i   ,j+1]]?.completed = true
+            case "Right+Up"   : state.pegs[id: [i-1 ,j  ]]?.completed = true
+            case "Right+Down" : state.pegs[id: [i+1 ,j+1]]?.completed = true
             default:
               break
             }
             
-            state.lastMove = direction
+            state.moves.append(direction)
             state.selection = value
           } else {
             state.selection = value
@@ -132,6 +141,19 @@ struct AppView: View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       NavigationStack {
         VStack {
+          VStack(alignment: .leading) {
+            HStack {
+              Text("Total:").bold().frame(width: 50, alignment: .leading)
+              Text(viewStore.moves.count.description)
+            }
+            HStack {
+              Text("Last:").bold().frame(width: 50, alignment: .leading)
+              Text(viewStore.moves.last ?? "n.a.")
+            }
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding()
+          
           VStack {
             ForEach(0..<5) { row in
               HStack {
@@ -141,6 +163,7 @@ struct AppView: View {
               }
             }
           }
+          Spacer()
         }
         .navigationTitle("Peg Game")
         .navigationBarTitleDisplayMode(.inline)
@@ -177,11 +200,11 @@ private extension AppView {
                 .overlay { Circle().padding() }
             }
           }
-          .overlay {
-            if viewStore.availableMoves.contains(peg) {
-              Circle().foregroundColor(.accentColor).opacity(0.5)
-            }
-          }
+//          .overlay {
+//            if viewStore.availableMoves.contains(peg) {
+//              Circle().foregroundColor(.accentColor).opacity(0.5)
+//            }
+//          }
           .opacity(!peg.completed ? 1 : 0.25)
       }
       .buttonStyle(.plain)
