@@ -213,6 +213,7 @@ private extension AppView {
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
+      .disabled(peg.completed)
     }
   }
 }
