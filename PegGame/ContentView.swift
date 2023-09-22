@@ -54,18 +54,12 @@ struct AppReducer: Reducer {
             
             
             switch direction {
-            case "Left":
-              state.pegs[id: [selection.row, selection.col-1]]?.completed = true
-            case "Left+Up":
-              state.pegs[id: [selection.row-1, selection.col-1]]?.completed = true
-            case "Left+Down":
-              state.pegs[id: [selection.row+1, selection.col]]?.completed = true
-            case "Right":
-              state.pegs[id: [selection.row, selection.col+1]]?.completed = true
-            case "Right+Up":
-              state.pegs[id: [selection.row-1, selection.col]]?.completed = true
-            case "Right+Down":
-              state.pegs[id: [selection.row+1, selection.col+1]]?.completed = true
+            case "Left"       : state.pegs[id: [selection.row   ,selection.col-1 ]]?.completed = true
+            case "Left+Up"    : state.pegs[id: [selection.row-1 ,selection.col-1 ]]?.completed = true
+            case "Left+Down"  : state.pegs[id: [selection.row+1 ,selection.col   ]]?.completed = true
+            case "Right"      : state.pegs[id: [selection.row   ,selection.col+1 ]]?.completed = true
+            case "Right+Up"   : state.pegs[id: [selection.row-1 ,selection.col   ]]?.completed = true
+            case "Right+Down" : state.pegs[id: [selection.row+1 ,selection.col+1 ]]?.completed = true
             default:
               break
             }
@@ -138,9 +132,6 @@ struct AppView: View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       NavigationStack {
         VStack {
-//          Text(viewStore.lastMove ?? "")
-//            .frame(height: 30)
-          
           VStack {
             ForEach(0..<5) { row in
               HStack {
@@ -191,14 +182,6 @@ private extension AppView {
               Circle().foregroundColor(.accentColor).opacity(0.5)
             }
           }
-//          .overlay {
-//            if viewStore.availableForCompletion.contains(peg) {
-//              Circle().foregroundColor(.pink).opacity(0.25)
-//            }
-//          }
-//          .overlay {
-//            Text("\(peg.row), \(peg.col)")
-//          }
           .opacity(!peg.completed ? 1 : 0.25)
       }
       .buttonStyle(.plain)
