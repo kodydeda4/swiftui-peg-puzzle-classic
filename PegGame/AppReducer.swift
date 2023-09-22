@@ -37,6 +37,9 @@ struct AppReducer: Reducer {
         guard !value.completed else {
           return .none
         }
+        
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
         // first move.
         guard !state.pegs.filter(\.completed).isEmpty else {
           state.pegs[id: value.id]?.completed = true
@@ -48,35 +51,32 @@ struct AppReducer: Reducer {
           return .none
         }
         
-        
         if let selection = state.selection {
           if state.availableMoves.contains(value) {
-            let i = selection.row
-            let j = selection.col
-            
+            let row = selection.row
+            let col = selection.col
 
             let direction: String = {
-                   if i == value.row, j == value.col + 2                         { return "Left" }
-              else if i == value.row + 2, j == value.col + 2                     { return "Left+Up" }
-              else if i == value.row - 2, j == value.col                         { return "Left+Down" }
-              else if value.row == selection.row, value.col == selection.col + 2 { return "Right" }
-              else if i == value.row + 2, selection.col == value.col             { return "Right+Up" }
-              else if i == value.row - 2, selection.col == value.col - 2         { return "Right+Down" }
+                   if row == value.row,     col == value.col + 2  { return "Left" }
+              else if row == value.row + 2, col == value.col + 2  { return "Left+Up" }
+              else if row == value.row - 2, col == value.col      { return "Left+Down" }
+              else if row == value.row    , col == value.col - 2  { return "Right" }
+              else if row == value.row + 2, col == value.col      { return "Right+Up" }
+              else if row == value.row - 2, col == value.col - 2  { return "Right+Down" }
               else { return "" }
             }()
             
             
             switch direction {
-            case "Left"       : state.pegs[id: [i   ,j-1]]?.completed = true
-            case "Left+Up"    : state.pegs[id: [i-1 ,j-1]]?.completed = true
-            case "Left+Down"  : state.pegs[id: [i+1 ,j  ]]?.completed = true
-            case "Right"      : state.pegs[id: [i   ,j+1]]?.completed = true
-            case "Right+Up"   : state.pegs[id: [i-1 ,j  ]]?.completed = true
-            case "Right+Down" : state.pegs[id: [i+1 ,j+1]]?.completed = true
+            case "Left"       : state.pegs[id: [row   ,col-1]]?.completed = true
+            case "Left+Up"    : state.pegs[id: [row-1 ,col-1]]?.completed = true
+            case "Left+Down"  : state.pegs[id: [row+1 ,col  ]]?.completed = true
+            case "Right"      : state.pegs[id: [row   ,col+1]]?.completed = true
+            case "Right+Up"   : state.pegs[id: [row-1 ,col  ]]?.completed = true
+            case "Right+Down" : state.pegs[id: [row+1 ,col+1]]?.completed = true
             default:
               break
             }
-            
             state.moves.append(direction)
             state.selection = value
           } else {
