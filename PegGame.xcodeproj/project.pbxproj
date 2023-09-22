@@ -7,15 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		33E6E3562ABE2AAF00B76E4A /* PegGameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3552ABE2AAF00B76E4A /* PegGameApp.swift */; };
+		33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3552ABE2AAF00B76E4A /* Main.swift */; };
 		33E6E3582ABE2AAF00B76E4A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3572ABE2AAF00B76E4A /* ContentView.swift */; };
 		33E6E35A2ABE2AB000B76E4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33E6E3592ABE2AB000B76E4A /* Assets.xcassets */; };
 		33E6E35D2ABE2AB000B76E4A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33E6E35C2ABE2AB000B76E4A /* Preview Assets.xcassets */; };
+		33E6E3652ABE2EFD00B76E4A /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		33E6E3522ABE2AAF00B76E4A /* PegGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PegGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		33E6E3552ABE2AAF00B76E4A /* PegGameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PegGameApp.swift; sourceTree = "<group>"; };
+		33E6E3552ABE2AAF00B76E4A /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
 		33E6E3572ABE2AAF00B76E4A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		33E6E3592ABE2AB000B76E4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		33E6E35C2ABE2AB000B76E4A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -26,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33E6E3652ABE2EFD00B76E4A /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -51,7 +53,7 @@
 		33E6E3542ABE2AAF00B76E4A /* PegGame */ = {
 			isa = PBXGroup;
 			children = (
-				33E6E3552ABE2AAF00B76E4A /* PegGameApp.swift */,
+				33E6E3552ABE2AAF00B76E4A /* Main.swift */,
 				33E6E3572ABE2AAF00B76E4A /* ContentView.swift */,
 				33E6E3592ABE2AB000B76E4A /* Assets.xcassets */,
 				33E6E35B2ABE2AB000B76E4A /* Preview Content */,
@@ -83,6 +85,9 @@
 			dependencies = (
 			);
 			name = PegGame;
+			packageProductDependencies = (
+				33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */,
+			);
 			productName = PegGame;
 			productReference = 33E6E3522ABE2AAF00B76E4A /* PegGame.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +116,9 @@
 				Base,
 			);
 			mainGroup = 33E6E3492ABE2AAF00B76E4A;
+			packageReferences = (
+				33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+			);
 			productRefGroup = 33E6E3532ABE2AAF00B76E4A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -138,7 +146,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33E6E3582ABE2AAF00B76E4A /* ContentView.swift in Sources */,
-				33E6E3562ABE2AAF00B76E4A /* PegGameApp.swift in Sources */,
+				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +352,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 33E6E34A2ABE2AAF00B76E4A /* Project object */;
 }
