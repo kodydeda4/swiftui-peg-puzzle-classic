@@ -34,6 +34,9 @@ struct AppReducer: Reducer {
       switch action {
       
       case let .pegTapped(value):
+        guard !value.completed else {
+          return .none
+        }
         // first move.
         guard !state.pegs.filter(\.completed).isEmpty else {
           state.pegs[id: value.id]?.completed = true
@@ -44,6 +47,7 @@ struct AppReducer: Reducer {
           state.selection = nil
           return .none
         }
+        
         
         if let selection = state.selection {
           if state.availableMoves.contains(value) {
