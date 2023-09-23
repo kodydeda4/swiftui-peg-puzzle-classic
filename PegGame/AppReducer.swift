@@ -1,4 +1,4 @@
-import SwiftUI
+ import SwiftUI
 import ComposableArchitecture
 
 
@@ -7,6 +7,7 @@ import ComposableArchitecture
 // 2. how do you undo moves?
 // 3. how do you know when it's done?
 // 4. moves are wrong ;/
+// 5. you should only be able to go when there's one inbetween.
 
 struct AppReducer: Reducer {
   struct State: Equatable {
@@ -35,10 +36,6 @@ struct AppReducer: Reducer {
       switch action {
       
       case let .pegTapped(value):
-//        guard !value.completed else {
-//          return .none
-//        }
-//        
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
 
         // first move.
@@ -50,8 +47,7 @@ struct AppReducer: Reducer {
         guard state.selection != value else {
           state.selection = nil
           return .none
-        }
-        
+        }        
         if let selection = state.selection {
           if state.availableMoves.contains(value) {
             let row = selection.row
@@ -67,16 +63,24 @@ struct AppReducer: Reducer {
               else { return "" }
             }()
             
-            switch direction {
-            case "Left"       : state.pegs[id: [row   ,col-1]]?.completed = true
-            case "Left+Up"    : state.pegs[id: [row-1 ,col-1]]?.completed = true
-            case "Left+Down"  : state.pegs[id: [row+1 ,col  ]]?.completed = true
-            case "Right"      : state.pegs[id: [row   ,col+1]]?.completed = true
-            case "Right+Up"   : state.pegs[id: [row-1 ,col  ]]?.completed = true
-            case "Right+Down" : state.pegs[id: [row+1 ,col+1]]?.completed = true
-            default:
-              break
-            }
+            let pegToBeModified: Peg? = {
+              switch direction {
+              case "Left"       : return state.pegs[id: [row   ,col-1]]
+              case "Left+Up"    : return state.pegs[id: [row-1 ,col-1]]
+              case "Left+Down"  : return state.pegs[id: [row+1 ,col  ]]
+              case "Right"      : return state.pegs[id: [row   ,col+1]]
+              case "Right+Up"   : return state.pegs[id: [row-1 ,col  ]]
+              case "Right+Down" : return state.pegs[id: [row+1 ,col+1]]
+              default:
+                return nil
+              }
+            }()
+            
+            guard let pegToBeModified = pegToBeModified else { return .none }
+            
+            guard !pegToBeModified.completed else { return .none }
+            
+            state.pegs[id: pegToBeModified.id]?.completed = true
             state.pegs[id: selection.id]?.completed = true
             state.pegs[id: value.id]?.completed = false
             state.moves.append(direction)
@@ -192,6 +196,9 @@ struct AppView: View {
   }
 }
 
+
+
+
 private extension AppView {
   private func pegView(peg: Peg) -> some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
@@ -216,7 +223,7 @@ private extension AppView {
 //          .overlay {
 //            if viewStore.availableMoves.contains(peg) {
 //              Circle().foregroundColor(.accentColor).opacity(0.5)
-//            }
+//            } 891838
 //          }
           .opacity(!peg.completed ? 1 : 0.25)
       }
