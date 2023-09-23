@@ -35,10 +35,10 @@ struct AppReducer: Reducer {
       switch action {
       
       case let .pegTapped(value):
-        guard !value.completed else {
-          return .none
-        }
-        
+//        guard !value.completed else {
+//          return .none
+//        }
+//        
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
 
         // first move.
@@ -67,7 +67,6 @@ struct AppReducer: Reducer {
               else { return "" }
             }()
             
-            
             switch direction {
             case "Left"       : state.pegs[id: [row   ,col-1]]?.completed = true
             case "Left+Up"    : state.pegs[id: [row-1 ,col-1]]?.completed = true
@@ -78,8 +77,10 @@ struct AppReducer: Reducer {
             default:
               break
             }
+            state.pegs[id: selection.id]?.completed = true
+            state.pegs[id: value.id]?.completed = false
             state.moves.append(direction)
-            state.selection = value
+            state.selection = nil
           } else {
             state.selection = value
           }
@@ -109,7 +110,7 @@ extension AppReducer.State {
       pegs[id: [selection.row+2, selection.col+2]], // down+right
     ]
       .compactMap { $0 }
-      .filter { !$0.completed }
+      .filter { $0.completed }
     )
   }
   
@@ -202,7 +203,14 @@ private extension AppView {
             if viewStore.selection == peg {
               Circle()
                 .foregroundColor(.accentColor)
-                .overlay { Circle().padding() }
+                //.overlay { Circle().padding() }
+            }
+          }
+          .overlay {
+            if viewStore.availableMoves.contains(peg) {
+              Circle()
+                .foregroundColor(.accentColor)
+                .opacity(0.5)
             }
           }
 //          .overlay {
@@ -211,6 +219,9 @@ private extension AppView {
 //            }
 //          }
           .opacity(!peg.completed ? 1 : 0.25)
+          .overlay {
+            Text("\(peg.row), \(peg.col)")
+          }
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
