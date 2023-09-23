@@ -219,9 +219,6 @@ private extension AppView {
 //            }
 //          }
           .opacity(!peg.completed ? 1 : 0.25)
-          .overlay {
-            Text("\(peg.row), \(peg.col)")
-          }
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
