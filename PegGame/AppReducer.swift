@@ -6,6 +6,7 @@ import ComposableArchitecture
 // 1. how do you calculate available moves?
 // 2. how do you undo moves?
 // 3. how do you know when it's done?
+// 4. moves are wrong ;/
 
 struct AppReducer: Reducer {
   struct State: Equatable {
@@ -213,7 +214,7 @@ private extension AppView {
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
-      .disabled(peg.completed)
+      //.disabled(peg.completed)
     }
   }
 }
