@@ -1,4 +1,4 @@
- import SwiftUI
+import SwiftUI
 import ComposableArchitecture
 
 
@@ -28,10 +28,10 @@ struct AppReducer: Reducer {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      
+        
       case let .pegTapped(value):
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-
+        
         // first move.
         guard !state.pegs.filter(\.completed).isEmpty else {
           state.pegs[id: value.id]?.completed = true
@@ -41,14 +41,14 @@ struct AppReducer: Reducer {
         guard state.selection != value else {
           state.selection = nil
           return .none
-        }        
+        }
         if let selection = state.selection {
           if state.availableMoves.contains(value) {
             let row = selection.row
             let col = selection.col
-
+            
             let direction: String = {
-                   if row == value.row,     col == value.col + 2  { return "Left" }
+              if row == value.row,     col == value.col + 2  { return "Left" }
               else if row == value.row + 2, col == value.col + 2  { return "Left+Up" }
               else if row == value.row - 2, col == value.col      { return "Left+Down" }
               else if row == value.row    , col == value.col - 2  { return "Right" }
@@ -88,6 +88,7 @@ struct AppReducer: Reducer {
         return .none
         
       case .restartButtonTapped:
+        state.selection = nil
         state.pegs = State.makePegs()
         return .none
         
@@ -111,7 +112,7 @@ extension AppReducer.State {
       }
     )
   }
-
+  
   var availableMoves: IdentifiedArrayOf<Peg> {
     guard let selection = selection else { return [] }
     
@@ -221,28 +222,13 @@ private extension AppView {
           .frame(width: 50, height: 50)
           .overlay {
             if viewStore.selection == peg {
-              Circle()
-                .foregroundColor(.accentColor)
-                //.overlay { Circle().padding() }
+              Circle().foregroundColor(.accentColor)
             }
           }
-          .overlay {
-            if viewStore.availableMoves.contains(peg) {
-              Circle()
-                .foregroundColor(.accentColor)
-                .opacity(0.5)
-            }
-          }
-//          .overlay {
-//            if viewStore.availableMoves.contains(peg) {
-//              Circle().foregroundColor(.accentColor).opacity(0.5)
-//            } 891838
-//          }
           .opacity(!peg.completed ? 1 : 0.25)
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
-      //.disabled(peg.completed)
     }
   }
 }
