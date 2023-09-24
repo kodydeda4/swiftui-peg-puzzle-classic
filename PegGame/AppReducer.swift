@@ -201,7 +201,7 @@ struct AppView: View {
             .disabled(true)
             .buttonStyle(.bordered)
           }
-          ToolbarItem(placement: .navigationBarLeading) {
+          ToolbarItem(placement: .navigationBarTrailing) {
             Button("Restart") {
               viewStore.send(.restartButtonTapped)
             }
