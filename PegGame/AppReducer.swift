@@ -8,18 +8,11 @@ import ComposableArchitecture
 // 3. how do you know when it's done?
 // 4. moves are wrong ;/
 // 5. you should only be able to go when there's one inbetween.
+// 6. timer?
 
 struct AppReducer: Reducer {
   struct State: Equatable {
-    @BindingState var pegs = IdentifiedArrayOf<Peg>(
-      uniqueElements: (0..<5).map { row in
-        (0..<row+1).map {
-          Peg(row: row, col: $0)
-        }
-      }.flatMap {
-        $0
-      }
-    )
+    @BindingState var pegs = Self.makePegs()
     @BindingState var moves = [String]()
     @BindingState var lastMove: String?
     @BindingState var selection: Peg? = nil
@@ -27,6 +20,7 @@ struct AppReducer: Reducer {
   
   enum Action: BindableAction, Equatable {
     case pegTapped(Peg)
+    case restartButtonTapped
     case binding(BindingAction<State>)
   }
   
@@ -93,6 +87,10 @@ struct AppReducer: Reducer {
         }
         return .none
         
+      case .restartButtonTapped:
+        state.pegs = State.makePegs()
+        return .none
+        
       case .binding:
         return .none
         
@@ -102,6 +100,18 @@ struct AppReducer: Reducer {
 }
 
 extension AppReducer.State {
+  static func makePegs() -> IdentifiedArrayOf<Peg> {
+    IdentifiedArrayOf<Peg>(
+      uniqueElements: (0..<5).map { row in
+        (0..<row+1).map {
+          Peg(row: row, col: $0)
+        }
+      }.flatMap {
+        $0
+      }
+    )
+  }
+
   var availableMoves: IdentifiedArrayOf<Peg> {
     guard let selection = selection else { return [] }
     
@@ -138,6 +148,7 @@ struct Peg: Identifiable, Equatable {
   let col: Int
   var completed = false
 }
+
 
 // MARK: - SwiftUI
 
@@ -190,14 +201,16 @@ struct AppView: View {
             .disabled(true)
             .buttonStyle(.bordered)
           }
+          ToolbarItem(placement: .navigationBarLeading) {
+            Button("Restart") {
+              viewStore.send(.restartButtonTapped)
+            }
+          }
         }
       }
     }
   }
 }
-
-
-
 
 private extension AppView {
   private func pegView(peg: Peg) -> some View {
