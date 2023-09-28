@@ -10,10 +10,12 @@ import ComposableArchitecture
 struct AppReducer: Reducer {
   struct State: Equatable {
     @BindingState var pegs = Peg.grid()
-    @BindingState var selection: Peg? = nil
+    @BindingState var selection: Peg?
   }
   enum Action: BindableAction, Equatable {
     case pegTapped(Peg)
+    case undoButtonTapped
+    case redoButtonTapped
     case restartButtonTapped
     case binding(BindingAction<State>)
   }
@@ -38,13 +40,19 @@ struct AppReducer: Reducer {
           state.selection = state.selection == value ? nil : value
           return .none
         }
-        guard !state.pegBetween(selection, value).completed else {
+        guard !Peg.between(selection, value, in: state.pegs).completed else {
           return .none
         }
-        state.pegs[id: state.pegBetween(selection, value).id]?.completed = true
+        state.pegs[id: Peg.between(selection, value, in: state.pegs).id]?.completed = true
         state.pegs[id: selection.id]?.completed = true
         state.pegs[id: value.id]?.completed = false
         state.selection = nil
+        return .none
+        
+      case .undoButtonTapped:
+        return .none
+        
+      case .redoButtonTapped:
         return .none
         
       case .restartButtonTapped:
@@ -65,7 +73,15 @@ struct Peg: Identifiable, Equatable {
   let row: Int
   let col: Int
   var completed = false
+}
 
+struct Move: Equatable {
+  let selection: Peg
+  let value: Peg
+  var isActive = true
+}
+
+extension Peg {
   static func grid() -> IdentifiedArrayOf<Peg> {
     IdentifiedArrayOf<Peg>(
       uniqueElements: (0..<5).map { row in
@@ -77,43 +93,8 @@ struct Peg: Identifiable, Equatable {
       }
     )
   }
-}
-
-extension AppReducer.State {
-  var isFirstMove: Bool {
-    pegs.filter(\.completed).isEmpty
-  }
   
-  var availableMoves: IdentifiedArrayOf<Peg> {
-    guard let selection = selection else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [selection.row+0, selection.col-2]], // left
-      pegs[id: [selection.row+0, selection.col+2]], // right
-      pegs[id: [selection.row-2, selection.col-2]], // up+left
-      pegs[id: [selection.row-2, selection.col+0]], // up+right
-      pegs[id: [selection.row+2, selection.col]],   // down+left
-      pegs[id: [selection.row+2, selection.col+2]], // down+right
-    ]
-      .compactMap { $0 }
-      .filter { $0.completed }
-    )
-  }
-  
-  var availableForCompletion: IdentifiedArrayOf<Peg> {
-    guard let selection = selection else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [selection.row+0, selection.col-1]], // left
-      pegs[id: [selection.row+0, selection.col+1]], // right
-      pegs[id: [selection.row-1, selection.col-1]], // up+left
-      pegs[id: [selection.row-1, selection.col+0]], // up+right
-      pegs[id: [selection.row+1, selection.col]],   // down+left
-      pegs[id: [selection.row+1, selection.col+1]], // down+right
-    ].compactMap { $0 })
-  }
-  
-  func pegBetween(_ a: Peg, _ b: Peg) -> Peg {
+  static func between(_ a: Peg, _ b: Peg, in pegs: IdentifiedArrayOf<Peg>) -> Peg {
     pegs[id: [
       (a.row - b.row) == 0 ? a.row : {
         switch (a.row - b.row) {
@@ -133,6 +114,46 @@ extension AppReducer.State {
   }
 }
 
+extension AppReducer.State {
+  var isFirstMove: Bool {
+    pegs.filter(\.completed).isEmpty
+  }
+  var availableMoves: IdentifiedArrayOf<Peg> {
+    guard let selection = selection else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [selection.row+0, selection.col-2]], // left
+      pegs[id: [selection.row+0, selection.col+2]], // right
+      pegs[id: [selection.row-2, selection.col-2]], // up+left
+      pegs[id: [selection.row-2, selection.col+0]], // up+right
+      pegs[id: [selection.row+2, selection.col]],   // down+left
+      pegs[id: [selection.row+2, selection.col+2]], // down+right
+    ]
+      .compactMap { $0 }
+      .filter { $0.completed }
+    )
+  }
+  var availableForCompletion: IdentifiedArrayOf<Peg> {
+    guard let selection = selection else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [selection.row+0, selection.col-1]], // left
+      pegs[id: [selection.row+0, selection.col+1]], // right
+      pegs[id: [selection.row-1, selection.col-1]], // up+left
+      pegs[id: [selection.row-1, selection.col+0]], // up+right
+      pegs[id: [selection.row+1, selection.col]],   // down+left
+      pegs[id: [selection.row+1, selection.col+1]], // down+right
+    ].compactMap { $0 })
+  }
+  
+  var isUndoButtonDisabled: Bool {
+    false
+  }
+  var isRedoButtonDisabled: Bool {
+    false
+  }
+}
+
 // MARK: - SwiftUI
 
 struct AppView: View {
@@ -149,22 +170,24 @@ struct AppView: View {
               }
             }
           }
+          HStack {
+            Button(action: { viewStore.send(.undoButtonTapped) }) {
+              Label("Undo", systemImage: "arrow.uturn.backward")
+            }
+            .disabled(viewStore.isUndoButtonDisabled)
+            Spacer()
+            Button(action: { viewStore.send(.redoButtonTapped) }) {
+              Label("Redo", systemImage: "arrow.uturn.forward")
+            }
+            .disabled(viewStore.isRedoButtonDisabled)
+          }
+          .buttonStyle(.bordered)
+          .frame(width: 200)
+          .padding()
         }
         .navigationTitle("Peg Game")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-          ToolbarItem(placement: .navigationBarLeading) {
-            Button(action: {}) {
-              VStack {
-                HStack {
-                  Text("Undo")
-                  Image(systemName: "arrow.uturn.backward")
-                }
-              }
-            }
-            .disabled(true)
-            .buttonStyle(.bordered)
-          }
           ToolbarItem(placement: .navigationBarTrailing) {
             Button("Restart") {
               viewStore.send(.restartButtonTapped)
