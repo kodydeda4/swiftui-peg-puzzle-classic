@@ -61,6 +61,50 @@ struct AppReducer: Reducer {
   }
 }
 
+struct AppView: View {
+  let store: StoreOf<AppReducer>
+  
+  var body: some View {
+    WithViewStore(store, observe: { $0 }) { viewStore in
+      NavigationStack {
+        VStack {
+          Text("Moves: \(viewStore.previousGameStates.count.description)")
+          
+          GameView(store: store.scope(
+            state: \.game,
+            action: AppReducer.Action.game
+          ))
+          
+          HStack {
+            Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
+              Label("Undo", systemImage: "arrow.uturn.backward")
+            }
+            .disabled(viewStore.isUndoButtonDisabled)
+            Spacer()
+            Button(action: { viewStore.send(.redoButtonTapped) }) {
+              Label("Redo", systemImage: "arrow.uturn.forward")
+            }
+            .disabled(viewStore.isRedoButtonDisabled)
+          }
+          .buttonStyle(.bordered)
+          .frame(width: 200)
+          .padding()
+        }
+        .navigationTitle("Peg Game")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Restart") {
+              viewStore.send(.restartButtonTapped)
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - Game
 
 struct Game: Reducer {
   struct State: Identifiable, Equatable {
@@ -135,6 +179,43 @@ extension Game.State {
   }
 }
 
+struct GameView: View {
+  let store: StoreOf<Game>
+  
+  var body: some View {
+    WithViewStore(store, observe: { $0 }) { viewStore in
+      VStack {
+        ForEach(0..<5) { row in
+          HStack {
+            ForEach(0..<row+1) { col in
+              pegView(peg: viewStore.pegs[id: [row, col]]!)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private func pegView(peg: Peg) -> some View {
+    WithViewStore(store, observe: { $0 }) { viewStore in
+      Button(action: { viewStore.send(.move(peg)) }) {
+        Circle()
+          .foregroundColor(Color(.systemGray))
+          .frame(width: 50, height: 50)
+          .overlay {
+            if viewStore.selection == peg {
+              Circle().foregroundColor(.accentColor)
+            }
+          }
+          .opacity(!peg.completed ? 1 : 0.25)
+      }
+      .buttonStyle(.plain)
+      .animation(.default, value: viewStore.selection)
+    }
+  }
+}
+
+// MARK: - Models
 
 struct Peg: Identifiable, Equatable {
   var id: [Int] { [row, col] }
@@ -180,88 +261,6 @@ extension Collection {
   /// Returns the element at the specified index if it is within bounds, otherwise nil.
   subscript (safe index: Index) -> Element? {
     return indices.contains(index) ? self[index] : nil
-  }
-}
-
-// MARK: - SwiftUI
-
-struct AppView: View {
-  let store: StoreOf<AppReducer>
-  
-  var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      NavigationStack {
-        VStack {
-          Text("Moves: \(viewStore.previousGameStates.count.description)")
-          
-          GameView(store: store.scope(
-            state: \.game,
-            action: AppReducer.Action.game
-          ))
-          
-          HStack {
-            Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
-              Label("Undo", systemImage: "arrow.uturn.backward")
-            }
-            .disabled(viewStore.isUndoButtonDisabled)
-            Spacer()
-            Button(action: { viewStore.send(.redoButtonTapped) }) {
-              Label("Redo", systemImage: "arrow.uturn.forward")
-            }
-            .disabled(viewStore.isRedoButtonDisabled)
-          }
-          .buttonStyle(.bordered)
-          .frame(width: 200)
-          .padding()
-        }
-        .navigationTitle("Peg Game")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .navigationBarTrailing) {
-            Button("Restart") {
-              viewStore.send(.restartButtonTapped)
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-struct GameView: View {
-  let store: StoreOf<Game>
-  
-  var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack {
-        ForEach(0..<5) { row in
-          HStack {
-            ForEach(0..<row+1) { col in
-              pegView(peg: viewStore.pegs[id: [row, col]]!)
-            }
-          }
-        }
-      }
-    }
-  }
-}
-private extension GameView {
-  private func pegView(peg: Peg) -> some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.move(peg)) }) {
-        Circle()
-          .foregroundColor(Color(.systemGray))
-          .frame(width: 50, height: 50)
-          .overlay {
-            if viewStore.selection == peg {
-              Circle().foregroundColor(.accentColor)
-            }
-          }
-          .opacity(!peg.completed ? 1 : 0.25)
-      }
-      .buttonStyle(.plain)
-      .animation(.default, value: viewStore.selection)
-    }
   }
 }
 
