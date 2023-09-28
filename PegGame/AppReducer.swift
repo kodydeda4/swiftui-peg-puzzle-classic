@@ -31,7 +31,7 @@ struct AppReducer: Reducer {
       case let .pegTapped(value):
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         
-        guard !state.isFirstMove else {
+        if state.isFirstMove {
           state.pegs[id: value.id]?.completed = true
           state.selection = nil
           return .none
