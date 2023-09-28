@@ -13,7 +13,7 @@ struct AppReducer: Reducer {
   struct State: Equatable {
     @BindingState var pegs = Self.makePegs()
     @BindingState var moves = [String]()
-    @BindingState var lastMove: String?
+    //@BindingState var lastMove: String?
     @BindingState var selection: Peg? = nil
   }
   
@@ -31,59 +31,58 @@ struct AppReducer: Reducer {
       case let .pegTapped(value):
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         
-        // first move.
-        guard !state.pegs.filter(\.completed).isEmpty else {
+        guard !state.isFirstMove else {
           state.pegs[id: value.id]?.completed = true
           state.selection = nil
           return .none
         }
+        
         guard state.selection != value else {
           state.selection = nil
           return .none
         }
-        if let selection = state.selection {
-          if state.availableMoves.contains(value) {
-            let row = selection.row
-            let col = selection.col
-            
-            let direction: String = {
-              if row == value.row,     col == value.col + 2  { return "Left" }
-              else if row == value.row + 2, col == value.col + 2  { return "Left+Up" }
-              else if row == value.row - 2, col == value.col      { return "Left+Down" }
-              else if row == value.row    , col == value.col - 2  { return "Right" }
-              else if row == value.row + 2, col == value.col      { return "Right+Up" }
-              else if row == value.row - 2, col == value.col - 2  { return "Right+Down" }
-              else { return "" }
-            }()
-            
-            let pegToBeModified: Peg? = {
-              switch direction {
-              case "Left"       : return state.pegs[id: [row   ,col-1]]
-              case "Left+Up"    : return state.pegs[id: [row-1 ,col-1]]
-              case "Left+Down"  : return state.pegs[id: [row+1 ,col  ]]
-              case "Right"      : return state.pegs[id: [row   ,col+1]]
-              case "Right+Up"   : return state.pegs[id: [row-1 ,col  ]]
-              case "Right+Down" : return state.pegs[id: [row+1 ,col+1]]
-              default:
-                return nil
-              }
-            }()
-            
-            guard let pegToBeModified = pegToBeModified else { return .none }
-            
-            guard !pegToBeModified.completed else { return .none }
-            
-            state.pegs[id: pegToBeModified.id]?.completed = true
-            state.pegs[id: selection.id]?.completed = true
-            state.pegs[id: value.id]?.completed = false
-            state.moves.append(direction)
-            state.selection = nil
-          } else {
-            state.selection = value
-          }
-        } else {
+        
+        guard let selection = state.selection else {
           state.selection = state.selection != value ? value : nil
+          return .none
         }
+        
+        guard state.availableMoves.contains(value) else {
+          state.selection = value
+          return .none
+        }
+
+        let pegToBeModified: Peg? = {
+          switch (selection.row - value.row, selection.col - value.col) {
+            
+          case (0,2):
+            return state.pegs[id: [selection.row,   selection.col-1]]
+          case (2,2):
+            return state.pegs[id: [selection.row-1, selection.col-1]]
+          case (-2,0):
+            return state.pegs[id: [selection.row+1, selection.col]]
+          case (0,-2):
+            return state.pegs[id: [selection.row,   selection.col+1]]
+          case (2,0):
+            return state.pegs[id: [selection.row-1, selection.col]]
+          case (-2,-2):
+            return state.pegs[id: [selection.row+1 ,selection.col+1]]
+            
+          default:
+            return nil
+          }
+        }()
+        
+        guard let pegToBeModified = pegToBeModified else { return .none }
+        
+        guard !pegToBeModified.completed else { return .none }
+        
+        state.pegs[id: pegToBeModified.id]?.completed = true
+        state.pegs[id: selection.id]?.completed = true
+        state.pegs[id: value.id]?.completed = false
+        
+        //state.moves.append(direction)
+        state.selection = nil
         return .none
         
       case .restartButtonTapped:
@@ -97,6 +96,12 @@ struct AppReducer: Reducer {
         
       }
     }
+  }
+}
+
+extension AppReducer.State {
+  var isFirstMove: Bool {
+    pegs.filter(\.completed).isEmpty
   }
 }
 
