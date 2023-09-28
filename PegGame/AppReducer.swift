@@ -31,7 +31,7 @@ struct AppReducer: Reducer {
     Reduce { state, action in
       switch action {
         
-      case .game(.move):
+      case .game(.delegate(.didMove)):
         var copy = state.game
         copy.id = .init()
         state.previousGameStates.append(copy)
@@ -113,18 +113,23 @@ struct Game: Reducer {
     var selection: Peg?
   }
   enum Action: Equatable {
-    case move(Peg)
+    case pegButtonTapped(Peg)
+    case delegate(Delegate)
+    
+    enum Delegate: Equatable {
+      case didMove
+    }
   }
   func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
       
-    case let .move(value):
+    case let .pegButtonTapped(value):
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
         state.pegs[id: value.id]?.completed = true
         state.selection = nil
-        return .none
+        return .send(.delegate(.didMove))
       }
       guard state.availableMoves.contains(value) else {
         state.selection = value
@@ -141,6 +146,9 @@ struct Game: Reducer {
       state.pegs[id: selection.id]?.completed = true
       state.pegs[id: value.id]?.completed = false
       state.selection = nil
+      return .send(.delegate(.didMove))
+      
+    case .delegate:
       return .none
     }
   }
@@ -198,7 +206,7 @@ struct GameView: View {
 
   private func pegView(peg: Peg) -> some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.move(peg)) }) {
+      Button(action: { viewStore.send(.pegButtonTapped(peg)) }) {
         Circle()
           .foregroundColor(Color(.systemGray))
           .frame(width: 50, height: 50)
