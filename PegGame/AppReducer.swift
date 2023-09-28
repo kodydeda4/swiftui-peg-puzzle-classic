@@ -2,21 +2,13 @@ import SwiftUI
 import ComposableArchitecture
 
 // 1. how do you calculate available moves?
-// 2. how do you undo moves?
 // 3. how do you know when it's done?
 // 6. timer?
 
 struct AppReducer: Reducer {
   struct State: Equatable {
     var game = Game.State()
-    var previousGameStates = IdentifiedArrayOf<Game.State>()
-    
-    var isUndoButtonDisabled: Bool {
-      previousGameStates.isEmpty
-    }
-    var isRedoButtonDisabled: Bool {
-      false
-    }
+    var previousGameStates = [Game.State]()
   }
   enum Action: Equatable {
     case game(Game.Action)
@@ -32,13 +24,11 @@ struct AppReducer: Reducer {
       switch action {
         
       case .game(.delegate(.didMove)):
-        var copy = state.game
-        copy.id = .init()
-        state.previousGameStates.append(copy)
+        state.previousGameStates.append(state.game)
         return .none
         
       case .undoButtonTapped:
-        state.previousGameStates = .init(uniqueElements: state.previousGameStates.dropLast())
+        state.previousGameStates = state.previousGameStates.dropLast()
         
         if let prev = state.previousGameStates.last {
           state.game = prev
@@ -58,6 +48,15 @@ struct AppReducer: Reducer {
         return .none
       }
     }
+  }
+}
+
+private extension AppReducer.State {
+  var isUndoButtonDisabled: Bool {
+    previousGameStates.isEmpty
+  }
+  var isRedoButtonDisabled: Bool {
+    false
   }
 }
 
@@ -107,8 +106,7 @@ struct AppView: View {
 // MARK: - Game
 
 struct Game: Reducer {
-  struct State: Identifiable, Equatable {
-    var id = UUID()
+  struct State: Equatable {
     var pegs = Peg.grid()
     var selection: Peg?
   }
@@ -154,7 +152,7 @@ struct Game: Reducer {
   }
 }
 
-extension Game.State {
+private extension Game.State {
   var isFirstMove: Bool {
     pegs.filter(\.completed).isEmpty
   }
