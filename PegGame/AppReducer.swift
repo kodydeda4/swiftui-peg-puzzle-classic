@@ -67,8 +67,7 @@ struct AppReducer: Reducer {
           }()
         ]]
         
-        guard let middlePeg = middlePeg,
-              !middlePeg.completed else {
+        guard let middlePeg, !middlePeg.completed else {
           return .none
         }
         
