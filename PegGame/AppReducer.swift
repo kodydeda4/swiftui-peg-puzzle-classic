@@ -2,7 +2,6 @@ import SwiftUI
 import ComposableArchitecture
 
 
-// 0. First move removes center pig
 // 1. how do you calculate available moves?
 // 2. how do you undo moves?
 // 3. how do you know when it's done?
@@ -89,6 +88,7 @@ struct AppReducer: Reducer {
         
       case .restartButtonTapped:
         state.selection = nil
+        state.moves = []
         state.pegs = State.makePegs()
         return .none
         
