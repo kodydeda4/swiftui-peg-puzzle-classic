@@ -42,33 +42,12 @@ struct AppReducer: Reducer {
           state.selection = value
           return .none
         }
-
-        let middlePeg = state.pegs[id: [
-          (selection.row - value.row) == 0 ? selection.row : {
-            switch (selection.row - value.row) {
-            case +2: return -1 + selection.row
-            case -2: return +1 + selection.row
-            default: fatalError()
-            }
-          }(),
-          (selection.col - value.col) == 0 ? selection.col : {
-            switch (selection.col - value.col) {
-            case +2: return -1 + selection.col
-            case -2: return +1 + selection.col
-            default: fatalError()
-            }
-          }()
-        ]]!
-        
-        guard !middlePeg.completed else {
+        guard !state.pegBetween(selection, value).completed else {
           return .none
         }
-        
-        state.pegs[id: middlePeg.id]?.completed = true
+        state.pegs[id: state.pegBetween(selection, value).id]?.completed = true
         state.pegs[id: selection.id]?.completed = true
         state.pegs[id: value.id]?.completed = false
-        
-        //state.moves.append(direction)
         state.selection = nil
         return .none
         
@@ -136,6 +115,25 @@ extension AppReducer.State {
       pegs[id: [selection.row+1, selection.col]],   // down+left
       pegs[id: [selection.row+1, selection.col+1]], // down+right
     ].compactMap { $0 })
+  }
+  
+  func pegBetween(_ a: Peg, _ b: Peg) -> Peg {
+    pegs[id: [
+      (a.row - b.row) == 0 ? a.row : {
+        switch (a.row - b.row) {
+        case +2: return -1 + a.row
+        case -2: return +1 + a.row
+        default: fatalError()
+        }
+      }(),
+      (a.col - b.col) == 0 ? a.col : {
+        switch (a.col - b.col) {
+        case +2: return -1 + a.col
+        case -2: return +1 + a.col
+        default: fatalError()
+        }
+      }()
+    ]]!
   }
 }
 
