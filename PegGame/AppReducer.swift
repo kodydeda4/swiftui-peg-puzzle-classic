@@ -28,7 +28,7 @@ struct AppReducer: Reducer {
         return .none
         
       case .undoButtonTapped:
-        state.previousGameStates = state.previousGameStates.dropLast()
+        state.previousGameStates.removeLast()
         
         if let prev = state.previousGameStates.last {
           state.game = prev
