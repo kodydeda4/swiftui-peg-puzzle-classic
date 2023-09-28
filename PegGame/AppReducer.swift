@@ -55,20 +55,24 @@ struct AppReducer: Reducer {
         
         
         let pegBetween: (Peg, Peg) -> Peg.ID? = { a, b in
-          switch (a.row - b.row, a.col - b.col) {
-            
-          case (0,2)   : return [a.row, a.col-1]
-          case (0,-2)  : return [a.row, a.col+1]
-          
-          case (2,0)   : return [a.row-1, a.col]
-          case (2,2)   : return [a.row-1, a.col-1]
-          
-          case (-2,0)  : return [a.row+1, a.col]
-          case (-2,-2) : return [a.row+1, a.col+1]
-            
-          default:
-            return nil
-          }
+          return [
+            {
+              switch (a.row - b.row) {
+              case 0 : return a.row
+              case 2 : return a.row - 1
+              case -2: return a.row + 1
+              default: fatalError()
+              }
+            }(),
+            {
+              switch (a.col - b.col) {
+              case 0: return a.col
+              case 2: return a.col-1
+              case -2: return a.col+1
+              default: fatalError()
+              }
+            }()
+          ]
         }
 
         guard let middlePeg = state.pegs[id: pegBetween(selection, value)!],
