@@ -49,25 +49,23 @@ struct AppReducer: Reducer {
         
         
         let middlePeg = state.pegs[id: [
-          {
+          (selection.row - value.row) == 0 ? selection.row : {
             switch (selection.row - value.row) {
-            case 0 : return selection.row
-            case 2 : return selection.row - 1
-            case -2: return selection.row + 1
+            case +2: return -1 + selection.row
+            case -2: return +1 + selection.row
             default: fatalError()
             }
           }(),
-          {
+          (selection.col - value.col) == 0 ? selection.col : {
             switch (selection.col - value.col) {
-            case 0: return selection.col
-            case 2: return selection.col-1
-            case -2: return selection.col+1
+            case +2: return -1 + selection.col
+            case -2: return +1 + selection.col
             default: fatalError()
             }
           }()
-        ]]
+        ]]!
         
-        guard let middlePeg, !middlePeg.completed else {
+        guard !middlePeg.completed else {
           return .none
         }
         
