@@ -42,12 +42,7 @@ struct AppReducer: Reducer {
           state.selection = value
           return .none
         }
-        //        let middlePeg = state.pegs[id: [
-        //          -1/2 * (selection.row - value.row),
-        //          -1/2 * (selection.col - value.col)
-        //        ]]!
-        
-        
+
         let middlePeg = state.pegs[id: [
           (selection.row - value.row) == 0 ? selection.row : {
             switch (selection.row - value.row) {
