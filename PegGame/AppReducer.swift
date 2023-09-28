@@ -5,24 +5,18 @@ import ComposableArchitecture
 // 1. how do you calculate available moves?
 // 2. how do you undo moves?
 // 3. how do you know when it's done?
-// 4. moves are wrong ;/
-// 5. you should only be able to go when there's one inbetween.
 // 6. timer?
 
 struct AppReducer: Reducer {
   struct State: Equatable {
     @BindingState var pegs = Self.makePegs()
-    @BindingState var moves = [String]()
-    //@BindingState var lastMove: String?
     @BindingState var selection: Peg? = nil
   }
-  
   enum Action: BindableAction, Equatable {
     case pegTapped(Peg)
     case restartButtonTapped
     case binding(BindingAction<State>)
   }
-  
   var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
@@ -48,10 +42,10 @@ struct AppReducer: Reducer {
           state.selection = value
           return .none
         }
-//        let middlePeg = state.pegs[id: [
-//          -1/2 * (selection.row - value.row),
-//          -1/2 * (selection.col - value.col)
-//        ]]!
+        //        let middlePeg = state.pegs[id: [
+        //          -1/2 * (selection.row - value.row),
+        //          -1/2 * (selection.col - value.col)
+        //        ]]!
         
         
         let pegBetween: (Peg, Peg) -> Peg.ID? = { a, b in
@@ -74,7 +68,7 @@ struct AppReducer: Reducer {
             }()
           ]
         }
-
+        
         guard let middlePeg = state.pegs[id: pegBetween(selection, value)!],
               !middlePeg.completed else {
           return .none
@@ -90,7 +84,6 @@ struct AppReducer: Reducer {
         
       case .restartButtonTapped:
         state.selection = nil
-        state.moves = []
         state.pegs = State.makePegs()
         return .none
         
@@ -102,10 +95,11 @@ struct AppReducer: Reducer {
   }
 }
 
-extension AppReducer.State {
-  var isFirstMove: Bool {
-    pegs.filter(\.completed).isEmpty
-  }
+struct Peg: Identifiable, Equatable {
+  var id: [Int] { [row, col] }
+  let row: Int
+  let col: Int
+  var completed = false
 }
 
 extension AppReducer.State {
@@ -119,6 +113,10 @@ extension AppReducer.State {
         $0
       }
     )
+  }
+  
+  var isFirstMove: Bool {
+    pegs.filter(\.completed).isEmpty
   }
   
   var availableMoves: IdentifiedArrayOf<Peg> {
@@ -151,49 +149,22 @@ extension AppReducer.State {
   }
 }
 
-struct Peg: Identifiable, Equatable {
-  var id: [Int] { [row, col] }
-  let row: Int
-  let col: Int
-  var completed = false
-}
-
-
 // MARK: - SwiftUI
 
 struct AppView: View {
-  let store: StoreOf<AppReducer> = Store(
-    initialState: AppReducer.State(),
-    reducer: AppReducer.init
-  )
+  let store: StoreOf<AppReducer>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       NavigationStack {
         VStack {
-          VStack(alignment: .leading) {
+          ForEach(0..<5) { row in
             HStack {
-              Text("Total:").bold().frame(width: 50, alignment: .leading)
-              Text(viewStore.moves.count.description)
-            }
-            HStack {
-              Text("Last:").bold().frame(width: 50, alignment: .leading)
-              Text(viewStore.moves.last ?? "n.a.")
-            }
-          }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding()
-          
-          VStack {
-            ForEach(0..<5) { row in
-              HStack {
-                ForEach(0..<row+1) { col in
-                  pegView(peg: viewStore.pegs[id: [row, col]]!)
-                }
+              ForEach(0..<row+1) { col in
+                pegView(peg: viewStore.pegs[id: [row, col]]!)
               }
             }
           }
-          Spacer()
         }
         .navigationTitle("Peg Game")
         .navigationBarTitleDisplayMode(.inline)
@@ -242,5 +213,8 @@ private extension AppView {
 }
 
 #Preview {
-  AppView()
+  AppView(store: Store(
+    initialState: AppReducer.State(),
+    reducer: AppReducer.init
+  ))
 }
