@@ -1,7 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
 
-
 // 1. how do you calculate available moves?
 // 2. how do you undo moves?
 // 3. how do you know when it's done?
@@ -10,7 +9,7 @@ import ComposableArchitecture
 struct AppReducer: Reducer {
   struct State: Equatable {
     var game = Game.State()
-    var previousGameStates = [Game.State]()
+    var previousGameStates = IdentifiedArrayOf<Game.State>()
     
     var isUndoButtonDisabled: Bool {
       previousGameStates.isEmpty
@@ -20,10 +19,10 @@ struct AppReducer: Reducer {
     }
   }
   enum Action: Equatable {
+    case game(Game.Action)
     case undoButtonTapped
     case redoButtonTapped
     case restartButtonTapped
-    case game(Game.Action)
   }
   var body: some ReducerOf<Self> {
     Scope(state: \.game, action: /Action.game) {
@@ -32,17 +31,20 @@ struct AppReducer: Reducer {
     Reduce { state, action in
       switch action {
         
+      case .game(.move):
+        var copy = state.game
+        copy.id = .init()
+        state.previousGameStates.append(copy)
+        return .none
+        
       case .undoButtonTapped:
-        guard let idx = state.previousGameStates.firstIndex(of: state.game) else {
-          return .none
-        }
-        guard let previous = state.previousGameStates[safe: idx - 1] else {
+        state.previousGameStates = .init(uniqueElements: state.previousGameStates.dropLast())
+        
+        if let prev = state.previousGameStates.last {
+          state.game = prev
+        } else {
           state.game = .init()
-          return .none
         }
-        state.game = previous
-        state.game.selection = nil
-        state.previousGameStates.remove(at: idx)
         return .none
         
       case .redoButtonTapped:
@@ -53,71 +55,92 @@ struct AppReducer: Reducer {
         return .none
         
       case .game:
-        state.previousGameStates.append(state.game)
         return .none
       }
     }
   }
 }
 
+
 struct Game: Reducer {
-  struct State: Equatable {
-    @BindingState var pegs = Peg.grid()
-    @BindingState var selection: Peg?
+  struct State: Identifiable, Equatable {
+    var id = UUID()
+    var pegs = Peg.grid()
+    var selection: Peg?
   }
-  enum Action: BindableAction, Equatable {
-    case pegTapped(Peg)
-    case binding(BindingAction<State>)
+  enum Action: Equatable {
+    case move(Peg)
   }
-  var body: some ReducerOf<Self> {
-    BindingReducer()
-    Reduce { state, action in
-      switch action {
-        
-      case let .pegTapped(value):
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        
-        if state.isFirstMove {
-          state.pegs[id: value.id]?.completed = true
-          //state.selection = nil
-          return .none
-        }
-        guard state.availableMoves.contains(value) else {
-          state.selection = value
-          return .none
-        }
-        guard let selection = state.selection else {
-          state.selection = state.selection == value ? nil : value
-          return .none
-        }
-        guard !Peg.between(selection, value, in: state.pegs).completed else {
-          return .none
-        }
-        state.pegs[id: Peg.between(selection, value, in: state.pegs).id]?.completed = true
-        state.pegs[id: selection.id]?.completed = true
-        state.pegs[id: value.id]?.completed = false
+  func reduce(into state: inout State, action: Action) -> Effect<Action> {
+    switch action {
+      
+    case let .move(value):
+      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+      
+      if state.isFirstMove {
+        state.pegs[id: value.id]?.completed = true
         state.selection = nil
         return .none
-        
-      case .binding:
-        return .none
-        
       }
+      guard state.availableMoves.contains(value) else {
+        state.selection = value
+        return .none
+      }
+      guard let selection = state.selection else {
+        state.selection = state.selection == value ? nil : value
+        return .none
+      }
+      guard !Peg.between(selection, value, in: state.pegs).completed else {
+        return .none
+      }
+      state.pegs[id: Peg.between(selection, value, in: state.pegs).id]?.completed = true
+      state.pegs[id: selection.id]?.completed = true
+      state.pegs[id: value.id]?.completed = false
+      state.selection = nil
+      return .none
     }
   }
 }
+
+extension Game.State {
+  var isFirstMove: Bool {
+    pegs.filter(\.completed).isEmpty
+  }
+  var availableMoves: IdentifiedArrayOf<Peg> {
+    guard let selection = selection else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [selection.row+0, selection.col-2]], // left
+      pegs[id: [selection.row+0, selection.col+2]], // right
+      pegs[id: [selection.row-2, selection.col-2]], // up+left
+      pegs[id: [selection.row-2, selection.col+0]], // up+right
+      pegs[id: [selection.row+2, selection.col]],   // down+left
+      pegs[id: [selection.row+2, selection.col+2]], // down+right
+    ]
+      .compactMap { $0 }
+      .filter { $0.completed }
+    )
+  }
+  var availableForCompletion: IdentifiedArrayOf<Peg> {
+    guard let selection = selection else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [selection.row+0, selection.col-1]], // left
+      pegs[id: [selection.row+0, selection.col+1]], // right
+      pegs[id: [selection.row-1, selection.col-1]], // up+left
+      pegs[id: [selection.row-1, selection.col+0]], // up+right
+      pegs[id: [selection.row+1, selection.col]],   // down+left
+      pegs[id: [selection.row+1, selection.col+1]], // down+right
+    ].compactMap { $0 })
+  }
+}
+
 
 struct Peg: Identifiable, Equatable {
   var id: [Int] { [row, col] }
   let row: Int
   let col: Int
   var completed = false
-}
-
-struct Move: Equatable {
-  let selection: Peg
-  let value: Peg
-  var isActive = true
 }
 
 extension Peg {
@@ -157,39 +180,6 @@ extension Collection {
   /// Returns the element at the specified index if it is within bounds, otherwise nil.
   subscript (safe index: Index) -> Element? {
     return indices.contains(index) ? self[index] : nil
-  }
-}
-
-extension Game.State {
-  var isFirstMove: Bool {
-    pegs.filter(\.completed).isEmpty
-  }
-  var availableMoves: IdentifiedArrayOf<Peg> {
-    guard let selection = selection else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [selection.row+0, selection.col-2]], // left
-      pegs[id: [selection.row+0, selection.col+2]], // right
-      pegs[id: [selection.row-2, selection.col-2]], // up+left
-      pegs[id: [selection.row-2, selection.col+0]], // up+right
-      pegs[id: [selection.row+2, selection.col]],   // down+left
-      pegs[id: [selection.row+2, selection.col+2]], // down+right
-    ]
-      .compactMap { $0 }
-      .filter { $0.completed }
-    )
-  }
-  var availableForCompletion: IdentifiedArrayOf<Peg> {
-    guard let selection = selection else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [selection.row+0, selection.col-1]], // left
-      pegs[id: [selection.row+0, selection.col+1]], // right
-      pegs[id: [selection.row-1, selection.col-1]], // up+left
-      pegs[id: [selection.row-1, selection.col+0]], // up+right
-      pegs[id: [selection.row+1, selection.col]],   // down+left
-      pegs[id: [selection.row+1, selection.col+1]], // down+right
-    ].compactMap { $0 })
   }
 }
 
@@ -258,7 +248,7 @@ struct GameView: View {
 private extension GameView {
   private func pegView(peg: Peg) -> some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.pegTapped(peg)) }) {
+      Button(action: { viewStore.send(.move(peg)) }) {
         Circle()
           .foregroundColor(Color(.systemGray))
           .frame(width: 50, height: 50)
