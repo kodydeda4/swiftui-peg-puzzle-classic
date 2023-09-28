@@ -36,48 +36,48 @@ struct AppReducer: Reducer {
           state.selection = nil
           return .none
         }
-        
         guard state.selection != value else {
           state.selection = nil
           return .none
         }
-        
         guard let selection = state.selection else {
           state.selection = state.selection != value ? value : nil
           return .none
         }
-        
         guard state.availableMoves.contains(value) else {
           state.selection = value
           return .none
         }
-
-        let pegToBeModified: Peg? = {
+//        let middlePeg = state.pegs[id: [
+//          -1/2 * (selection.row - value.row),
+//          -1/2 * (selection.col - value.col)
+//        ]]!
+        let middlePeg: Peg = {
           switch (selection.row - value.row, selection.col - value.col) {
             
           case (0,2):
-            return state.pegs[id: [selection.row,   selection.col-1]]
+            return state.pegs[id: [selection.row, selection.col-1]]!
           case (2,2):
-            return state.pegs[id: [selection.row-1, selection.col-1]]
+            return state.pegs[id: [selection.row-1, selection.col-1]]!
           case (-2,0):
-            return state.pegs[id: [selection.row+1, selection.col]]
+            return state.pegs[id: [selection.row+1, selection.col]]!
           case (0,-2):
-            return state.pegs[id: [selection.row,   selection.col+1]]
+            return state.pegs[id: [selection.row, selection.col+1]]!
           case (2,0):
-            return state.pegs[id: [selection.row-1, selection.col]]
+            return state.pegs[id: [selection.row-1, selection.col]]!
           case (-2,-2):
-            return state.pegs[id: [selection.row+1 ,selection.col+1]]
+            return state.pegs[id: [selection.row+1, selection.col+1]]!
             
           default:
-            return nil
+            fatalError()
           }
         }()
+
+        guard !middlePeg.completed else {
+          return .none
+        }
         
-        guard let pegToBeModified = pegToBeModified else { return .none }
-        
-        guard !pegToBeModified.completed else { return .none }
-        
-        state.pegs[id: pegToBeModified.id]?.completed = true
+        state.pegs[id: middlePeg.id]?.completed = true
         state.pegs[id: selection.id]?.completed = true
         state.pegs[id: value.id]?.completed = false
         
