@@ -25,21 +25,17 @@ struct AppReducer: Reducer {
       case let .pegTapped(value):
         UIImpactFeedbackGenerator(style: .soft).impactOccurred()
         
-        guard !state.isFirstMove else {
+        if state.isFirstMove {
           state.pegs[id: value.id]?.completed = true
           state.selection = nil
           return .none
         }
-        guard state.selection != value else {
-          state.selection = nil
+        guard state.availableMoves.contains(value) else {
+          state.selection = value
           return .none
         }
         guard let selection = state.selection else {
-          state.selection = state.selection != value ? value : nil
-          return .none
-        }
-        guard state.availableMoves.contains(value) else {
-          state.selection = value
+          state.selection = state.selection == value ? nil : value
           return .none
         }
         guard !state.pegBetween(selection, value).completed else {
