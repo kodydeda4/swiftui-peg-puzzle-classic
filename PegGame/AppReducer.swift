@@ -9,14 +9,64 @@ import ComposableArchitecture
 
 struct AppReducer: Reducer {
   struct State: Equatable {
+    var game = Game.State()
+    var previousGameStates = [Game.State]()
+    
+    var isUndoButtonDisabled: Bool {
+      previousGameStates.isEmpty
+    }
+    var isRedoButtonDisabled: Bool {
+      false
+    }
+  }
+  enum Action: Equatable {
+    case undoButtonTapped
+    case redoButtonTapped
+    case restartButtonTapped
+    case game(Game.Action)
+  }
+  var body: some ReducerOf<Self> {
+    Scope(state: \.game, action: /Action.game) {
+      Game()
+    }
+    Reduce { state, action in
+      switch action {
+        
+      case .undoButtonTapped:
+        guard let idx = state.previousGameStates.firstIndex(of: state.game) else {
+          return .none
+        }
+        guard let previous = state.previousGameStates[safe: idx - 1] else {
+          state.game = .init()
+          return .none
+        }
+        state.game = previous
+        state.game.selection = nil
+        state.previousGameStates.remove(at: idx)
+        return .none
+        
+      case .redoButtonTapped:
+        return .none
+        
+      case .restartButtonTapped:
+        state = State()
+        return .none
+        
+      case .game:
+        state.previousGameStates.append(state.game)
+        return .none
+      }
+    }
+  }
+}
+
+struct Game: Reducer {
+  struct State: Equatable {
     @BindingState var pegs = Peg.grid()
     @BindingState var selection: Peg?
   }
   enum Action: BindableAction, Equatable {
     case pegTapped(Peg)
-    case undoButtonTapped
-    case redoButtonTapped
-    case restartButtonTapped
     case binding(BindingAction<State>)
   }
   var body: some ReducerOf<Self> {
@@ -29,7 +79,7 @@ struct AppReducer: Reducer {
         
         if state.isFirstMove {
           state.pegs[id: value.id]?.completed = true
-          state.selection = nil
+          //state.selection = nil
           return .none
         }
         guard state.availableMoves.contains(value) else {
@@ -47,17 +97,6 @@ struct AppReducer: Reducer {
         state.pegs[id: selection.id]?.completed = true
         state.pegs[id: value.id]?.completed = false
         state.selection = nil
-        return .none
-        
-      case .undoButtonTapped:
-        return .none
-        
-      case .redoButtonTapped:
-        return .none
-        
-      case .restartButtonTapped:
-        state.selection = nil
-        state.pegs = Peg.grid()
         return .none
         
       case .binding:
@@ -114,7 +153,14 @@ extension Peg {
   }
 }
 
-extension AppReducer.State {
+extension Collection {
+  /// Returns the element at the specified index if it is within bounds, otherwise nil.
+  subscript (safe index: Index) -> Element? {
+    return indices.contains(index) ? self[index] : nil
+  }
+}
+
+extension Game.State {
   var isFirstMove: Bool {
     pegs.filter(\.completed).isEmpty
   }
@@ -145,13 +191,6 @@ extension AppReducer.State {
       pegs[id: [selection.row+1, selection.col+1]], // down+right
     ].compactMap { $0 })
   }
-  
-  var isUndoButtonDisabled: Bool {
-    false
-  }
-  var isRedoButtonDisabled: Bool {
-    false
-  }
 }
 
 // MARK: - SwiftUI
@@ -163,15 +202,15 @@ struct AppView: View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       NavigationStack {
         VStack {
-          ForEach(0..<5) { row in
-            HStack {
-              ForEach(0..<row+1) { col in
-                pegView(peg: viewStore.pegs[id: [row, col]]!)
-              }
-            }
-          }
+          Text("Moves: \(viewStore.previousGameStates.count.description)")
+          
+          GameView(store: store.scope(
+            state: \.game,
+            action: AppReducer.Action.game
+          ))
+          
           HStack {
-            Button(action: { viewStore.send(.undoButtonTapped) }) {
+            Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
               Label("Undo", systemImage: "arrow.uturn.backward")
             }
             .disabled(viewStore.isUndoButtonDisabled)
@@ -199,7 +238,24 @@ struct AppView: View {
   }
 }
 
-private extension AppView {
+struct GameView: View {
+  let store: StoreOf<Game>
+  
+  var body: some View {
+    WithViewStore(store, observe: { $0 }) { viewStore in
+      VStack {
+        ForEach(0..<5) { row in
+          HStack {
+            ForEach(0..<row+1) { col in
+              pegView(peg: viewStore.pegs[id: [row, col]]!)
+            }
+          }
+        }
+      }
+    }
+  }
+}
+private extension GameView {
   private func pegView(peg: Peg) -> some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       Button(action: { viewStore.send(.pegTapped(peg)) }) {
