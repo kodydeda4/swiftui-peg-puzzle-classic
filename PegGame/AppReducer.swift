@@ -9,7 +9,7 @@ import ComposableArchitecture
 
 struct AppReducer: Reducer {
   struct State: Equatable {
-    @BindingState var pegs = Self.makePegs()
+    @BindingState var pegs = Peg.grid()
     @BindingState var selection: Peg? = nil
   }
   enum Action: BindableAction, Equatable {
@@ -84,7 +84,7 @@ struct AppReducer: Reducer {
         
       case .restartButtonTapped:
         state.selection = nil
-        state.pegs = State.makePegs()
+        state.pegs = Peg.grid()
         return .none
         
       case .binding:
@@ -100,10 +100,8 @@ struct Peg: Identifiable, Equatable {
   let row: Int
   let col: Int
   var completed = false
-}
 
-extension AppReducer.State {
-  static func makePegs() -> IdentifiedArrayOf<Peg> {
+  static func grid() -> IdentifiedArrayOf<Peg> {
     IdentifiedArrayOf<Peg>(
       uniqueElements: (0..<5).map { row in
         (0..<row+1).map {
@@ -114,7 +112,9 @@ extension AppReducer.State {
       }
     )
   }
-  
+}
+
+extension AppReducer.State {
   var isFirstMove: Bool {
     pegs.filter(\.completed).isEmpty
   }
