@@ -9,7 +9,7 @@ struct NewGame: Reducer {
   struct State: Equatable {
     var move = Move.State()
     var previousMoves = [Move.State]()
-    var isTimerActive = false
+    var isPaused = false
     var secondsElapsed = 0
     var isUndoButtonDisabled: Bool { previousMoves.isEmpty }
     var isRedoButtonDisabled: Bool { false }
@@ -18,7 +18,7 @@ struct NewGame: Reducer {
   enum Action: Equatable {
     case view(View)
     case move(Move.Action)
-    case toggleTimer
+    case toggleIsPaused
     case timerTicked
     
     enum View {
@@ -47,10 +47,10 @@ struct NewGame: Reducer {
         switch action {
           
         case .onAppear:
-          return .send(.toggleTimer)
+          return .send(.toggleIsPaused)
           
         case .pauseButtonTapped:
-          return .send(.toggleTimer)
+          return .send(.toggleIsPaused)
           
         case .quitButtonTapped:
           return .run { _ in await self.dismiss() }
@@ -87,9 +87,9 @@ struct NewGame: Reducer {
           return .none
         }
         
-      case .toggleTimer:
-        state.isTimerActive.toggle()
-        return .run { [isTimerActive = state.isTimerActive] send in
+      case .toggleIsPaused:
+        state.isPaused.toggle()
+        return .run { [isTimerActive = state.isPaused] send in
           guard isTimerActive else { return }
           for await _ in self.clock.timer(interval: .seconds(1)) {
             await send(.timerTicked, animation: .interpolatingSpring(stiffness: 3000, damping: 40))
@@ -198,7 +198,7 @@ struct NewGameView: View {
             state: \.move,
             action: { .move($0) }
           ))
-          .disabled(!viewStore.isTimerActive)
+          .disabled(!viewStore.isPaused)
           .padding()
           
           Button("Pause") {
@@ -219,6 +219,7 @@ struct NewGameView: View {
           .buttonStyle(.bordered)
           .frame(width: 200)
           .padding()
+          .disabled(!viewStore.isPaused)
         }
         .navigationTitle("\(viewStore.secondsElapsed)")
         .navigationBarTitleDisplayMode(.inline)
