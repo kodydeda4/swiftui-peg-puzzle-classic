@@ -5,7 +5,7 @@ struct Peg: Identifiable, Equatable {
   var id: [Int] { [row, col] }
   let row: Int
   let col: Int
-  var isEmpty = false
+  var isRemoved = false
 }
 
 extension Peg {

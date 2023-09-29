@@ -136,11 +136,10 @@ struct Move: Reducer {
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
-        state.pegs[id: endPoint.id]?.isEmpty = true
+        state.pegs[id: endPoint.id]?.isRemoved = true
         state.startingPoint = nil
         return .send(.delegate(.didComplete))
       }
-      
       guard let startingPoint = state.startingPoint else {
         state.startingPoint = endPoint
         return .none
@@ -150,16 +149,14 @@ struct Move: Reducer {
         return .none
       }
       
-      guard
-        // across is empty
-        state.pegs(acrossFrom: startingPoint).filter(\.isEmpty).contains(endPoint),
-          // between is non empty
-        !state.peg(between: startingPoint, and: endPoint).isEmpty
-      else { return .none }
+      let isAcrossEmpty = state.pegs(acrossFrom: startingPoint).filter(\.isRemoved).contains(endPoint)
+      let isBetweenNonEmpty = !state.peg(between: startingPoint, and: endPoint).isRemoved
       
-      state.pegs[id: state.peg(between: startingPoint, and: endPoint).id]?.isEmpty = true
-      state.pegs[id: startingPoint.id]?.isEmpty = true
-      state.pegs[id: endPoint.id]?.isEmpty = false
+      guard isAcrossEmpty, isBetweenNonEmpty else { return .none }
+      
+      state.pegs[id: state.peg(between: startingPoint, and: endPoint).id]?.isRemoved = true
+      state.pegs[id: startingPoint.id]?.isRemoved = true
+      state.pegs[id: endPoint.id]?.isRemoved = false
       state.startingPoint = nil
       return .send(.delegate(.didComplete))
       
@@ -171,7 +168,7 @@ struct Move: Reducer {
 
 extension Move.State {
   var isFirstMove: Bool {
-    pegs.filter(\.isEmpty).isEmpty
+    pegs.filter(\.isRemoved).isEmpty
   }
   func peg(between a: Peg, and b: Peg) -> Peg {
     pegs[id: [
@@ -344,7 +341,7 @@ struct MoveView: View {
               Circle().foregroundColor(.blue)
             }
           }
-          .opacity(!peg.isEmpty ? 1 : 0.25)
+          .opacity(!peg.isRemoved ? 1 : 0.25)
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.startingPoint)
