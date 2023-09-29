@@ -119,7 +119,7 @@ extension NewGame.State {
 struct Move: Reducer {
   struct State: Equatable {
     var pegs = Peg.grid()
-    var selection: Peg?
+    var startingPoint: Peg?
   }
   enum Action: Equatable {
     case move(Peg)
@@ -132,32 +132,35 @@ struct Move: Reducer {
   func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
       
-    case let .move(value):
+    case let .move(endPoint):
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
-        state.pegs[id: value.id]?.isEmpty = true
-        state.selection = nil
+        state.pegs[id: endPoint.id]?.isEmpty = true
+        state.startingPoint = nil
         return .send(.delegate(.didComplete))
       }
-        
-      // check that the peg across form the selection is empty
-      guard state.pegs(acrossFrom: state.selection).filter(\.isEmpty).contains(value) else {
-        state.selection = value
+      
+      guard let startingPoint = state.startingPoint else {
+        state.startingPoint = endPoint
         return .none
       }
-      guard let selection = state.selection else {
-        state.selection = state.selection == value ? nil : value
+      guard startingPoint != endPoint else {
+        state.startingPoint = nil
         return .none
       }
-      // check that the peg between the selection and the new value is non empty
-      guard !Peg.between(selection, value, in: state.pegs).isEmpty else {
-        return .none
-      }
-      state.pegs[id: Peg.between(selection, value, in: state.pegs).id]?.isEmpty = true
-      state.pegs[id: selection.id]?.isEmpty = true
-      state.pegs[id: value.id]?.isEmpty = false
-      state.selection = nil
+      
+      guard
+        // across is empty
+        state.pegs(acrossFrom: startingPoint).filter(\.isEmpty).contains(endPoint),
+          // between is non empty
+        !state.peg(between: startingPoint, and: endPoint).isEmpty
+      else { return .none }
+      
+      state.pegs[id: state.peg(between: startingPoint, and: endPoint).id]?.isEmpty = true
+      state.pegs[id: startingPoint.id]?.isEmpty = true
+      state.pegs[id: endPoint.id]?.isEmpty = false
+      state.startingPoint = nil
       return .send(.delegate(.didComplete))
       
     case .delegate:
@@ -169,6 +172,24 @@ struct Move: Reducer {
 extension Move.State {
   var isFirstMove: Bool {
     pegs.filter(\.isEmpty).isEmpty
+  }
+  func peg(between a: Peg, and b: Peg) -> Peg {
+    pegs[id: [
+      (a.row - b.row) == 0 ? a.row : {
+        switch (a.row - b.row) {
+        case +2: return -1 + a.row
+        case -2: return +1 + a.row
+        default: fatalError()
+        }
+      }(),
+      (a.col - b.col) == 0 ? a.col : {
+        switch (a.col - b.col) {
+        case +2: return -1 + a.col
+        case -2: return +1 + a.col
+        default: fatalError()
+        }
+      }()
+    ]]!
   }
   func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
@@ -183,19 +204,19 @@ extension Move.State {
     ]
       .compactMap { $0 })
   }
-  
-  func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
-    guard let peg = peg else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [peg.row+0, peg.col-1]], // left
-      pegs[id: [peg.row+0, peg.col+1]], // right
-      pegs[id: [peg.row-1, peg.col-1]], // up+left
-      pegs[id: [peg.row-1, peg.col+0]], // up+right
-      pegs[id: [peg.row+1, peg.col]],   // down+left
-      pegs[id: [peg.row+1, peg.col+1]], // down+right
-    ].compactMap { $0 })
-  }
+//  
+//  func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
+//    guard let peg = peg else { return [] }
+//    
+//    return .init(uniqueElements: [
+//      pegs[id: [peg.row+0, peg.col-1]], // left
+//      pegs[id: [peg.row+0, peg.col+1]], // right
+//      pegs[id: [peg.row-1, peg.col-1]], // up+left
+//      pegs[id: [peg.row-1, peg.col+0]], // up+right
+//      pegs[id: [peg.row+1, peg.col]],   // down+left
+//      pegs[id: [peg.row+1, peg.col+1]], // down+right
+//    ].compactMap { $0 })
+//  }
 }
 
 // MARK: - SwiftUI
@@ -314,22 +335,19 @@ struct MoveView: View {
           .foregroundColor(Color(.systemGray))
           .frame(width: 50, height: 50)
           .overlay {
-            if viewStore.selection == peg {
+            if viewStore.startingPoint == peg {
               Circle().foregroundColor(.accentColor)
             }
           }
           .overlay {
-            if viewStore.state.pegs(acrossFrom: viewStore.selection).contains(peg) {
+            if viewStore.state.pegs(acrossFrom: viewStore.startingPoint).contains(peg) {
               Circle().foregroundColor(.blue)
-            }
-            if viewStore.state.pegs(adjacentTo: viewStore.selection).contains(peg) {
-              Circle().foregroundColor(.orange)
             }
           }
           .opacity(!peg.isEmpty ? 1 : 0.25)
       }
       .buttonStyle(.plain)
-      .animation(.default, value: viewStore.selection)
+      .animation(.default, value: viewStore.startingPoint)
     }
   }
 }
