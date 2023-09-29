@@ -10,6 +10,7 @@
 		33B78C172AC732D0005FC780 /* NewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* NewGame.swift */; };
 		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
 		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
+		33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C232AC73882005FC780 /* RoundedRectangleButtonStyle.swift */; };
 		33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3552ABE2AAF00B76E4A /* Main.swift */; };
 		33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */; };
 		33E6E35A2ABE2AB000B76E4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33E6E3592ABE2AB000B76E4A /* Assets.xcassets */; };
@@ -21,6 +22,7 @@
 		33B78C162AC732D0005FC780 /* NewGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGame.swift; sourceTree = "<group>"; };
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
+		33B78C232AC73882005FC780 /* RoundedRectangleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedRectangleButtonStyle.swift; sourceTree = "<group>"; };
 		33E6E3522ABE2AAF00B76E4A /* PegGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PegGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33E6E3552ABE2AAF00B76E4A /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
 		33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReducer.swift; sourceTree = "<group>"; };
@@ -81,6 +83,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
+		33B78C212AC7386E005FC780 /* SwiftUI */ = {
+			isa = PBXGroup;
+			children = (
+				33B78C222AC73874005FC780 /* ButtonStyles */,
+			);
+			path = SwiftUI;
+			sourceTree = "<group>";
+		};
+		33B78C222AC73874005FC780 /* ButtonStyles */ = {
+			isa = PBXGroup;
+			children = (
+				33B78C232AC73882005FC780 /* RoundedRectangleButtonStyle.swift */,
+			);
+			path = ButtonStyles;
+			sourceTree = "<group>";
+		};
 		33E6E3492ABE2AAF00B76E4A = {
 			isa = PBXGroup;
 			children = (
@@ -100,6 +118,7 @@
 		33E6E3542ABE2AAF00B76E4A /* PegGame */ = {
 			isa = PBXGroup;
 			children = (
+				33B78C212AC7386E005FC780 /* SwiftUI */,
 				33B78C1A2AC73401005FC780 /* Dependencies */,
 				33B78C182AC733F4005FC780 /* Features */,
 				33B78C1E2AC7346B005FC780 /* Models */,
@@ -197,6 +216,7 @@
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
 				33B78C172AC732D0005FC780 /* NewGame.swift in Sources */,
+				33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */,
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
 				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
 			);

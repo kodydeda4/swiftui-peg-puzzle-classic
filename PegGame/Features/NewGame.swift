@@ -146,40 +146,42 @@ struct NewGameView: View {
   
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack {
-        Text("Moves: \(viewStore.previousMoves.count.description)")
-        
-        MoveView(store: store.scope(
-          state: \.move,
-          action: { .move($0) }
-        ))
-        
-        HStack {
-          Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
-            Label("Undo", systemImage: "arrow.uturn.backward")
+      NavigationStack {
+        VStack {
+          Text("Moves: \(viewStore.previousMoves.count.description)")
+          
+          MoveView(store: store.scope(
+            state: \.move,
+            action: { .move($0) }
+          ))
+          
+          HStack {
+            Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
+              Label("Undo", systemImage: "arrow.uturn.backward")
+            }
+            .disabled(viewStore.isUndoButtonDisabled)
+            Spacer()
+            Button(action: { viewStore.send(.redoButtonTapped) }) {
+              Label("Redo", systemImage: "arrow.uturn.forward")
+            }
+            .disabled(viewStore.isRedoButtonDisabled)
           }
-          .disabled(viewStore.isUndoButtonDisabled)
-          Spacer()
-          Button(action: { viewStore.send(.redoButtonTapped) }) {
-            Label("Redo", systemImage: "arrow.uturn.forward")
-          }
-          .disabled(viewStore.isRedoButtonDisabled)
+          .buttonStyle(.bordered)
+          .frame(width: 200)
+          .padding()
         }
-        .buttonStyle(.bordered)
-        .frame(width: 200)
-        .padding()
-      }
-      .navigationTitle("Peg Game")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
-            viewStore.send(.cancelButtonTapped)
+        .navigationTitle("Peg Game")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItem(placement: .cancellationAction) {
+            Button("Cancel") {
+              viewStore.send(.cancelButtonTapped)
+            }
           }
-        }
-        ToolbarItem(placement: .navigationBarTrailing) {
-          Button("Restart") {
-            viewStore.send(.restartButtonTapped)
+          ToolbarItem(placement: .navigationBarTrailing) {
+            Button("Restart") {
+              viewStore.send(.restartButtonTapped)
+            }
           }
         }
       }
@@ -226,10 +228,8 @@ struct MoveView: View {
 // MARK: - SwiftUI Previews
 
 #Preview {
-  NavigationStack {
-    NewGameView(store: Store(
-      initialState: NewGame.State(),
-      reducer: NewGame.init
-    ))
-  }
+  NewGameView(store: Store(
+    initialState: NewGame.State(),
+    reducer: NewGame.init
+  ))
 }

@@ -61,14 +61,63 @@ struct AppReducer: Reducer {
 struct AppView: View {
   let store: StoreOf<AppReducer>
   
+  //let columns = [GridItem(.flexible()), GridItem(.flexible())]
+
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       NavigationStack {
-        List {
-          Button("New Game") {
-            viewStore.send(.newGameButtonTapped)
+        VStack {
+          VStack {
+            HStack {
+              Image(systemName: "leaf")
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(.accentColor)
+                .padding(8)
+                .frame(width: 50, height: 50)
+                .background { Color.white }
+                .mask { Image(systemName: "app.fill").resizable().scaledToFit() }
+                .shadow(color: Color.accentColor.opacity(0.25), radius: 8, y: 2)
+                .padding(.trailing, 4)
+              
+              Text("Peggy")
+            }
+            .font(.title)
+            .fontWeight(.bold)
           }
+          .frame(height: 100)
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(Color.accentColor.gradient.opacity(0.15))
+          .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+              .strokeBorder()
+              .foregroundColor(.accentColor)
+          }
+          .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+          .frame(height: 100)
+          .padding(.bottom)
+          
+          VStack {
+            Button("Play") {
+              viewStore.send(.newGameButtonTapped)
+            }
+            .buttonStyle(RoundedRectangleButtonStyle())
+            
+            Button("Settings") {
+              //
+            }
+            .buttonStyle(RoundedRectangleButtonStyle(
+              foregroundColor: .secondary,
+              backgroundColor: Color(.systemGray5)
+            ))
+          }
+          .frame(width: 250)
+          
+          Spacer()
         }
+        .padding()
+        .navigationTitle("___")
+        .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(
           store: store.scope(state: \.$destination, action: AppReducer.Action.destination),
           state: /AppReducer.Destination.State.newGame,
@@ -76,7 +125,6 @@ struct AppView: View {
           content: NewGameView.init(store:)
         )
       }
-      .navigationTitle("App")
     }
   }
 }
