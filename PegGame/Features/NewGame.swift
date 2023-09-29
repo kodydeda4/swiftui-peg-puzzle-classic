@@ -342,6 +342,9 @@ struct MoveView: View {
             }
           }
           .opacity(!peg.isRemoved ? 1 : 0.25)
+          .overlay {
+            Text("\(peg.row), \(peg.col)").foregroundColor(.primary)
+          }
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.startingPoint)
