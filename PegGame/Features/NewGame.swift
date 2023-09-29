@@ -28,7 +28,6 @@ struct NewGame: Reducer {
       case undoButtonTapped
       case redoButtonTapped
       case newGameButtonTapped
-      case onDisappear
     }
   }
   
@@ -73,9 +72,6 @@ struct NewGame: Reducer {
           
         case .newGameButtonTapped:
           state = State()
-          return .cancel(id: CancelID.timer)
-                    
-        case .onDisappear:
           return .cancel(id: CancelID.timer)
         }
         
@@ -266,7 +262,6 @@ struct NewGameView: View {
         .padding()
         .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
-        .onDisappear { viewStore.send(.onDisappear) }
         .toolbar {
           ToolbarItem(placement: .navigationBarTrailing) {
             Menu {
