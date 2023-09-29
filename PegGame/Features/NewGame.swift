@@ -11,11 +11,7 @@ struct NewGame: Reducer {
     var score = 0
     var isTimerEnabled = false
     var secondsElapsed = 0
-    var isPaused: Bool { !isTimerEnabled && !previousMoves.isEmpty }
-    var isUndoButtonDisabled: Bool { previousMoves.isEmpty }
-    var isRedoButtonDisabled: Bool { false }
   }
-  
   enum Action: Equatable {
     case view(View)
     case move(Move.Action)
@@ -30,7 +26,6 @@ struct NewGame: Reducer {
       case newGameButtonTapped
     }
   }
-  
   private enum CancelID { case timer }
   
   @Dependency(\.continuousClock) var clock
@@ -106,6 +101,18 @@ struct NewGame: Reducer {
         return .none
       }
     }
+  }
+}
+
+extension NewGame.State {
+  var isPaused: Bool {
+    !isTimerEnabled && !previousMoves.isEmpty
+  }
+  var isUndoButtonDisabled: Bool {
+    previousMoves.isEmpty
+  }
+  var isRedoButtonDisabled: Bool {
+    false
   }
 }
 
