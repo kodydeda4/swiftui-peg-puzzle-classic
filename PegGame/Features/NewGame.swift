@@ -9,52 +9,96 @@ struct NewGame: Reducer {
   struct State: Equatable {
     var move = Move.State()
     var previousMoves = [Move.State]()
-    
-    // Comuted
+    var isTimerActive = false
+    var secondsElapsed = 0
     var isUndoButtonDisabled: Bool { previousMoves.isEmpty }
     var isRedoButtonDisabled: Bool { false }
   }
+  
   enum Action: Equatable {
+    case view(View)
     case move(Move.Action)
-    case cancelButtonTapped
-    case undoButtonTapped
-    case redoButtonTapped
-    case restartButtonTapped
+    case toggleTimer
+    case timerTicked
+    
+    enum View {
+      case onAppear
+      case pauseButtonTapped
+      case quitButtonTapped
+      case undoButtonTapped
+      case redoButtonTapped
+      case restartButtonTapped
+      case onDisappear
+    }
   }
+  
+  private enum CancelID { case timer }
+  
+  @Dependency(\.continuousClock) var clock
   @Dependency(\.dismiss) var dismiss
+  
   var body: some ReducerOf<Self> {
     Scope(state: \.move, action: /Action.move) {
       Move()
     }
     Reduce { state, action in
       switch action {
-        
-      case .move(.delegate(.didComplete)):
-        state.previousMoves.append(state.move)
-        return .none
-        
-      case .cancelButtonTapped:
-        return .run { _ in await self.dismiss() }
-        
-      case .undoButtonTapped:
-        state.previousMoves.removeLast()
-        
-        if let prev = state.previousMoves.last {
-          state.move = prev
-        } else {
+      case let .view(action):
+        switch action {
+          
+        case .onAppear:
+          return .send(.toggleTimer)
+          
+        case .pauseButtonTapped:
+          return .send(.toggleTimer)
+          
+        case .quitButtonTapped:
+          return .run { _ in await self.dismiss() }
+          
+        case .undoButtonTapped:
+          state.previousMoves.removeLast()
+          
+          if let prev = state.previousMoves.last {
+            state.move = prev
+          } else {
+            state.move = .init()
+          }
+          return .none
+          
+        case .redoButtonTapped:
+          return .none
+          
+        case .restartButtonTapped:
           state.move = .init()
+          state.previousMoves = .init()
+          return .none
+                    
+        case .onDisappear:
+          return .cancel(id: CancelID.timer)
         }
-        return .none
         
-      case .redoButtonTapped:
-        return .none
+      case let .move(action):
+        switch action {
+        case .delegate(.didComplete):
+          state.previousMoves.append(state.move)
+          return .none
+          
+        default:
+          return .none
+        }
         
-      case .restartButtonTapped:
-        state.move = .init()
-        state.previousMoves = .init()
-        return .none
-        
-      case .move:
+      case .toggleTimer:
+        state.isTimerActive.toggle()
+        return .run { [isTimerActive = state.isTimerActive] send in
+          guard isTimerActive else { return }
+          for await _ in self.clock.timer(interval: .seconds(1)) {
+            await send(.timerTicked, animation: .interpolatingSpring(stiffness: 3000, damping: 40))
+          }
+        }
+        .cancellable(id: CancelID.timer, cancelInFlight: true)
+  
+      case .timerTicked:
+        state.secondsElapsed += 1
         return .none
       }
     }
@@ -98,7 +142,7 @@ struct Move: Reducer {
     }
   }
   enum Action: Equatable {
-    case pegButtonTapped(Peg)
+    case move(Peg)
     case delegate(Delegate)
     
     enum Delegate: Equatable {
@@ -108,7 +152,7 @@ struct Move: Reducer {
   func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
       
-    case let .pegButtonTapped(value):
+    case let .move(value):
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
@@ -145,7 +189,7 @@ struct NewGameView: View {
   let store: StoreOf<NewGame>
   
   var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       NavigationStack {
         VStack {
           Text("Moves: \(viewStore.previousMoves.count.description)")
@@ -154,6 +198,12 @@ struct NewGameView: View {
             state: \.move,
             action: { .move($0) }
           ))
+          .disabled(!viewStore.isTimerActive)
+          .padding()
+          
+          Button("Pause") {
+            viewStore.send(.pauseButtonTapped)
+          }
           
           HStack {
             Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
@@ -170,17 +220,21 @@ struct NewGameView: View {
           .frame(width: 200)
           .padding()
         }
-        .navigationTitle("Peg Game")
+        .navigationTitle("\(viewStore.secondsElapsed)")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear { viewStore.send(.onAppear) }
+        .onDisappear { viewStore.send(.onDisappear) }
         .toolbar {
-          ToolbarItem(placement: .cancellationAction) {
-            Button("Cancel") {
-              viewStore.send(.cancelButtonTapped)
-            }
-          }
           ToolbarItem(placement: .navigationBarTrailing) {
-            Button("Restart") {
-              viewStore.send(.restartButtonTapped)
+            Menu {
+              Button(action: { viewStore.send(.restartButtonTapped) }) {
+                Text("New Game")
+              }
+              Button(action: { viewStore.send(.quitButtonTapped) }) {
+                Text("Quit")
+              }
+            } label: {
+              Image(systemName: "ellipsis.circle")
             }
           }
         }
@@ -208,7 +262,7 @@ struct MoveView: View {
   
   private func pegView(peg: Peg) -> some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.pegButtonTapped(peg)) }) {
+      Button(action: { viewStore.send(.move(peg)) }) {
         Circle()
           .foregroundColor(Color(.systemGray))
           .frame(width: 50, height: 50)
