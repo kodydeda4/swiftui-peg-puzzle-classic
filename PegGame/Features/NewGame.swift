@@ -136,11 +136,13 @@ struct Move: Reducer {
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
-        state.pegs[id: value.id]?.completed = true
+        state.pegs[id: value.id]?.isEmpty = true
         state.selection = nil
         return .send(.delegate(.didComplete))
       }
-      guard state.availableMoves.contains(value) else {
+        
+      // check that the peg across form the selection is empty
+      guard state.pegs(acrossFrom: state.selection).filter(\.isEmpty).contains(value) else {
         state.selection = value
         return .none
       }
@@ -148,12 +150,13 @@ struct Move: Reducer {
         state.selection = state.selection == value ? nil : value
         return .none
       }
-      guard !Peg.between(selection, value, in: state.pegs).completed else {
+      // check that the peg between the selection and the new value is non empty
+      guard !Peg.between(selection, value, in: state.pegs).isEmpty else {
         return .none
       }
-      state.pegs[id: Peg.between(selection, value, in: state.pegs).id]?.completed = true
-      state.pegs[id: selection.id]?.completed = true
-      state.pegs[id: value.id]?.completed = false
+      state.pegs[id: Peg.between(selection, value, in: state.pegs).id]?.isEmpty = true
+      state.pegs[id: selection.id]?.isEmpty = true
+      state.pegs[id: value.id]?.isEmpty = false
       state.selection = nil
       return .send(.delegate(.didComplete))
       
@@ -165,33 +168,32 @@ struct Move: Reducer {
 
 extension Move.State {
   var isFirstMove: Bool {
-    pegs.filter(\.completed).isEmpty
+    pegs.filter(\.isEmpty).isEmpty
   }
-  var availableMoves: IdentifiedArrayOf<Peg> {
-    guard let selection = selection else { return [] }
+  func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
+    guard let peg = peg else { return [] }
     
     return .init(uniqueElements: [
-      pegs[id: [selection.row+0, selection.col-2]], // left
-      pegs[id: [selection.row+0, selection.col+2]], // right
-      pegs[id: [selection.row-2, selection.col-2]], // up+left
-      pegs[id: [selection.row-2, selection.col+0]], // up+right
-      pegs[id: [selection.row+2, selection.col]],   // down+left
-      pegs[id: [selection.row+2, selection.col+2]], // down+right
+      pegs[id: [peg.row+0, peg.col-2]], // left
+      pegs[id: [peg.row+0, peg.col+2]], // right
+      pegs[id: [peg.row-2, peg.col-2]], // up+left
+      pegs[id: [peg.row-2, peg.col+0]], // up+right
+      pegs[id: [peg.row+2, peg.col]],   // down+left
+      pegs[id: [peg.row+2, peg.col+2]], // down+right
     ]
-      .compactMap { $0 }
-      .filter { $0.completed }
-    )
+      .compactMap { $0 })
   }
-  var availableForCompletion: IdentifiedArrayOf<Peg> {
-    guard let selection = selection else { return [] }
+  
+  func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
+    guard let peg = peg else { return [] }
     
     return .init(uniqueElements: [
-      pegs[id: [selection.row+0, selection.col-1]], // left
-      pegs[id: [selection.row+0, selection.col+1]], // right
-      pegs[id: [selection.row-1, selection.col-1]], // up+left
-      pegs[id: [selection.row-1, selection.col+0]], // up+right
-      pegs[id: [selection.row+1, selection.col]],   // down+left
-      pegs[id: [selection.row+1, selection.col+1]], // down+right
+      pegs[id: [peg.row+0, peg.col-1]], // left
+      pegs[id: [peg.row+0, peg.col+1]], // right
+      pegs[id: [peg.row-1, peg.col-1]], // up+left
+      pegs[id: [peg.row-1, peg.col+0]], // up+right
+      pegs[id: [peg.row+1, peg.col]],   // down+left
+      pegs[id: [peg.row+1, peg.col+1]], // down+right
     ].compactMap { $0 })
   }
 }
@@ -316,7 +318,15 @@ struct MoveView: View {
               Circle().foregroundColor(.accentColor)
             }
           }
-          .opacity(!peg.completed ? 1 : 0.25)
+          .overlay {
+            if viewStore.state.pegs(acrossFrom: viewStore.selection).contains(peg) {
+              Circle().foregroundColor(.blue)
+            }
+            if viewStore.state.pegs(adjacentTo: viewStore.selection).contains(peg) {
+              Circle().foregroundColor(.orange)
+            }
+          }
+          .opacity(!peg.isEmpty ? 1 : 0.25)
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
