@@ -3,14 +3,15 @@ import ComposableArchitecture
 
 // 1. how do you calculate available moves?
 // 3. how do you know when it's done?
-// 6. timer?
 
 struct NewGame: Reducer {
   struct State: Equatable {
     var move = Move.State()
     var previousMoves = [Move.State]()
-    var isPaused = false
+    var score = 0
+    var isTimerEnabled = false
     var secondsElapsed = 0
+    var isPaused: Bool { !isTimerEnabled && !previousMoves.isEmpty }
     var isUndoButtonDisabled: Bool { previousMoves.isEmpty }
     var isRedoButtonDisabled: Bool { false }
   }
@@ -22,12 +23,11 @@ struct NewGame: Reducer {
     case timerTicked
     
     enum View {
-      case onAppear
       case pauseButtonTapped
       case quitButtonTapped
       case undoButtonTapped
       case redoButtonTapped
-      case restartButtonTapped
+      case newGameButtonTapped
       case onDisappear
     }
   }
@@ -46,9 +46,6 @@ struct NewGame: Reducer {
       case let .view(action):
         switch action {
           
-        case .onAppear:
-          return .send(.toggleIsPaused)
-          
         case .pauseButtonTapped:
           return .send(.toggleIsPaused)
           
@@ -56,6 +53,7 @@ struct NewGame: Reducer {
           return .run { _ in await self.dismiss() }
           
         case .undoButtonTapped:
+          state.score -= 150
           state.previousMoves.removeLast()
           
           if let prev = state.previousMoves.last {
@@ -63,15 +61,19 @@ struct NewGame: Reducer {
           } else {
             state.move = .init()
           }
+          
+          if state.previousMoves.isEmpty {
+            state = State()
+            return .cancel(id: CancelID.timer)
+          }
           return .none
           
         case .redoButtonTapped:
           return .none
           
-        case .restartButtonTapped:
-          state.move = .init()
-          state.previousMoves = .init()
-          return .none
+        case .newGameButtonTapped:
+          state = State()
+          return .cancel(id: CancelID.timer)
                     
         case .onDisappear:
           return .cancel(id: CancelID.timer)
@@ -81,15 +83,21 @@ struct NewGame: Reducer {
         switch action {
         case .delegate(.didComplete):
           state.previousMoves.append(state.move)
+          state.score += 150
+          
+          if state.previousMoves.count == 1 {
+            return .send(.toggleIsPaused)
+          }
           return .none
+          
           
         default:
           return .none
         }
         
       case .toggleIsPaused:
-        state.isPaused.toggle()
-        return .run { [isTimerActive = state.isPaused] send in
+        state.isTimerEnabled.toggle()
+        return .run { [isTimerActive = state.isTimerEnabled] send in
           guard isTimerActive else { return }
           for await _ in self.clock.timer(interval: .seconds(1)) {
             await send(.timerTicked, animation: .interpolatingSpring(stiffness: 3000, damping: 40))
@@ -109,37 +117,6 @@ struct Move: Reducer {
   struct State: Equatable {
     var pegs = Peg.grid()
     var selection: Peg?
-    
-    var isFirstMove: Bool {
-      pegs.filter(\.completed).isEmpty
-    }
-    var availableMoves: IdentifiedArrayOf<Peg> {
-      guard let selection = selection else { return [] }
-      
-      return .init(uniqueElements: [
-        pegs[id: [selection.row+0, selection.col-2]], // left
-        pegs[id: [selection.row+0, selection.col+2]], // right
-        pegs[id: [selection.row-2, selection.col-2]], // up+left
-        pegs[id: [selection.row-2, selection.col+0]], // up+right
-        pegs[id: [selection.row+2, selection.col]],   // down+left
-        pegs[id: [selection.row+2, selection.col+2]], // down+right
-      ]
-        .compactMap { $0 }
-        .filter { $0.completed }
-      )
-    }
-    var availableForCompletion: IdentifiedArrayOf<Peg> {
-      guard let selection = selection else { return [] }
-      
-      return .init(uniqueElements: [
-        pegs[id: [selection.row+0, selection.col-1]], // left
-        pegs[id: [selection.row+0, selection.col+1]], // right
-        pegs[id: [selection.row-1, selection.col-1]], // up+left
-        pegs[id: [selection.row-1, selection.col+0]], // up+right
-        pegs[id: [selection.row+1, selection.col]],   // down+left
-        pegs[id: [selection.row+1, selection.col+1]], // down+right
-      ].compactMap { $0 })
-    }
   }
   enum Action: Equatable {
     case move(Peg)
@@ -183,27 +160,92 @@ struct Move: Reducer {
   }
 }
 
+extension Move.State {
+  var isFirstMove: Bool {
+    pegs.filter(\.completed).isEmpty
+  }
+  var availableMoves: IdentifiedArrayOf<Peg> {
+    guard let selection = selection else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [selection.row+0, selection.col-2]], // left
+      pegs[id: [selection.row+0, selection.col+2]], // right
+      pegs[id: [selection.row-2, selection.col-2]], // up+left
+      pegs[id: [selection.row-2, selection.col+0]], // up+right
+      pegs[id: [selection.row+2, selection.col]],   // down+left
+      pegs[id: [selection.row+2, selection.col+2]], // down+right
+    ]
+      .compactMap { $0 }
+      .filter { $0.completed }
+    )
+  }
+  var availableForCompletion: IdentifiedArrayOf<Peg> {
+    guard let selection = selection else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [selection.row+0, selection.col-1]], // left
+      pegs[id: [selection.row+0, selection.col+1]], // right
+      pegs[id: [selection.row-1, selection.col-1]], // up+left
+      pegs[id: [selection.row-1, selection.col+0]], // up+right
+      pegs[id: [selection.row+1, selection.col]],   // down+left
+      pegs[id: [selection.row+1, selection.col+1]], // down+right
+    ].compactMap { $0 })
+  }
+}
+
 // MARK: - SwiftUI
 
 struct NewGameView: View {
   let store: StoreOf<NewGame>
   
+  private var gameInfo: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      VStack(alignment: .leading, spacing: 0) {
+        HStack {
+          Text("Seconds")
+            .bold()
+            .frame(width: 70, alignment: .leading)
+            .padding()
+            .background { Color(.systemGray5) }
+          Text(viewStore.secondsElapsed.description)
+        }
+        Divider()
+        HStack {
+          Text("Score")
+            .bold()
+            .frame(width: 70, alignment: .leading)
+            .padding()
+            .background { Color(.systemGray5) }
+          Text(viewStore.score.description)
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background { Color(.systemGray6) }
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+  }
+  
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       NavigationStack {
         VStack {
-          Text("Moves: \(viewStore.previousMoves.count.description)")
+          gameInfo
+          
+          Spacer()
           
           MoveView(store: store.scope(
             state: \.move,
             action: { .move($0) }
           ))
-          .disabled(!viewStore.isPaused)
+          .disabled(viewStore.isPaused)
           .padding()
           
-          Button("Pause") {
+          Spacer()
+          
+          Button(viewStore.isPaused ? "Play" : "Pause") {
             viewStore.send(.pauseButtonTapped)
           }
+          .disabled(viewStore.previousMoves.isEmpty)
           
           HStack {
             Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
@@ -219,16 +261,16 @@ struct NewGameView: View {
           .buttonStyle(.bordered)
           .frame(width: 200)
           .padding()
-          .disabled(!viewStore.isPaused)
+          .disabled(viewStore.isPaused)
         }
-        .navigationTitle("\(viewStore.secondsElapsed)")
+        .padding()
+        .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { viewStore.send(.onAppear) }
         .onDisappear { viewStore.send(.onDisappear) }
         .toolbar {
           ToolbarItem(placement: .navigationBarTrailing) {
             Menu {
-              Button(action: { viewStore.send(.restartButtonTapped) }) {
+              Button(action: { viewStore.send(.newGameButtonTapped) }) {
                 Text("New Game")
               }
               Button(action: { viewStore.send(.quitButtonTapped) }) {
