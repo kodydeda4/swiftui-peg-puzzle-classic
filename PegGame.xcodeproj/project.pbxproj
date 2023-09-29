@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		33B78C172AC732D0005FC780 /* NewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* NewGame.swift */; };
+		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
+		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
 		33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3552ABE2AAF00B76E4A /* Main.swift */; };
 		33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */; };
 		33E6E35A2ABE2AB000B76E4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33E6E3592ABE2AB000B76E4A /* Assets.xcassets */; };
@@ -15,6 +18,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		33B78C162AC732D0005FC780 /* NewGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGame.swift; sourceTree = "<group>"; };
+		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
+		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
 		33E6E3522ABE2AAF00B76E4A /* PegGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PegGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33E6E3552ABE2AAF00B76E4A /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
 		33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReducer.swift; sourceTree = "<group>"; };
@@ -34,6 +40,47 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		33B78C182AC733F4005FC780 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */,
+				33B78C162AC732D0005FC780 /* NewGame.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		33B78C192AC733FA005FC780 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				33E6E3552ABE2AAF00B76E4A /* Main.swift */,
+				33E6E3592ABE2AB000B76E4A /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		33B78C1A2AC73401005FC780 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Dependencies;
+			sourceTree = "<group>";
+		};
+		33B78C1B2AC7341A005FC780 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				33B78C1C2AC73426005FC780 /* Collection+.swift */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		33B78C1E2AC7346B005FC780 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				33B78C1F2AC73471005FC780 /* Peg.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		33E6E3492ABE2AAF00B76E4A = {
 			isa = PBXGroup;
 			children = (
@@ -53,10 +100,12 @@
 		33E6E3542ABE2AAF00B76E4A /* PegGame */ = {
 			isa = PBXGroup;
 			children = (
-				33E6E3552ABE2AAF00B76E4A /* Main.swift */,
-				33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */,
-				33E6E3592ABE2AB000B76E4A /* Assets.xcassets */,
+				33B78C1A2AC73401005FC780 /* Dependencies */,
+				33B78C182AC733F4005FC780 /* Features */,
+				33B78C1E2AC7346B005FC780 /* Models */,
 				33E6E35B2ABE2AB000B76E4A /* Preview Content */,
+				33B78C192AC733FA005FC780 /* Resources */,
+				33B78C1B2AC7341A005FC780 /* Util */,
 			);
 			path = PegGame;
 			sourceTree = "<group>";
@@ -145,8 +194,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
+				33B78C172AC732D0005FC780 /* NewGame.swift in Sources */,
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
+				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
