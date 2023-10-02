@@ -26,6 +26,7 @@ struct NewGame: Reducer {
       case newGameButtonTapped
     }
   }
+  
   private enum CancelID { case timer }
   
   @Dependency(\.continuousClock) var clock
@@ -91,7 +92,8 @@ struct NewGame: Reducer {
         return .run { [isTimerActive = state.isTimerEnabled] send in
           guard isTimerActive else { return }
           for await _ in self.clock.timer(interval: .seconds(1)) {
-            await send(.timerTicked, animation: .interpolatingSpring(stiffness: 3000, damping: 40))
+            await send(.timerTicked)
+            //await send(.timerTicked, animation: .interpolatingSpring(stiffness: 3000, damping: 40))
           }
         }
         .cancellable(id: CancelID.timer, cancelInFlight: true)
@@ -109,10 +111,10 @@ extension NewGame.State {
     !isTimerEnabled && !previousMoves.isEmpty
   }
   var isUndoButtonDisabled: Bool {
-    previousMoves.isEmpty
+    previousMoves.isEmpty || isPaused
   }
   var isRedoButtonDisabled: Bool {
-    false
+    isPaused
   }
 }
 
@@ -221,38 +223,11 @@ extension Move.State {
 struct NewGameView: View {
   let store: StoreOf<NewGame>
   
-  private var gameInfo: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      VStack(alignment: .leading, spacing: 0) {
-        HStack {
-          Text("Seconds")
-            .bold()
-            .frame(width: 70, alignment: .leading)
-            .padding()
-            .background { Color(.systemGray5) }
-          Text(viewStore.secondsElapsed.description)
-        }
-        Divider()
-        HStack {
-          Text("Score")
-            .bold()
-            .frame(width: 70, alignment: .leading)
-            .padding()
-            .background { Color(.systemGray5) }
-          Text(viewStore.score.description)
-        }
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background { Color(.systemGray6) }
-      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-  }
-  
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       NavigationStack {
         VStack {
-          gameInfo
+          header
           
           Spacer()
           
@@ -265,28 +240,8 @@ struct NewGameView: View {
           
           Spacer()
           
-          Button(viewStore.isPaused ? "Play" : "Pause") {
-            viewStore.send(.pauseButtonTapped)
-          }
-          .disabled(viewStore.previousMoves.isEmpty)
-          
-          HStack {
-            Button(action: { viewStore.send(.undoButtonTapped, animation: .default) }) {
-              Label("Undo", systemImage: "arrow.uturn.backward")
-            }
-            .disabled(viewStore.isUndoButtonDisabled)
-            Spacer()
-            Button(action: { viewStore.send(.redoButtonTapped) }) {
-              Label("Redo", systemImage: "arrow.uturn.forward")
-            }
-            .disabled(viewStore.isRedoButtonDisabled)
-          }
-          .buttonStyle(.bordered)
-          .frame(width: 200)
-          .padding()
-          .disabled(viewStore.isPaused)
+          footer
         }
-        .padding()
         .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -305,6 +260,146 @@ struct NewGameView: View {
         }
       }
     }
+  }
+  
+  private var score: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      HStack(spacing: 0) {
+        Text("Score")
+          .bold()
+          .frame(width: 50, alignment: .leading)
+          .frame(maxHeight: .infinity)
+          .padding()
+          .background { Color.accentColor.opacity(0.15) }
+        
+        Rectangle()
+          .frame(width: 0.25)
+          .foregroundColor(.accentColor)
+        
+        Spacer()
+        
+        Text(viewStore.score.description)
+          .padding(.trailing)
+          .foregroundColor(.accentColor)
+      }
+      .frame(height: 50)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background { Color.accentColor.opacity(0.25) }
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+          .strokeBorder()
+          .foregroundColor(.accentColor)
+      }
+    }
+  }
+  
+  private var seconds: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      HStack {
+        Text("Seconds")
+          .bold()
+          .frame(width: 70, alignment: .leading)
+          .padding()
+          .background { Color(.systemGray5) }
+        Text(viewStore.secondsElapsed.description)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background { Color(.systemGray6) }
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+          .strokeBorder()
+          .foregroundColor(Color(.separator))
+      }
+    }
+  }
+  
+  private var header: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      VStack(spacing: 0) {
+        VStack {
+          score
+        }
+        .padding()
+        
+        Divider()
+      }
+      .background {
+        Color(.systemGray)
+          .opacity(0.1)
+          .ignoresSafeArea(edges: .top)
+      }
+    }
+  }
+  
+  private var footer: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      VStack(spacing: 0) {
+        Divider()
+        VStack {
+          seconds
+          
+          HStack {
+            Button(action: { viewStore.send(.undoButtonTapped) }) {
+              ThiccButtonLabel(
+                title: "Undo",
+                systemImage: "arrow.uturn.backward"
+              )
+            }
+            .disabled(viewStore.isUndoButtonDisabled)
+            
+            Button(action: { viewStore.send(.pauseButtonTapped) }) {
+              ThiccButtonLabel(
+                title: viewStore.isPaused ? "Play" : "Pause",
+                systemImage: viewStore.isPaused ? "play" : "pause"
+              )
+            }
+            .disabled(viewStore.previousMoves.isEmpty)
+            
+            Button(action: { viewStore.send(.redoButtonTapped) }) {
+              ThiccButtonLabel(
+                title: "Redo",
+                systemImage: "arrow.uturn.forward"
+              )
+            }
+            .disabled(viewStore.isRedoButtonDisabled)
+          }
+          .buttonStyle(.plain)
+          .padding(.bottom)
+        }
+        .padding()
+      }
+      .background {
+        Color(.systemGray)
+          .opacity(0.1)
+          .ignoresSafeArea(edges: .bottom)
+      }
+    }
+  }
+}
+
+private struct ThiccButtonLabel: View {
+  let title: String
+  let systemImage: String
+  
+  var body: some View {
+    HStack {
+      Text(title)
+        .bold()
+      Image(systemName: systemImage)
+    }
+    .padding(.horizontal)
+    .padding(.vertical, 10)
+    .frame(maxWidth: .infinity)
+    .background { Color(.systemGray6) }
+    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12, style: .continuous)
+        .strokeBorder()
+        .foregroundColor(Color(.separator))
+    }
+    .frame(width: 120)
   }
 }
 
