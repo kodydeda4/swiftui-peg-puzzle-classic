@@ -116,6 +116,9 @@ extension NewGame.State {
   var isRedoButtonDisabled: Bool {
     isPaused
   }
+  var total: Int {
+    (move.pegs.count - 1) * 150
+  }
 }
 
 struct Move: Reducer {
@@ -276,11 +279,20 @@ struct NewGameView: View {
           .frame(width: 0.25)
           .foregroundColor(.accentColor)
         
-        Spacer()
-        
         Text(viewStore.score.description)
           .padding(.trailing)
           .foregroundColor(.accentColor)
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+          .background {
+            VStack {
+              Spacer()
+              ProgressView(
+                value: CGFloat(viewStore.score),
+                total: CGFloat(viewStore.total)
+              )
+              .animation(.default, value: viewStore.score)
+            }
+          }
       }
       .frame(height: 50)
       .frame(maxWidth: .infinity, alignment: .leading)

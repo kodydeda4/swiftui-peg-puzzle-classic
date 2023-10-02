@@ -42,6 +42,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		33316E212ACAEFFB00CB5E49 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		33B78C182AC733F4005FC780 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -86,6 +93,7 @@
 		33B78C212AC7386E005FC780 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				33316E212ACAEFFB00CB5E49 /* Views */,
 				33B78C222AC73874005FC780 /* ButtonStyles */,
 			);
 			path = SwiftUI;
