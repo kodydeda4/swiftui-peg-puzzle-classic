@@ -212,7 +212,6 @@ extension Move.State {
     ]
       .compactMap { $0 })
   }
-  
   func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
     
