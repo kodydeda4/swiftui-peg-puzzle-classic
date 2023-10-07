@@ -124,7 +124,7 @@ extension NewGame.State {
 struct Move: Reducer {
   struct State: Equatable {
     var pegs = Peg.grid()
-    var startingPoint: Peg?
+    var selection: Peg?
   }
   enum Action: Equatable {
     case move(Peg)
@@ -137,35 +137,37 @@ struct Move: Reducer {
   func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
       
-    case let .move(endPoint):
+    case let .move(selection):
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
-        state.pegs[id: endPoint.id]?.isRemoved = true
-        state.startingPoint = nil
+        state.pegs[id: selection.id]?.isRemoved = true
+        state.selection = nil
         return .send(.delegate(.didComplete))
-      }
-      guard let startingPoint = state.startingPoint else {
-        state.startingPoint = endPoint
+      } 
+      if state.selection == nil {
+        state.selection = selection
         return .none
       }
-      guard startingPoint != endPoint else {
-        state.startingPoint = nil
+      if state.selection == selection  {
+        state.selection = nil
         return .none
       }
-      guard let midPoint = state.peg(between: startingPoint, and: endPoint) else {
-        return .none
-      }
+      
+      // handle hopping from: start -> middle -> end
       guard
-        endPoint.isRemoved,
-        !midPoint.isRemoved,
-        state.pegs(acrossFrom: startingPoint).contains(endPoint)
+        let start = state.selection,
+        let middle = state.peg(between: start, and: selection),
+        let end = Optional(selection),
+        !middle.isRemoved,
+        end.isRemoved,
+        state.pegs(acrossFrom: start).contains(end)
       else { return .none }
       
-      state.pegs[id: startingPoint.id]?.isRemoved = true
-      state.pegs[id: midPoint.id]?.isRemoved = true
-      state.pegs[id: endPoint.id]?.isRemoved = false
-      state.startingPoint = nil
+      state.pegs[id: start.id]?.isRemoved = true
+      state.pegs[id: middle.id]?.isRemoved = true
+      state.pegs[id: end.id]?.isRemoved = false
+      state.selection = nil
       return .send(.delegate(.didComplete))
       
     case .delegate:
@@ -444,12 +446,12 @@ struct MoveView: View {
           .foregroundColor(Color(.systemGray))
           .frame(width: 50, height: 50)
           .overlay {
-            if viewStore.startingPoint == peg {
+            if viewStore.selection == peg {
               Circle().foregroundColor(.accentColor)
             }
           }
           .overlay {
-            if viewStore.state.pegs(acrossFrom: viewStore.startingPoint).contains(peg) {
+            if viewStore.state.pegs(acrossFrom: viewStore.selection).contains(peg) {
               Circle().foregroundColor(.blue)
             }
           }
@@ -459,7 +461,7 @@ struct MoveView: View {
           }
       }
       .buttonStyle(.plain)
-      .animation(.default, value: viewStore.startingPoint)
+      .animation(.default, value: viewStore.selection)
     }
   }
 }
