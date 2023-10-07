@@ -6,15 +6,15 @@ import ComposableArchitecture
 
 struct NewGame: Reducer {
   struct State: Equatable {
-    var move = Move.State()
+    var currentMove = Move.State()
     var previousMoves = [Move.State]()
     var score = 0
-    var isTimerEnabled = false
     var secondsElapsed = 0
+    var isTimerEnabled = false
   }
   enum Action: Equatable {
     case view(View)
-    case move(Move.Action)
+    case currentMove(Move.Action)
     case toggleIsPaused
     case timerTicked
     
@@ -33,7 +33,7 @@ struct NewGame: Reducer {
   @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
-    Scope(state: \.move, action: /Action.move) {
+    Scope(state: \.currentMove, action: /Action.currentMove) {
       Move()
     }
     Reduce { state, action in
@@ -52,9 +52,9 @@ struct NewGame: Reducer {
           state.previousMoves.removeLast()
           
           if let prev = state.previousMoves.last {
-            state.move = prev
+            state.currentMove = prev
           } else {
-            state.move = .init()
+            state.currentMove = .init()
           }
           
           if state.previousMoves.isEmpty {
@@ -71,10 +71,10 @@ struct NewGame: Reducer {
           return .cancel(id: CancelID.timer)
         }
         
-      case let .move(action):
+      case let .currentMove(action):
         switch action {
         case .delegate(.didComplete):
-          state.previousMoves.append(state.move)
+          state.previousMoves.append(state.currentMove)
           state.score += 150
           
           if state.previousMoves.count == 1 {
@@ -117,7 +117,7 @@ extension NewGame.State {
     isPaused
   }
   var total: Int {
-    (move.pegs.count - 1) * 150
+    (currentMove.pegs.count - 1) * 150
   }
 }
 
@@ -153,14 +153,17 @@ struct Move: Reducer {
         state.startingPoint = nil
         return .none
       }
+      guard let midPoint = state.peg(between: startingPoint, and: endPoint) else {
+        return .none
+      }
+      guard
+        endPoint.isRemoved,
+        !midPoint.isRemoved,
+        state.pegs(acrossFrom: startingPoint).contains(endPoint)
+      else { return .none }
       
-      let isAcrossEmpty = state.pegs(acrossFrom: startingPoint).filter(\.isRemoved).contains(endPoint)
-      let isBetweenNonEmpty = !state.peg(between: startingPoint, and: endPoint).isRemoved
-      
-      guard isAcrossEmpty, isBetweenNonEmpty else { return .none }
-      
-      state.pegs[id: state.peg(between: startingPoint, and: endPoint).id]?.isRemoved = true
       state.pegs[id: startingPoint.id]?.isRemoved = true
+      state.pegs[id: midPoint.id]?.isRemoved = true
       state.pegs[id: endPoint.id]?.isRemoved = false
       state.startingPoint = nil
       return .send(.delegate(.didComplete))
@@ -175,7 +178,7 @@ extension Move.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
-  func peg(between a: Peg, and b: Peg) -> Peg {
+  func peg(between a: Peg, and b: Peg) -> Peg? {
     pegs[id: [
       (a.row - b.row) == 0 ? a.row : {
         switch (a.row - b.row) {
@@ -191,34 +194,36 @@ extension Move.State {
         default: fatalError()
         }
       }()
-    ]]!
+    ]]
   }
   func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
     
     return .init(uniqueElements: [
       pegs[id: [peg.row+0, peg.col-2]], // left
+      pegs[id: [peg.row-2, peg.col-2]], // left+up
+      pegs[id: [peg.row+2, peg.col]],   // left+down
+      //-------------------------------------------------------
       pegs[id: [peg.row+0, peg.col+2]], // right
-      pegs[id: [peg.row-2, peg.col-2]], // up+left
-      pegs[id: [peg.row-2, peg.col+0]], // up+right
-      pegs[id: [peg.row+2, peg.col]],   // down+left
-      pegs[id: [peg.row+2, peg.col+2]], // down+right
+      pegs[id: [peg.row-2, peg.col+0]], // right+up
+      pegs[id: [peg.row+2, peg.col+2]], // right+down
     ]
       .compactMap { $0 })
   }
-//  
-//  func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
-//    guard let peg = peg else { return [] }
-//    
-//    return .init(uniqueElements: [
-//      pegs[id: [peg.row+0, peg.col-1]], // left
-//      pegs[id: [peg.row+0, peg.col+1]], // right
-//      pegs[id: [peg.row-1, peg.col-1]], // up+left
-//      pegs[id: [peg.row-1, peg.col+0]], // up+right
-//      pegs[id: [peg.row+1, peg.col]],   // down+left
-//      pegs[id: [peg.row+1, peg.col+1]], // down+right
-//    ].compactMap { $0 })
-//  }
+  
+  func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
+    guard let peg = peg else { return [] }
+    
+    return .init(uniqueElements: [
+      pegs[id: [peg.row+0, peg.col-1]], // left
+      pegs[id: [peg.row-1, peg.col-1]], // left+up
+      pegs[id: [peg.row+1, peg.col]],   // left+down
+      //-------------------------------------------------------
+      pegs[id: [peg.row+0, peg.col+1]], // right
+      pegs[id: [peg.row-1, peg.col+0]], // right+up
+      pegs[id: [peg.row+1, peg.col+1]], // right+down
+    ].compactMap { $0 })
+  }
 }
 
 // MARK: - SwiftUI
@@ -235,8 +240,8 @@ struct NewGameView: View {
           Spacer()
           
           MoveView(store: store.scope(
-            state: \.move,
-            action: { .move($0) }
+            state: \.currentMove,
+            action: { .currentMove($0) }
           ))
           .disabled(viewStore.isPaused)
           .padding()
