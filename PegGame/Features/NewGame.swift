@@ -162,7 +162,10 @@ struct Move: Reducer {
         !middle.isRemoved,
         end.isRemoved,
         state.pegs(acrossFrom: start).contains(end)
-      else { return .none }
+      else {
+        state.selection = nil
+        return .none
+      }
       
       state.pegs[id: start.id]?.isRemoved = true
       state.pegs[id: middle.id]?.isRemoved = true
