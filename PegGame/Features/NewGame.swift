@@ -181,22 +181,26 @@ extension Move.State {
     pegs.filter(\.isRemoved).isEmpty
   }
   func peg(between a: Peg, and b: Peg) -> Peg? {
-    pegs[id: [
-      (a.row - b.row) == 0 ? a.row : {
-        switch (a.row - b.row) {
-        case +2: return -1 + a.row
-        case -2: return +1 + a.row
-        default: fatalError()
-        }
-      }(),
-      (a.col - b.col) == 0 ? a.col : {
-        switch (a.col - b.col) {
-        case +2: return -1 + a.col
-        case -2: return +1 + a.col
-        default: fatalError()
-        }
-      }()
-    ]]
+    let row: Int? = {
+      let diff = a.row - b.row
+      switch diff {
+      case 0 : return a.row
+      case +2: return -1 + a.row
+      case -2: return +1 + a.row
+      default: return nil
+      }
+    }()
+    let col: Int? = {
+      let diff = a.col - b.col
+      switch diff {
+      case 0 : return a.col
+      case +2: return -1 + a.col
+      case -2: return +1 + a.col
+      default: return nil
+      }
+    }()
+    guard let row = row, let col = col else { return nil }
+    return pegs[id: [row,col]]
   }
   func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
