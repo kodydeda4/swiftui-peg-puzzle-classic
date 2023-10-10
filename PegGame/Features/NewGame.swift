@@ -215,6 +215,8 @@ extension Move.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
+  
+  // for each peg, for each direction, if !adjacent.isRemoved && across.isRemoved { += 1 }
   var potentialMoves: Int {
     var rv = 0
     
