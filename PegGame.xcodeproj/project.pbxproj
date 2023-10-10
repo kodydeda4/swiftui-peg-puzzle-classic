@@ -16,6 +16,7 @@
 		33E6E35A2ABE2AB000B76E4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33E6E3592ABE2AB000B76E4A /* Assets.xcassets */; };
 		33E6E35D2ABE2AB000B76E4A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33E6E35C2ABE2AB000B76E4A /* Preview Assets.xcassets */; };
 		33E6E3652ABE2EFD00B76E4A /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */; };
+		33F2C8D52AD606A7004574A2 /* GameOver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33F2C8D42AD606A7004574A2 /* GameOver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReducer.swift; sourceTree = "<group>"; };
 		33E6E3592ABE2AB000B76E4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		33E6E35C2ABE2AB000B76E4A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		33F2C8D42AD606A7004574A2 /* GameOver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameOver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +56,7 @@
 			children = (
 				33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */,
 				33B78C162AC732D0005FC780 /* NewGame.swift */,
+				33F2C8D42AD606A7004574A2 /* GameOver.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -223,6 +226,7 @@
 			files = (
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
+				33F2C8D52AD606A7004574A2 /* GameOver.swift in Sources */,
 				33B78C172AC732D0005FC780 /* NewGame.swift in Sources */,
 				33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */,
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,

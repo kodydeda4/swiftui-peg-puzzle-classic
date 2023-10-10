@@ -2,7 +2,6 @@ import SwiftUI
 import ComposableArchitecture
 
 // 1. how do you calculate available moves?
-// 3. how do you know when it's done?
 
 struct NewGame: Reducer {
   struct State: Equatable {
@@ -11,12 +10,15 @@ struct NewGame: Reducer {
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
+    @PresentationState var destination: Destination.State?
   }
   enum Action: Equatable {
     case view(View)
     case currentMove(Move.Action)
+    case destination(PresentationAction<Destination.Action>)
     case toggleIsPaused
     case timerTicked
+    case gameOver
     
     enum View {
       case pauseButtonTapped
@@ -61,6 +63,7 @@ struct NewGame: Reducer {
             state = State()
             return .cancel(id: CancelID.timer)
           }
+          
           return .none
           
         case .redoButtonTapped:
@@ -80,8 +83,14 @@ struct NewGame: Reducer {
           if state.previousMoves.count == 1 {
             return .send(.toggleIsPaused)
           }
+//          if state.currentMove.potentialMoves == 0 {
+//            return .send(.gameOver)
+//          }
+          if state.previousMoves.count > 1 {
+            //@DEBUG
+            return .send(.gameOver)
+          }
           return .none
-          
           
         default:
           return .none
@@ -93,14 +102,41 @@ struct NewGame: Reducer {
           guard isTimerActive else { return }
           for await _ in self.clock.timer(interval: .seconds(1)) {
             await send(.timerTicked)
-            //await send(.timerTicked, animation: .interpolatingSpring(stiffness: 3000, damping: 40))
           }
         }
         .cancellable(id: CancelID.timer, cancelInFlight: true)
-  
+        
       case .timerTicked:
         state.secondsElapsed += 1
         return .none
+        
+      case .gameOver:
+        state.destination = .gameOver(.init())
+        return .send(.toggleIsPaused)
+        
+      case .destination(.presented(.gameOver(.doneButtonTapped))):
+        state = State()
+        return .none
+        
+      case .destination:
+        return .none
+      }
+    }
+    .ifLet(\.$destination, action: /Action.destination) {
+      Destination()
+    }
+  }
+  
+  struct Destination: Reducer {
+    enum State: Equatable {
+      case gameOver(GameOver.State)
+    }
+    enum Action: Equatable {
+      case gameOver(GameOver.Action)
+    }
+    var body: some ReducerOf<Self> {
+      Scope(state: /State.gameOver, action: /Action.gameOver) {
+        GameOver()
       }
     }
   }
@@ -144,7 +180,7 @@ struct Move: Reducer {
         state.pegs[id: selection.id]?.isRemoved = true
         state.selection = nil
         return .send(.delegate(.didComplete))
-      } 
+      }
       if state.selection == nil {
         state.selection = selection
         return .none
@@ -154,7 +190,7 @@ struct Move: Reducer {
         return .none
       }
       
-      // handle hopping from: start -> middle -> end
+      // hopping from: start -> middle -> end
       guard
         let start = state.selection,
         let middle = state.peg(between: start, and: selection),
@@ -182,6 +218,9 @@ struct Move: Reducer {
 extension Move.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
+  }
+  var potentialMoves: Int {
+    return 1
   }
   func peg(between a: Peg, and b: Peg) -> Peg? {
     let row: Int? = {
@@ -274,6 +313,15 @@ struct NewGameView: View {
             }
           }
         }
+        .sheet(
+          store: store.scope(
+            state: \.$destination,
+            action: NewGame.Action.destination
+          ),
+          state: /NewGame.Destination.State.gameOver,
+          action: NewGame.Destination.Action.gameOver,
+          content: GameOverSheet.init(store:)
+        )
       }
     }
   }
