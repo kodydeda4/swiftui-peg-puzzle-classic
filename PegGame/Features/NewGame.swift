@@ -83,11 +83,7 @@ struct NewGame: Reducer {
           if state.previousMoves.count == 1 {
             return .send(.toggleIsPaused)
           }
-//          if state.currentMove.potentialMoves == 0 {
-//            return .send(.gameOver)
-//          }
-          if state.previousMoves.count > 1 {
-            //@DEBUG
+          if state.currentMove.potentialMoves == 0 {
             return .send(.gameOver)
           }
           return .none
