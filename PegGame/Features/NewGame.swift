@@ -216,7 +216,55 @@ extension Move.State {
     pegs.filter(\.isRemoved).isEmpty
   }
   var potentialMoves: Int {
-    return 1
+    var rv = 0
+    
+    let isValid: (Peg?, Peg?) -> Bool = { adjacent, across in
+      guard let adjacent, let across else { return false }
+      return !adjacent.isRemoved && across.isRemoved
+    }
+    
+    for peg in self.pegs {
+      rv += [
+        // left
+        isValid(
+          pegs[id: [peg.row+0, peg.col-1]],
+          pegs[id: [peg.row+0, peg.col-2]]
+        ),
+        
+        // left+up
+        isValid(
+          pegs[id: [peg.row-1, peg.col-1]],
+          pegs[id: [peg.row-2, peg.col-2]]
+        ),
+        
+        // left+down
+        isValid(
+          pegs[id: [peg.row+1, peg.col]],
+          pegs[id: [peg.row+2, peg.col]]
+        ),
+        
+        // right
+        isValid(
+          pegs[id: [peg.row+0, peg.col+1]],
+          pegs[id: [peg.row+0, peg.col+2]]
+        ),
+        
+        // right+up
+        isValid(
+          pegs[id: [peg.row-1, peg.col+0]],
+          pegs[id: [peg.row-2, peg.col+0]]
+        ),
+        
+        // right+down
+        isValid(
+          pegs[id: [peg.row+1, peg.col+1]],
+          pegs[id: [peg.row+2, peg.col+2]]
+        )
+      ]
+        .filter({ $0 == true })
+        .count
+    }
+    return rv
   }
   func peg(between a: Peg, and b: Peg) -> Peg? {
     let row: Int? = {
@@ -279,6 +327,8 @@ struct NewGameView: View {
       NavigationStack {
         VStack {
           header
+          
+          Text("Potential Moves: \(viewStore.currentMove.potentialMoves.description)")
           
           Spacer()
           
