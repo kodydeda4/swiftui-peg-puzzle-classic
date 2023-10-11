@@ -193,12 +193,12 @@ struct Pegboard: Reducer {
       // hopping from: start -> middle -> end
       guard
         let start = state.selection,
-        let middle = state.pegBetween(start, selection),
+        let middle = state.peg(between: start, and: selection),
         let end = Optional(selection),
         !start.isRemoved,
         !middle.isRemoved,
         end.isRemoved,
-        state.getPegs(acrossFrom: start).contains(end)
+        state.peg(acrossFrom: start).contains(end)
       else {
         state.selection = nil
         return .none
@@ -220,34 +220,18 @@ extension Pegboard.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
-  
   var potentialMoves: Int {
     isFirstMove ? pegs.count : pegs.map(potentialMoves).reduce(0, +)
   }
-
-  enum Direction: CaseIterable {
-    case left
-    case leftUp
-    case leftDown
-    case right
-    case rightUp
-    case rightDown
-  }
-  
-  func pegBetween(_ a: Peg, _ b: Peg) -> Peg? {
-    pegs[id: [
-      a.row + ((a.row-b.row) * -1/2),
-      a.col + ((a.col-b.col) * -1/2),
-    ]]
-  }
-  
-  func getPegs(acrossFrom peg: Peg) -> [Peg] {
+  func peg(acrossFrom peg: Peg) -> [Peg] {
     Direction.allCases.compactMap {
-      getPeg(direction: $0, of: peg, offset: 2)
+      self.peg(direction: $0, of: peg, offset: 2)
     }
   }
-  
-  private func getPeg(direction: Direction, of peg: Peg, offset: Int) -> Peg? {
+  func peg(between a: Peg, and b: Peg) -> Peg? {
+    pegs[id: [a.row+((a.row-b.row) * -1/2), a.col+((a.col-b.col) * -1/2)]]
+  }
+  private func peg(direction: Direction, of peg: Peg, offset: Int) -> Peg? {
     switch direction {
     case .left: pegs[id: [peg.row, peg.col-offset]]
     case .leftUp: pegs[id: [peg.row-offset, peg.col-offset]]
@@ -257,19 +241,26 @@ extension Pegboard.State {
     case .rightDown: pegs[id: [peg.row+offset, peg.col+offset]]
     }
   }
-  
   private func potentialMoves(for peg: Peg) -> Int {
     guard !peg.isRemoved else { return 0 }
     
     return Direction.allCases.map {
       guard
-        let adjacent = getPeg(direction: $0, of: peg, offset: 1),
-        let across = getPeg(direction: $0, of: peg, offset: 2)
+        let adjacent = self.peg(direction: $0, of: peg, offset: 1),
+        let across = self.peg(direction: $0, of: peg, offset: 2)
       else { return false }
       return !adjacent.isRemoved && across.isRemoved
     }
     .filter({ $0 == true })
     .count
+  }
+  private enum Direction: CaseIterable {
+    case left
+    case leftUp
+    case leftDown
+    case right
+    case rightUp
+    case rightDown
   }
 }
 
