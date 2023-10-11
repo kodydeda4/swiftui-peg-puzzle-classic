@@ -1,7 +1,7 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct Game: Reducer {
+struct NewGame: Reducer {
   struct State: Equatable {
     var pegboardCurrent = Pegboard.State()
     var pegboardHistory = [Pegboard.State]()
@@ -12,7 +12,7 @@ struct Game: Reducer {
   }
   enum Action: Equatable {
     case view(View)
-    case currentMove(Pegboard.Action)
+    case pegboard(Pegboard.Action)
     case destination(PresentationAction<Destination.Action>)
     case toggleIsPaused
     case timerTicked
@@ -33,7 +33,7 @@ struct Game: Reducer {
   @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
-    Scope(state: \.pegboardCurrent, action: /Action.currentMove) {
+    Scope(state: \.pegboardCurrent, action: /Action.pegboard) {
       Pegboard()
     }
     Reduce { state, action in
@@ -66,7 +66,7 @@ struct Game: Reducer {
           return .cancel(id: CancelID.timer)
         }
         
-      case .currentMove(.delegate(.didComplete)):
+      case .pegboard(.delegate(.didComplete)):
         state.score += 150
         state.pegboardHistory.append(state.pegboardCurrent)
           
@@ -99,7 +99,7 @@ struct Game: Reducer {
         state = State()
         return .none
         
-      case .currentMove, .destination:
+      case .pegboard, .destination:
         return .none
       }
     }
@@ -123,7 +123,7 @@ struct Game: Reducer {
   }
 }
 
-private extension Game.State {
+private extension NewGame.State {
   var isPaused: Bool {
     !isTimerEnabled && !pegboardHistory.isEmpty
   }
@@ -144,117 +144,10 @@ private extension Game.State {
   }
 }
 
-struct Pegboard: Reducer {
-  struct State: Equatable {
-    var pegs = Peg.grid()
-    var selection: Peg?
-  }
-  enum Action: Equatable {
-    case move(Peg)
-    case delegate(Delegate)
-    
-    enum Delegate: Equatable {
-      case didComplete
-    }
-  }
-  func reduce(into state: inout State, action: Action) -> Effect<Action> {
-    switch action {
-      
-    case let .move(selection):
-      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-      
-      if state.isFirstMove {
-        state.pegs[id: selection.id]?.isRemoved = true
-        state.selection = nil
-        return .send(.delegate(.didComplete))
-      }
-      if state.selection == nil {
-        state.selection = selection
-        return .none
-      }
-      if state.selection == selection  {
-        state.selection = nil
-        return .none
-      }
-      
-      // hopping from: start -> middle -> end
-      guard
-        let start = state.selection,
-        let middle = state.peg(between: start, and: selection),
-        let end = Optional(selection),
-        !start.isRemoved,
-        !middle.isRemoved,
-        end.isRemoved,
-        state.peg(acrossFrom: start).contains(end)
-      else {
-        state.selection = nil
-        return .none
-      }
-      
-      state.pegs[id: start.id]?.isRemoved = true
-      state.pegs[id: middle.id]?.isRemoved = true
-      state.pegs[id: end.id]?.isRemoved = false
-      state.selection = nil
-      return .send(.delegate(.didComplete))
-      
-    case .delegate:
-      return .none
-    }
-  }
-}
-
-extension Pegboard.State {
-  var isFirstMove: Bool {
-    pegs.filter(\.isRemoved).isEmpty
-  }
-  var potentialMoves: Int {
-    isFirstMove ? pegs.count : pegs.map(potentialMoves).reduce(0, +)
-  }
-  func peg(acrossFrom peg: Peg) -> [Peg] {
-    Direction.allCases.compactMap {
-      self.peg(direction: $0, of: peg, offset: 2)
-    }
-  }
-  func peg(between a: Peg, and b: Peg) -> Peg? {
-    pegs[id: [a.row+((a.row-b.row) * -1/2), a.col+((a.col-b.col) * -1/2)]]
-  }
-  private func peg(direction: Direction, of peg: Peg, offset: Int) -> Peg? {
-    switch direction {
-    case .left: pegs[id: [peg.row, peg.col-offset]]
-    case .leftUp: pegs[id: [peg.row-offset, peg.col-offset]]
-    case .leftDown: pegs[id: [peg.row+offset, peg.col]]
-    case .right: pegs[id: [peg.row, peg.col+offset]]
-    case .rightUp: pegs[id: [peg.row-offset, peg.col]]
-    case .rightDown: pegs[id: [peg.row+offset, peg.col+offset]]
-    }
-  }
-  private func potentialMoves(for peg: Peg) -> Int {
-    guard !peg.isRemoved else { return 0 }
-    
-    return Direction.allCases.map {
-      guard
-        let adjacent = self.peg(direction: $0, of: peg, offset: 1),
-        let across = self.peg(direction: $0, of: peg, offset: 2)
-      else { return false }
-      return !adjacent.isRemoved && across.isRemoved
-    }
-    .filter({ $0 == true })
-    .count
-  }
-  private enum Direction: CaseIterable {
-    case left
-    case leftUp
-    case leftDown
-    case right
-    case rightUp
-    case rightDown
-  }
-}
-
 // MARK: - SwiftUI
 
 struct NewGameView: View {
-  let store: StoreOf<Game>
+  let store: StoreOf<NewGame>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -268,7 +161,7 @@ struct NewGameView: View {
           
           PegboardView(store: store.scope(
             state: \.pegboardCurrent,
-            action: { .currentMove($0) }
+            action: { .pegboard($0) }
           ))
           .disabled(viewStore.isPaused)
           .padding()
@@ -297,10 +190,10 @@ struct NewGameView: View {
         .sheet(
           store: store.scope(
             state: \.$destination,
-            action: Game.Action.destination
+            action: NewGame.Action.destination
           ),
-          state: /Game.Destination.State.gameOver,
-          action: Game.Destination.Action.gameOver,
+          state: /NewGame.Destination.State.gameOver,
+          action: NewGame.Destination.Action.gameOver,
           content: GameOverSheet.init(store:)
         )
       }
@@ -457,47 +350,11 @@ private struct ThiccButtonLabel: View {
   }
 }
 
-struct PegboardView: View {
-  let store: StoreOf<Pegboard>
-  
-  var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack {
-        ForEach(0..<5) { row in
-          HStack {
-            ForEach(0..<row+1) { col in
-              pegView(peg: viewStore.pegs[id: [row, col]]!)
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  private func pegView(peg: Peg) -> some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.move(peg)) }) {
-        Circle()
-          .foregroundColor(Color(.systemGray))
-          .frame(width: 50, height: 50)
-          .overlay {
-            if viewStore.selection == peg {
-              Circle().foregroundColor(.accentColor)
-            }
-          }
-          .opacity(!peg.isRemoved ? 1 : 0.25)
-      }
-      .buttonStyle(.plain)
-      .animation(.default, value: viewStore.selection)
-    }
-  }
-}
-
 // MARK: - SwiftUI Previews
 
 #Preview {
   NewGameView(store: Store(
-    initialState: Game.State(),
-    reducer: Game.init
+    initialState: NewGame.State(),
+    reducer: NewGame.init
   ))
 }

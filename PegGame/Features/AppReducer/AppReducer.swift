@@ -43,14 +43,14 @@ struct AppReducer: Reducer {
   
   struct Destination: Reducer {
     enum State: Equatable {
-      case newGame(Game.State = .init())
+      case newGame(NewGame.State = .init())
     }
     enum Action: Equatable {
-      case newGame(Game.Action)
+      case newGame(NewGame.Action)
     }
     var body: some ReducerOf<Self> {
       Scope(state: /State.newGame, action: /Action.newGame) {
-        Game()
+        NewGame()
       }
     }
   }
