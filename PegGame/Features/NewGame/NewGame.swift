@@ -71,7 +71,10 @@ struct NewGame: Reducer {
         state.pegboardHistory.append(state.pegboardCurrent)
           
         if state.isGameOver {
-          return .send(.gameOver)
+          return .run { send in
+            try await self.clock.sleep(for: .seconds(1))
+            await send(.gameOver)
+          }
         } else if state.pegboardHistory.count == 1 {
           return .send(.toggleIsPaused)
         }
