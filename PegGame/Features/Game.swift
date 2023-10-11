@@ -1,10 +1,10 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct NewGame: Reducer {
+struct Game: Reducer {
   struct State: Equatable {
-    var currentMove = Move.State()
-    var previousMoves = [Move.State]()
+    var currentMove = Pegboard.State()
+    var previousMoves = [Pegboard.State]()
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
@@ -12,7 +12,7 @@ struct NewGame: Reducer {
   }
   enum Action: Equatable {
     case view(View)
-    case currentMove(Move.Action)
+    case currentMove(Pegboard.Action)
     case destination(PresentationAction<Destination.Action>)
     case toggleIsPaused
     case timerTicked
@@ -34,7 +34,7 @@ struct NewGame: Reducer {
   
   var body: some ReducerOf<Self> {
     Scope(state: \.currentMove, action: /Action.currentMove) {
-      Move()
+      Pegboard()
     }
     Reduce { state, action in
       switch action {
@@ -136,7 +136,7 @@ struct NewGame: Reducer {
   }
 }
 
-extension NewGame.State {
+extension Game.State {
   var isPaused: Bool {
     !isTimerEnabled && !previousMoves.isEmpty
   }
@@ -152,12 +152,12 @@ extension NewGame.State {
   var isRedoButtonDisabled: Bool {
     isPaused
   }
-  var total: Int {
+  var maxScore: Int {
     (currentMove.pegs.count - 1) * 150
   }
 }
 
-struct Move: Reducer {
+struct Pegboard: Reducer {
   struct State: Equatable {
     var pegs = Peg.grid()
     var selection: Peg?
@@ -215,7 +215,7 @@ struct Move: Reducer {
   }
 }
 
-extension Move.State {
+extension Pegboard.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
@@ -236,31 +236,26 @@ extension Move.State {
           pegs[id: [peg.row+0, peg.col-1]],
           pegs[id: [peg.row+0, peg.col-2]]
         ),
-        
         // left+up
         isValid(
           pegs[id: [peg.row-1, peg.col-1]],
           pegs[id: [peg.row-2, peg.col-2]]
         ),
-        
         // left+down
         isValid(
           pegs[id: [peg.row+1, peg.col]],
           pegs[id: [peg.row+2, peg.col]]
         ),
-        
         // right
         isValid(
           pegs[id: [peg.row+0, peg.col+1]],
           pegs[id: [peg.row+0, peg.col+2]]
         ),
-        
         // right+up
         isValid(
           pegs[id: [peg.row-1, peg.col+0]],
           pegs[id: [peg.row-2, peg.col+0]]
         ),
-        
         // right+down
         isValid(
           pegs[id: [peg.row+1, peg.col+1]],
@@ -305,7 +300,8 @@ extension Move.State {
       pegs[id: [peg.row-2, peg.col+0]], // right+up
       pegs[id: [peg.row+2, peg.col+2]], // right+down
     ]
-      .compactMap { $0 })
+      .compactMap { $0 }
+    )
   }
   func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
@@ -317,14 +313,16 @@ extension Move.State {
       pegs[id: [peg.row+0, peg.col+1]], // right
       pegs[id: [peg.row-1, peg.col+0]], // right+up
       pegs[id: [peg.row+1, peg.col+1]], // right+down
-    ].compactMap { $0 })
+    ]
+      .compactMap { $0 }
+    )
   }
 }
 
 // MARK: - SwiftUI
 
 struct NewGameView: View {
-  let store: StoreOf<NewGame>
+  let store: StoreOf<Game>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -336,17 +334,18 @@ struct NewGameView: View {
           
           Spacer()
           
-          MoveView(store: store.scope(
+          PegboardView(store: store.scope(
             state: \.currentMove,
             action: { .currentMove($0) }
           ))
-          .disabled(viewStore.isGameOver || viewStore.isPaused)
+          .disabled(viewStore.isPaused)
           .padding()
           
           Spacer()
           
           footer
         }
+        .disabled(viewStore.isGameOver)
         .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -366,10 +365,10 @@ struct NewGameView: View {
         .sheet(
           store: store.scope(
             state: \.$destination,
-            action: NewGame.Action.destination
+            action: Game.Action.destination
           ),
-          state: /NewGame.Destination.State.gameOver,
-          action: NewGame.Destination.Action.gameOver,
+          state: /Game.Destination.State.gameOver,
+          action: Game.Destination.Action.gameOver,
           content: GameOverSheet.init(store:)
         )
       }
@@ -399,7 +398,7 @@ struct NewGameView: View {
               Spacer()
               ProgressView(
                 value: CGFloat(viewStore.score),
-                total: CGFloat(viewStore.total)
+                total: CGFloat(viewStore.maxScore)
               )
               .animation(.default, value: viewStore.score)
             }
@@ -526,8 +525,8 @@ private struct ThiccButtonLabel: View {
   }
 }
 
-struct MoveView: View {
-  let store: StoreOf<Move>
+struct PegboardView: View {
+  let store: StoreOf<Pegboard>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
@@ -566,7 +565,7 @@ struct MoveView: View {
 
 #Preview {
   NewGameView(store: Store(
-    initialState: NewGame.State(),
-    reducer: NewGame.init
+    initialState: Game.State(),
+    reducer: Game.init
   ))
 }

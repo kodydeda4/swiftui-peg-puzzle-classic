@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		33B78C172AC732D0005FC780 /* NewGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* NewGame.swift */; };
+		33B78C172AC732D0005FC780 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* Game.swift */; };
 		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
 		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
 		33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C232AC73882005FC780 /* RoundedRectangleButtonStyle.swift */; };
@@ -20,7 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		33B78C162AC732D0005FC780 /* NewGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGame.swift; sourceTree = "<group>"; };
+		33B78C162AC732D0005FC780 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
 		33B78C232AC73882005FC780 /* RoundedRectangleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedRectangleButtonStyle.swift; sourceTree = "<group>"; };
@@ -55,7 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */,
-				33B78C162AC732D0005FC780 /* NewGame.swift */,
+				33B78C162AC732D0005FC780 /* Game.swift */,
 				33F2C8D42AD606A7004574A2 /* GameOver.swift */,
 			);
 			path = Features;
@@ -227,7 +227,7 @@
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
 				33F2C8D52AD606A7004574A2 /* GameOver.swift in Sources */,
-				33B78C172AC732D0005FC780 /* NewGame.swift in Sources */,
+				33B78C172AC732D0005FC780 /* Game.swift in Sources */,
 				33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */,
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
 				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
