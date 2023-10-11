@@ -193,7 +193,7 @@ struct Pegboard: Reducer {
       // hopping from: start -> middle -> end
       guard
         let start = state.selection,
-        let middle = state.getPeg(between: start, and: selection),
+        let middle = state.pegBetween(start, selection),
         let end = Optional(selection),
         !start.isRemoved,
         !middle.isRemoved,
@@ -234,7 +234,7 @@ extension Pegboard.State {
     case rightDown
   }
   
-  func getPeg(between a: Peg, and b: Peg) -> Peg? {
+  func pegBetween(_ a: Peg, _ b: Peg) -> Peg? {
     let row: Int? = {
       let diff = a.row - b.row
       switch diff {
@@ -259,11 +259,11 @@ extension Pegboard.State {
   
   func getPegs(acrossFrom peg: Peg) -> [Peg] {
     Direction.allCases.compactMap {
-      getPeg($0, of: peg, offset: 2)
+      getPeg(direction: $0, of: peg, offset: 2)
     }
   }
   
-  private func getPeg(_ direction: Direction, of peg: Peg, offset: Int) -> Peg? {
+  private func getPeg(direction: Direction, of peg: Peg, offset: Int) -> Peg? {
     switch direction {
     case .left: pegs[id: [peg.row, peg.col-offset]]
     case .leftUp: pegs[id: [peg.row-offset, peg.col-offset]]
@@ -277,10 +277,10 @@ extension Pegboard.State {
   private func potentialMoves(for peg: Peg) -> Int {
     guard !peg.isRemoved else { return 0 }
     
-    return Direction.allCases.map { direction in
+    return Direction.allCases.map {
       guard
-        let adjacent = getPeg(direction, of: peg, offset: 1),
-        let across = getPeg(direction, of: peg, offset: 2)
+        let adjacent = getPeg(direction: $0, of: peg, offset: 1),
+        let across = getPeg(direction: $0, of: peg, offset: 2)
       else { return false }
       return !adjacent.isRemoved && across.isRemoved
     }
