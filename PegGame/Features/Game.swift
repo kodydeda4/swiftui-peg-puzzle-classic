@@ -136,7 +136,7 @@ struct Game: Reducer {
   }
 }
 
-extension Game.State {
+private extension Game.State {
   var isPaused: Bool {
     !isTimerEnabled && !previousMoves.isEmpty
   }
@@ -222,15 +222,14 @@ extension Pegboard.State {
   var potentialMoves: Int {
     guard !isFirstMove else { return pegs.count }
     
-    var rv = 0
-    
     let isValid: (Peg?, Peg?) -> Bool = { adjacent, across in
       guard let adjacent, let across else { return false }
       return !adjacent.isRemoved && across.isRemoved
     }
     
-    for peg in self.pegs.filter({ !$0.isRemoved }) {
-      rv += [
+    return self.pegs
+      .filter({ !$0.isRemoved })
+      .compactMap({ peg in [
         // left
         isValid(
           pegs[id: [peg.row+0, peg.col-1]],
@@ -262,11 +261,12 @@ extension Pegboard.State {
           pegs[id: [peg.row+2, peg.col+2]]
         )
       ]
-        .filter({ $0 == true })
-        .count
-    }
-    return rv
+          .filter({ $0 == true })
+          .count
+      })
+      .reduce(0, +)
   }
+  
   func peg(between a: Peg, and b: Peg) -> Peg? {
     let row: Int? = {
       let diff = a.row - b.row
@@ -289,6 +289,7 @@ extension Pegboard.State {
     guard let row = row, let col = col else { return nil }
     return pegs[id: [row,col]]
   }
+  
   func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
     
@@ -303,6 +304,7 @@ extension Pegboard.State {
       .compactMap { $0 }
     )
   }
+  
   func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
     
