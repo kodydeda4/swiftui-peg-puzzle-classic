@@ -214,8 +214,6 @@ extension Move.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
-  
-  // for each peg, for each direction, if !adjacent.isRemoved && across.isRemoved { += 1 }
   var potentialMoves: Int {
     guard !isFirstMove else { return pegs.count }
     
@@ -339,13 +337,14 @@ struct NewGameView: View {
             state: \.currentMove,
             action: { .currentMove($0) }
           ))
-          .disabled(viewStore.isGameOver || viewStore.isPaused)
+          .disabled(viewStore.isPaused)
           .padding()
           
           Spacer()
           
           footer
         }
+        .disabled(viewStore.isGameOver)
         .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -362,6 +361,7 @@ struct NewGameView: View {
             }
           }
         }
+        
         .sheet(
           store: store.scope(
             state: \.$destination,
