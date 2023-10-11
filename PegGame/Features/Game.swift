@@ -195,6 +195,7 @@ struct Pegboard: Reducer {
         let start = state.selection,
         let middle = state.peg(between: start, and: selection),
         let end = Optional(selection),
+        !start.isRemoved,
         !middle.isRemoved,
         end.isRemoved,
         state.pegs(acrossFrom: start).contains(end)
@@ -220,6 +221,14 @@ extension Pegboard.State {
     pegs.filter(\.isRemoved).isEmpty
   }
   
+  var potentialMoves: Int {
+    isFirstMove
+    ? pegs.count
+    : pegs.map(potentialMoves(for:)).reduce(0, +)
+  }
+}
+  
+extension Pegboard.State {
   enum Direction: CaseIterable {
     case left
     case leftUp
@@ -227,23 +236,6 @@ extension Pegboard.State {
     case right
     case rightUp
     case rightDown
-  }
-  
-  var potentialMoves: Int {
-    isFirstMove
-    ? pegs.count
-    : pegs.filter({ !$0.isRemoved }).compactMap({ peg in
-      Direction.allCases.map { direction in
-        guard
-          let adjacent = getPeg(direction, of: peg, offset: 1),
-          let across = getPeg(direction, of: peg, offset: 2)
-        else { return false }
-        return !adjacent.isRemoved && across.isRemoved
-      }
-      .filter({ $0 == true })
-      .count
-    })
-    .reduce(0, +)
   }
   
   func peg(between a: Peg, and b: Peg) -> Peg? {
@@ -271,49 +263,41 @@ extension Pegboard.State {
   
   func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [peg.row+0, peg.col-2]], // left
-      pegs[id: [peg.row-2, peg.col-2]], // left+up
-      pegs[id: [peg.row+2, peg.col]],   // left+down
-      pegs[id: [peg.row+0, peg.col+2]], // right
-      pegs[id: [peg.row-2, peg.col+0]], // right+up
-      pegs[id: [peg.row+2, peg.col+2]], // right+down
-    ]
-      .compactMap { $0 }
-    )
+    return .init(uniqueElements: Direction.allCases.compactMap { direction in
+      getPeg(direction, of: peg, offset: 2)
+    })
   }
   
-  func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
+  private func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
     guard let peg = peg else { return [] }
-    
-    return .init(uniqueElements: [
-      pegs[id: [peg.row+0, peg.col-1]], // left
-      pegs[id: [peg.row-1, peg.col-1]], // left+up
-      pegs[id: [peg.row+1, peg.col]],   // left+down
-      pegs[id: [peg.row+0, peg.col+1]], // right
-      pegs[id: [peg.row-1, peg.col+0]], // right+up
-      pegs[id: [peg.row+1, peg.col+1]], // right+down
-    ]
-      .compactMap { $0 }
-    )
+    return .init(uniqueElements: Direction.allCases.compactMap { direction in
+      getPeg(direction, of: peg, offset: 1)
+    })
   }
   
-  func getPeg(_ direction: Direction, of peg: Peg, offset: Int) -> Peg? {
+  private func getPeg(_ direction: Direction, of peg: Peg, offset: Int) -> Peg? {
     switch direction {
-    case .left:
-      return pegs[id: [peg.row, peg.col-offset]]
-    case .leftUp:
-      return pegs[id: [peg.row-offset, peg.col-offset]]
-    case .leftDown:
-      return pegs[id: [peg.row+offset, peg.col]]
-    case .right:
-      return pegs[id: [peg.row, peg.col+offset]]
-    case .rightUp:
-      return pegs[id: [peg.row-offset, peg.col]]
-    case .rightDown:
-      return pegs[id: [peg.row+offset, peg.col+offset]]
+    case .left: pegs[id: [peg.row, peg.col-offset]]
+    case .leftUp: pegs[id: [peg.row-offset, peg.col-offset]]
+    case .leftDown: pegs[id: [peg.row+offset, peg.col]]
+    case .right: pegs[id: [peg.row, peg.col+offset]]
+    case .rightUp: pegs[id: [peg.row-offset, peg.col]]
+    case .rightDown: pegs[id: [peg.row+offset, peg.col+offset]]
     }
+  }
+  
+  private func potentialMoves(for peg: Peg) -> Int {
+    guard !peg.isRemoved else { return 0 }
+    
+    return Direction.allCases.map { direction in
+      guard
+        let adjacent = getPeg(direction, of: peg, offset: 1),
+        let across = getPeg(direction, of: peg, offset: 2)
+      else { return false }
+      return !adjacent.isRemoved && across.isRemoved
+    }
+    .filter({ $0 == true })
+    .count
   }
 }
 
