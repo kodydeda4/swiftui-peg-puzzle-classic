@@ -51,18 +51,15 @@ struct Game: Reducer {
         case .undoButtonTapped:
           state.score -= 150
           state.pegboardHistory.removeLast()
-          
           if let prev = state.pegboardHistory.last {
             state.pegboardCurrent = prev
           } else {
             state.pegboardCurrent = .init()
           }
-          
           if state.pegboardHistory.isEmpty {
             state = State()
             return .cancel(id: CancelID.timer)
           }
-          
           return .none
           
         case .redoButtonTapped:
