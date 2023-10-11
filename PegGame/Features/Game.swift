@@ -66,24 +66,16 @@ struct Game: Reducer {
           return .cancel(id: CancelID.timer)
         }
         
-      case let .currentMove(action):
-        switch action {
-        
-        case .delegate(.didComplete):
-          state.pegboardHistory.append(state.pegboardCurrent)
-          state.score += 150
+      case .currentMove(.delegate(.didComplete)):
+        state.score += 150
+        state.pegboardHistory.append(state.pegboardCurrent)
           
-          if state.pegboardHistory.count == 1 {
-            return .send(.toggleIsPaused)
-          }
-          if state.pegboardCurrent.potentialMoves == 0 {
-            return .send(.gameOver)
-          }
-          return .none
-          
-        default:
-          return .none
+        if state.isGameOver {
+          return .send(.gameOver)
+        } else if state.pegboardHistory.count == 1 {
+          return .send(.toggleIsPaused)
         }
+        return .none
         
       case .toggleIsPaused:
         state.isTimerEnabled.toggle()
@@ -103,16 +95,12 @@ struct Game: Reducer {
         state.destination = .gameOver(.init())
         return .send(.toggleIsPaused)
         
-      case let .destination(action):
-        switch action {
+      case .destination(.presented(.gameOver(.doneButtonTapped))):
+        state = State()
+        return .none
         
-        case .presented(.gameOver(.doneButtonTapped)):
-          state = State()
-          return .none
-          
-        default:
-          return .none
-        }
+      case .currentMove, .destination:
+        return .none
       }
     }
     .ifLet(\.$destination, action: /Action.destination) {
