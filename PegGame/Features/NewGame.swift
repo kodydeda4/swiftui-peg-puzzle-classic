@@ -8,6 +8,7 @@ struct NewGame: Reducer {
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
+    var isGameOver = false
     @PresentationState var destination: Destination.State?
   }
   enum Action: Equatable {
@@ -338,7 +339,7 @@ struct NewGameView: View {
             state: \.currentMove,
             action: { .currentMove($0) }
           ))
-          .disabled(viewStore.isPaused)
+          .disabled(viewStore.isGameOver || viewStore.isPaused)
           .padding()
           
           Spacer()
