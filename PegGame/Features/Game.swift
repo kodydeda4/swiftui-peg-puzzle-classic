@@ -193,12 +193,12 @@ struct Pegboard: Reducer {
       // hopping from: start -> middle -> end
       guard
         let start = state.selection,
-        let middle = state.peg(between: start, and: selection),
+        let middle = state.getPeg(between: start, and: selection),
         let end = Optional(selection),
         !start.isRemoved,
         !middle.isRemoved,
         end.isRemoved,
-        state.pegs(acrossFrom: start).contains(end)
+        state.getPegs(acrossFrom: start).contains(end)
       else {
         state.selection = nil
         return .none
@@ -222,13 +222,9 @@ extension Pegboard.State {
   }
   
   var potentialMoves: Int {
-    isFirstMove
-    ? pegs.count
-    : pegs.map(potentialMoves(for:)).reduce(0, +)
+    isFirstMove ? pegs.count : pegs.map(potentialMoves).reduce(0, +)
   }
-}
-  
-extension Pegboard.State {
+
   enum Direction: CaseIterable {
     case left
     case leftUp
@@ -238,7 +234,7 @@ extension Pegboard.State {
     case rightDown
   }
   
-  func peg(between a: Peg, and b: Peg) -> Peg? {
+  func getPeg(between a: Peg, and b: Peg) -> Peg? {
     let row: Int? = {
       let diff = a.row - b.row
       switch diff {
@@ -261,18 +257,10 @@ extension Pegboard.State {
     return pegs[id: [row,col]]
   }
   
-  func pegs(acrossFrom peg: Peg?) -> IdentifiedArrayOf<Peg> {
-    guard let peg = peg else { return [] }
-    return .init(uniqueElements: Direction.allCases.compactMap { direction in
-      getPeg(direction, of: peg, offset: 2)
-    })
-  }
-  
-  private func pegs(adjacentTo peg: Peg?) -> IdentifiedArrayOf<Peg> {
-    guard let peg = peg else { return [] }
-    return .init(uniqueElements: Direction.allCases.compactMap { direction in
-      getPeg(direction, of: peg, offset: 1)
-    })
+  func getPegs(acrossFrom peg: Peg) -> [Peg] {
+    Direction.allCases.compactMap {
+      getPeg($0, of: peg, offset: 2)
+    }
   }
   
   private func getPeg(_ direction: Direction, of peg: Peg, offset: Int) -> Peg? {
