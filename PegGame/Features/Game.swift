@@ -251,7 +251,7 @@ extension Pegboard.State {
       default: return nil
       }
     }
-    guard let row = row, let col = col else { return nil }
+    guard let row, let col else { return nil }
     return pegs[id: [row,col]]
   }
   
