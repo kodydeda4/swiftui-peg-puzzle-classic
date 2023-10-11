@@ -161,9 +161,7 @@ struct NewGameView: View {
       NavigationStack {
         VStack {
           header
-          
-          Text("Potential Moves: \(viewStore.pegboardCurrent.potentialMoves.description)")
-          
+
           Spacer()
           
           PegboardView(store: store.scope(
