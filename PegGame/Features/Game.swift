@@ -219,30 +219,31 @@ extension Pegboard.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
+  
+  enum Direction: CaseIterable {
+    case left
+    case leftUp
+    case leftDown
+    case right
+    case rightUp
+    case rightDown
+  }
+  
   var potentialMoves: Int {
-    guard !isFirstMove else { return pegs.count }
-    
-    let isValid: (String, Peg?, Peg?) -> Bool = { _, adjacent, across in
-      guard let adjacent, let across else { return false }
-      return !adjacent.isRemoved && across.isRemoved
-    }
-    
-    return self.pegs
-      .filter({ !$0.isRemoved })
-      .compactMap({ peg in
-        Array
-          .init([
-            isValid("left", pegs[id: [peg.row, peg.col-1]], pegs[id: [peg.row, peg.col-2]]),
-            isValid("left+up", pegs[id: [peg.row-1, peg.col-1]], pegs[id: [peg.row-2, peg.col-2]]),
-            isValid("left+down", pegs[id: [peg.row+1, peg.col]], pegs[id: [peg.row+2, peg.col]]),
-            isValid("right", pegs[id: [peg.row, peg.col+1]], pegs[id: [peg.row, peg.col+2]]),
-            isValid("right+up", pegs[id: [peg.row-1, peg.col]], pegs[id: [peg.row-2, peg.col]]),
-            isValid("right+down", pegs[id: [peg.row+1, peg.col+1]], pegs[id: [peg.row+2, peg.col+2]])
-          ])
-          .filter({ $0 == true })
-          .count
-      })
-      .reduce(0, +)
+    isFirstMove
+    ? pegs.count
+    : pegs.filter({ !$0.isRemoved }).compactMap({ peg in
+      Direction.allCases.map { direction in
+        guard
+          let adjacent = getPeg(direction, of: peg, offset: 1),
+          let across = getPeg(direction, of: peg, offset: 2)
+        else { return false }
+        return !adjacent.isRemoved && across.isRemoved
+      }
+      .filter({ $0 == true })
+      .count
+    })
+    .reduce(0, +)
   }
   
   func peg(between a: Peg, and b: Peg) -> Peg? {
@@ -296,6 +297,23 @@ extension Pegboard.State {
     ]
       .compactMap { $0 }
     )
+  }
+  
+  func getPeg(_ direction: Direction, of peg: Peg, offset: Int) -> Peg? {
+    switch direction {
+    case .left:
+      return pegs[id: [peg.row, peg.col-offset]]
+    case .leftUp:
+      return pegs[id: [peg.row-offset, peg.col-offset]]
+    case .leftDown:
+      return pegs[id: [peg.row+offset, peg.col]]
+    case .right:
+      return pegs[id: [peg.row, peg.col+offset]]
+    case .rightUp:
+      return pegs[id: [peg.row-offset, peg.col]]
+    case .rightDown:
+      return pegs[id: [peg.row+offset, peg.col+offset]]
+    }
   }
 }
 
