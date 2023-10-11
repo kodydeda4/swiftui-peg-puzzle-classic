@@ -138,14 +138,10 @@ struct PegboardView: View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       Button(action: { viewStore.send(.move(peg)) }) {
         Circle()
-          .foregroundColor(Color(.systemGray))
+          .foregroundColor(viewStore.selection == peg ? .accentColor : Color(.systemGray))
           .frame(width: 50, height: 50)
-          .overlay {
-            if viewStore.selection == peg {
-              Circle().foregroundColor(.accentColor)
-            }
-          }
           .opacity(!peg.isRemoved ? 1 : 0.25)
+          .transition(.scale)
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
