@@ -95,10 +95,14 @@ struct NewGame: Reducer {
         return .none
         
       case .gameOver:
-        state.destination = .gameOver(.init())
+        state.destination = .gameOver(.init(
+          score: state.score,
+          maxScore: state.maxScore,
+          secondsElapsed: state.secondsElapsed
+        ))
         return .send(.toggleIsPaused)
-        
-      case .destination(.presented(.gameOver(.doneButtonTapped))):
+          
+      case .destination(.presented(.gameOver(.newGameButtonTapped))):
         state = State()
         return .none
         

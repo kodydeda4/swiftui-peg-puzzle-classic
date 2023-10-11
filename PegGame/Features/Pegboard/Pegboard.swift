@@ -1,68 +1,66 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension NewGame {
-  struct Pegboard: Reducer {
-    struct State: Equatable {
-      var pegs = Peg.grid()
-      var selection: Peg?
+struct Pegboard: Reducer {
+  struct State: Equatable {
+    var pegs = Peg.grid()
+    var selection: Peg?
+  }
+  enum Action: Equatable {
+    case move(Peg)
+    case delegate(Delegate)
+    
+    enum Delegate: Equatable {
+      case didComplete
     }
-    enum Action: Equatable {
-      case move(Peg)
-      case delegate(Delegate)
+  }
+  func reduce(into state: inout State, action: Action) -> Effect<Action> {
+    switch action {
       
-      enum Delegate: Equatable {
-        case didComplete
-      }
-    }
-    func reduce(into state: inout State, action: Action) -> Effect<Action> {
-      switch action {
-        
-      case let .move(selection):
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-        
-        if state.isFirstMove {
-          state.pegs[id: selection.id]?.isRemoved = true
-          state.selection = nil
-          return .send(.delegate(.didComplete))
-        }
-        if state.selection == nil {
-          state.selection = selection
-          return .none
-        }
-        if state.selection == selection  {
-          state.selection = nil
-          return .none
-        }
-        
-        // hopping from: start -> middle -> end
-        guard
-          let start = state.selection,
-          let middle = state.peg(between: start, and: selection),
-          let end = Optional(selection),
-          !start.isRemoved,
-          !middle.isRemoved,
-          end.isRemoved,
-          state.peg(acrossFrom: start).contains(end)
-        else {
-          state.selection = nil
-          return .none
-        }
-        
-        state.pegs[id: start.id]?.isRemoved = true
-        state.pegs[id: middle.id]?.isRemoved = true
-        state.pegs[id: end.id]?.isRemoved = false
+    case let .move(selection):
+      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+      
+      if state.isFirstMove {
+        state.pegs[id: selection.id]?.isRemoved = true
         state.selection = nil
         return .send(.delegate(.didComplete))
-        
-      case .delegate:
+      }
+      if state.selection == nil {
+        state.selection = selection
         return .none
       }
+      if state.selection == selection  {
+        state.selection = nil
+        return .none
+      }
+      
+      // hopping from: start -> middle -> end
+      guard
+        let start = state.selection,
+        let middle = state.peg(between: start, and: selection),
+        let end = Optional(selection),
+        !start.isRemoved,
+        !middle.isRemoved,
+        end.isRemoved,
+        state.peg(acrossFrom: start).contains(end)
+      else {
+        state.selection = nil
+        return .none
+      }
+      
+      state.pegs[id: start.id]?.isRemoved = true
+      state.pegs[id: middle.id]?.isRemoved = true
+      state.pegs[id: end.id]?.isRemoved = false
+      state.selection = nil
+      return .send(.delegate(.didComplete))
+      
+    case .delegate:
+      return .none
     }
   }
 }
 
-extension NewGame.Pegboard.State {
+extension Pegboard.State {
   var isFirstMove: Bool {
     pegs.filter(\.isRemoved).isEmpty
   }
@@ -71,7 +69,7 @@ extension NewGame.Pegboard.State {
   }
 }
 
-private extension NewGame.Pegboard.State {
+private extension Pegboard.State {
   private enum Direction: CaseIterable {
     case left
     case leftUp
@@ -80,7 +78,7 @@ private extension NewGame.Pegboard.State {
     case rightUp
     case rightDown
   }
-
+  
   func peg(between a: Peg, and b: Peg) -> Peg? {
     pegs[id: [a.row+((a.row-b.row) * -1/2), a.col+((a.col-b.col) * -1/2)]]
   }
@@ -120,7 +118,7 @@ private extension NewGame.Pegboard.State {
 // MARK: - SwiftUI
 
 struct PegboardView: View {
-  let store: StoreOf<NewGame.Pegboard>
+  let store: StoreOf<Pegboard>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
@@ -159,7 +157,7 @@ struct PegboardView: View {
 
 #Preview {
   PegboardView(store: Store(
-    initialState: NewGame.Pegboard.State(),
-    reducer: NewGame.Pegboard.init
+    initialState: Pegboard.State(),
+    reducer: Pegboard.init
   ))
 }

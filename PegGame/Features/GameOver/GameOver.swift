@@ -3,13 +3,14 @@ import ComposableArchitecture
 
 struct GameOver: Reducer {
   struct State: Equatable {
-    
+    let score: Int
+    let maxScore: Int
+    let secondsElapsed: Int
   }
-  
   enum Action: Equatable {
     case doneButtonTapped
+    case newGameButtonTapped
   }
-  
   @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
@@ -17,6 +18,9 @@ struct GameOver: Reducer {
       switch action {
         
       case .doneButtonTapped:
+        return .run { _ in await self.dismiss() }
+        
+      case .newGameButtonTapped:
         return .run { _ in await self.dismiss() }
       }
     }
@@ -31,14 +35,29 @@ struct GameOverSheet: View {
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       NavigationStack {
-        VStack {
-          
+        Form {
+          Section("Results") {
+            HStack {
+              Text("🎉 Score").bold()
+              Text("\(viewStore.score) / \(viewStore.maxScore)")
+            }
+            HStack {
+              Text("⏰ Time").bold()
+              Text("\(viewStore.secondsElapsed)s")
+            }
+          }
         }
         .navigationTitle("Game Over")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationOverlay {
+          Button("New Game") {
+            viewStore.send(.newGameButtonTapped)
+          }
+          .buttonStyle(RoundedRectangleButtonStyle())
+        }
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
-            Button("New Game") {
+            Button("Done") {
               viewStore.send(.doneButtonTapped)
             }
           }
@@ -53,7 +72,11 @@ struct GameOverSheet: View {
 #Preview {
   Text("Hello World").sheet(isPresented: .constant(true)) {
     GameOverSheet(store: Store(
-      initialState: GameOver.State(),
+      initialState: GameOver.State(
+        score: 150,
+        maxScore: 1300,
+        secondsElapsed: 10
+      ),
       reducer: GameOver.init
     ))
   }
