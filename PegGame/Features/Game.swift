@@ -222,45 +222,23 @@ extension Pegboard.State {
   var potentialMoves: Int {
     guard !isFirstMove else { return pegs.count }
     
-    let isValid: (Peg?, Peg?) -> Bool = { adjacent, across in
+    let isValid: (String, Peg?, Peg?) -> Bool = { _, adjacent, across in
       guard let adjacent, let across else { return false }
       return !adjacent.isRemoved && across.isRemoved
     }
     
     return self.pegs
       .filter({ !$0.isRemoved })
-      .compactMap({ peg in [
-        // left
-        isValid(
-          pegs[id: [peg.row+0, peg.col-1]],
-          pegs[id: [peg.row+0, peg.col-2]]
-        ),
-        // left+up
-        isValid(
-          pegs[id: [peg.row-1, peg.col-1]],
-          pegs[id: [peg.row-2, peg.col-2]]
-        ),
-        // left+down
-        isValid(
-          pegs[id: [peg.row+1, peg.col]],
-          pegs[id: [peg.row+2, peg.col]]
-        ),
-        // right
-        isValid(
-          pegs[id: [peg.row+0, peg.col+1]],
-          pegs[id: [peg.row+0, peg.col+2]]
-        ),
-        // right+up
-        isValid(
-          pegs[id: [peg.row-1, peg.col+0]],
-          pegs[id: [peg.row-2, peg.col+0]]
-        ),
-        // right+down
-        isValid(
-          pegs[id: [peg.row+1, peg.col+1]],
-          pegs[id: [peg.row+2, peg.col+2]]
-        )
-      ]
+      .compactMap({ peg in
+        Array
+          .init([
+            isValid("left", pegs[id: [peg.row, peg.col-1]], pegs[id: [peg.row, peg.col-2]]),
+            isValid("left+up", pegs[id: [peg.row-1, peg.col-1]], pegs[id: [peg.row-2, peg.col-2]]),
+            isValid("left+down", pegs[id: [peg.row+1, peg.col]], pegs[id: [peg.row+2, peg.col]]),
+            isValid("right", pegs[id: [peg.row, peg.col+1]], pegs[id: [peg.row, peg.col+2]]),
+            isValid("right+up", pegs[id: [peg.row-1, peg.col]], pegs[id: [peg.row-2, peg.col]]),
+            isValid("right+down", pegs[id: [peg.row+1, peg.col+1]], pegs[id: [peg.row+2, peg.col+2]])
+          ])
           .filter({ $0 == true })
           .count
       })
