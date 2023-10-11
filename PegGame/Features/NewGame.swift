@@ -1,8 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
 
-// 1. how do you calculate available moves?
-
 struct NewGame: Reducer {
   struct State: Equatable {
     var currentMove = Move.State()
@@ -218,6 +216,8 @@ extension Move.State {
   
   // for each peg, for each direction, if !adjacent.isRemoved && across.isRemoved { += 1 }
   var potentialMoves: Int {
+    guard !isFirstMove else { return pegs.count }
+    
     var rv = 0
     
     let isValid: (Peg?, Peg?) -> Bool = { adjacent, across in
@@ -225,7 +225,7 @@ extension Move.State {
       return !adjacent.isRemoved && across.isRemoved
     }
     
-    for peg in self.pegs {
+    for peg in self.pegs.filter({ !$0.isRemoved }) {
       rv += [
         // left
         isValid(
@@ -558,9 +558,6 @@ struct MoveView: View {
             }
           }
           .opacity(!peg.isRemoved ? 1 : 0.25)
-          .overlay {
-            Text("\(peg.row), \(peg.col)").foregroundColor(.primary)
-          }
       }
       .buttonStyle(.plain)
       .animation(.default, value: viewStore.selection)
