@@ -8,6 +8,7 @@ extension View {
     overlay {
       VStack(spacing: 0) {
         Spacer()
+        
         Rectangle()
           .fill(
             LinearGradient(
@@ -19,11 +20,16 @@ extension View {
           .frame(height: 30)
           .opacity(0.035)
 
+        Divider().opacity(0.5)
+        
         VStack {
           content()
             .padding()
         }
-        .background { Color(.systemBackground).ignoresSafeArea() }
+        .background {
+          Color(.systemBackground)
+            .ignoresSafeArea()
+        }
       }
     }
   }
