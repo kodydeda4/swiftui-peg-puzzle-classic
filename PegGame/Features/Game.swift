@@ -235,14 +235,10 @@ extension Pegboard.State {
   }
   
   func pegBetween(_ a: Peg, _ b: Peg) -> Peg? {
-    let o: (Int, Int) -> Int? = { $0 + (($0-$1) * -1/2) }
-    
-    guard
-      let row = o(a.row, b.row),
-      let col = o(a.col, b.col)
-    else { return nil }
-    
-    return pegs[id: [row,col]]
+    pegs[id: [
+      a.row + ((a.row-b.row) * -1/2),
+      a.col + ((a.col-b.col) * -1/2),
+    ]]
   }
   
   func getPegs(acrossFrom peg: Peg) -> [Peg] {
