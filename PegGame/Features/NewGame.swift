@@ -552,11 +552,6 @@ struct MoveView: View {
               Circle().foregroundColor(.accentColor)
             }
           }
-          .overlay {
-            if viewStore.state.pegs(acrossFrom: viewStore.selection).contains(peg) {
-              Circle().foregroundColor(.blue)
-            }
-          }
           .opacity(!peg.isRemoved ? 1 : 0.25)
       }
       .buttonStyle(.plain)
