@@ -8,7 +8,6 @@ struct NewGame: Reducer {
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
-    var isGameOver = false
     @PresentationState var destination: Destination.State?
   }
   enum Action: Equatable {
@@ -141,8 +140,14 @@ extension NewGame.State {
   var isPaused: Bool {
     !isTimerEnabled && !previousMoves.isEmpty
   }
+  var isGameOver: Bool {
+    currentMove.potentialMoves == 0
+  }
   var isUndoButtonDisabled: Bool {
-    previousMoves.isEmpty || isPaused
+    isPaused || previousMoves.isEmpty
+  }
+  var isPauseButtonDisabled: Bool {
+    isGameOver || previousMoves.isEmpty
   }
   var isRedoButtonDisabled: Bool {
     isPaused
@@ -296,7 +301,6 @@ extension Move.State {
       pegs[id: [peg.row+0, peg.col-2]], // left
       pegs[id: [peg.row-2, peg.col-2]], // left+up
       pegs[id: [peg.row+2, peg.col]],   // left+down
-      //-------------------------------------------------------
       pegs[id: [peg.row+0, peg.col+2]], // right
       pegs[id: [peg.row-2, peg.col+0]], // right+up
       pegs[id: [peg.row+2, peg.col+2]], // right+down
@@ -310,7 +314,6 @@ extension Move.State {
       pegs[id: [peg.row+0, peg.col-1]], // left
       pegs[id: [peg.row-1, peg.col-1]], // left+up
       pegs[id: [peg.row+1, peg.col]],   // left+down
-      //-------------------------------------------------------
       pegs[id: [peg.row+0, peg.col+1]], // right
       pegs[id: [peg.row-1, peg.col+0]], // right+up
       pegs[id: [peg.row+1, peg.col+1]], // right+down
@@ -337,14 +340,13 @@ struct NewGameView: View {
             state: \.currentMove,
             action: { .currentMove($0) }
           ))
-          .disabled(viewStore.isPaused)
+          .disabled(viewStore.isGameOver || viewStore.isPaused)
           .padding()
           
           Spacer()
           
           footer
         }
-        .disabled(viewStore.isGameOver)
         .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -361,7 +363,6 @@ struct NewGameView: View {
             }
           }
         }
-        
         .sheet(
           store: store.scope(
             state: \.$destination,
@@ -477,7 +478,7 @@ struct NewGameView: View {
                 systemImage: viewStore.isPaused ? "play" : "pause"
               )
             }
-            .disabled(viewStore.previousMoves.isEmpty)
+            .disabled(viewStore.isPauseButtonDisabled)
             
             Button(action: { viewStore.send(.redoButtonTapped) }) {
               ThiccButtonLabel(
