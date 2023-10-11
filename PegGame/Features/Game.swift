@@ -3,8 +3,8 @@ import ComposableArchitecture
 
 struct Game: Reducer {
   struct State: Equatable {
-    var currentMove = Pegboard.State()
-    var previousMoves = [Pegboard.State]()
+    var pegboardCurrent = Pegboard.State()
+    var pegboardHistory = [Pegboard.State]()
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
@@ -33,11 +33,12 @@ struct Game: Reducer {
   @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
-    Scope(state: \.currentMove, action: /Action.currentMove) {
+    Scope(state: \.pegboardCurrent, action: /Action.currentMove) {
       Pegboard()
     }
     Reduce { state, action in
       switch action {
+      
       case let .view(action):
         switch action {
           
@@ -49,15 +50,15 @@ struct Game: Reducer {
           
         case .undoButtonTapped:
           state.score -= 150
-          state.previousMoves.removeLast()
+          state.pegboardHistory.removeLast()
           
-          if let prev = state.previousMoves.last {
-            state.currentMove = prev
+          if let prev = state.pegboardHistory.last {
+            state.pegboardCurrent = prev
           } else {
-            state.currentMove = .init()
+            state.pegboardCurrent = .init()
           }
           
-          if state.previousMoves.isEmpty {
+          if state.pegboardHistory.isEmpty {
             state = State()
             return .cancel(id: CancelID.timer)
           }
@@ -74,14 +75,15 @@ struct Game: Reducer {
         
       case let .currentMove(action):
         switch action {
+        
         case .delegate(.didComplete):
-          state.previousMoves.append(state.currentMove)
+          state.pegboardHistory.append(state.pegboardCurrent)
           state.score += 150
           
-          if state.previousMoves.count == 1 {
+          if state.pegboardHistory.count == 1 {
             return .send(.toggleIsPaused)
           }
-          if state.currentMove.potentialMoves == 0 {
+          if state.pegboardCurrent.potentialMoves == 0 {
             return .send(.gameOver)
           }
           return .none
@@ -108,12 +110,16 @@ struct Game: Reducer {
         state.destination = .gameOver(.init())
         return .send(.toggleIsPaused)
         
-      case .destination(.presented(.gameOver(.doneButtonTapped))):
-        state = State()
-        return .none
+      case let .destination(action):
+        switch action {
         
-      case .destination:
-        return .none
+        case .presented(.gameOver(.doneButtonTapped)):
+          state = State()
+          return .none
+          
+        default:
+          return .none
+        }
       }
     }
     .ifLet(\.$destination, action: /Action.destination) {
@@ -138,22 +144,22 @@ struct Game: Reducer {
 
 private extension Game.State {
   var isPaused: Bool {
-    !isTimerEnabled && !previousMoves.isEmpty
+    !isTimerEnabled && !pegboardHistory.isEmpty
   }
   var isGameOver: Bool {
-    currentMove.potentialMoves == 0
+    pegboardCurrent.potentialMoves == 0
   }
   var isUndoButtonDisabled: Bool {
-    isPaused || previousMoves.isEmpty
+    isPaused || pegboardHistory.isEmpty
   }
   var isPauseButtonDisabled: Bool {
-    isGameOver || previousMoves.isEmpty
+    isGameOver || pegboardHistory.isEmpty
   }
   var isRedoButtonDisabled: Bool {
     isPaused
   }
   var maxScore: Int {
-    (currentMove.pegs.count - 1) * 150
+    (pegboardCurrent.pegs.count - 1) * 150
   }
 }
 
@@ -275,12 +281,12 @@ struct NewGameView: View {
         VStack {
           header
           
-          Text("Potential Moves: \(viewStore.currentMove.potentialMoves.description)")
+          Text("Potential Moves: \(viewStore.pegboardCurrent.potentialMoves.description)")
           
           Spacer()
           
           PegboardView(store: store.scope(
-            state: \.currentMove,
+            state: \.pegboardCurrent,
             action: { .currentMove($0) }
           ))
           .disabled(viewStore.isPaused)
