@@ -160,8 +160,8 @@ struct NewGameView: View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       NavigationStack {
         VStack {
-          header
-
+          Header(store: store)
+          
           Spacer()
           
           PegboardView(store: store.scope(
@@ -173,7 +173,7 @@ struct NewGameView: View {
           
           Spacer()
           
-          footer
+          Footer(store: store)
         }
         .disabled(viewStore.isGameOver)
         .navigationTitle("New Game")
@@ -201,6 +201,28 @@ struct NewGameView: View {
           action: NewGame.Destination.Action.gameOver,
           content: GameOverSheet.init(store:)
         )
+      }
+    }
+  }
+}
+
+private struct Header: View {
+  let store: StoreOf<NewGame>
+  
+  var body: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      VStack(spacing: 0) {
+        VStack {
+          score
+        }
+        .padding()
+        
+        Divider()
+      }
+      .background {
+        Color(.systemGray)
+          .opacity(0.1)
+          .ignoresSafeArea(edges: .top)
       }
     }
   }
@@ -245,47 +267,12 @@ struct NewGameView: View {
       }
     }
   }
+}
+
+private struct Footer: View {
+  let store: StoreOf<NewGame>
   
-  private var seconds: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      HStack {
-        Text("Seconds")
-          .bold()
-          .frame(width: 70, alignment: .leading)
-          .padding()
-          .background { Color(.systemGray5) }
-        Text(viewStore.secondsElapsed.description)
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background { Color(.systemGray6) }
-      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-          .strokeBorder()
-          .foregroundColor(Color(.separator))
-      }
-    }
-  }
-  
-  private var header: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      VStack(spacing: 0) {
-        VStack {
-          score
-        }
-        .padding()
-        
-        Divider()
-      }
-      .background {
-        Color(.systemGray)
-          .opacity(0.1)
-          .ignoresSafeArea(edges: .top)
-      }
-    }
-  }
-  
-  private var footer: some View {
+  var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       VStack(spacing: 0) {
         Divider()
@@ -329,6 +316,27 @@ struct NewGameView: View {
       }
     }
   }
+  
+  private var seconds: some View {
+    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+      HStack {
+        Text("Seconds")
+          .bold()
+          .frame(width: 70, alignment: .leading)
+          .padding()
+          .background { Color(.systemGray5) }
+        Text(viewStore.secondsElapsed.description)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background { Color(.systemGray6) }
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+          .strokeBorder()
+          .foregroundColor(Color(.separator))
+      }
+    }
+  }
 }
 
 private struct ThiccButtonLabel: View {
@@ -344,7 +352,7 @@ private struct ThiccButtonLabel: View {
     .padding(.horizontal)
     .padding(.vertical, 10)
     .frame(maxWidth: .infinity)
-    .background { Color(.systemGray6) }
+    .background { Color(.systemGray5) }
     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     .overlay {
       RoundedRectangle(cornerRadius: 12, style: .continuous)
