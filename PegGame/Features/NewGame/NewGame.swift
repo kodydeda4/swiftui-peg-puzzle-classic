@@ -162,20 +162,15 @@ struct NewGameView: View {
         VStack {
           Header(store: store)
           
-          Spacer()
-          
           PegboardView(store: store.scope(
             state: \.pegboardCurrent,
             action: { .pegboard($0) }
           ))
-          .disabled(viewStore.isPaused)
-          .padding()
-          
-          Spacer()
+          .frame(maxHeight: .infinity)
+          .disabled(viewStore.isGameOver || viewStore.isPaused)
           
           Footer(store: store)
         }
-        .disabled(viewStore.isGameOver)
         .navigationTitle("New Game")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
