@@ -61,13 +61,6 @@ struct Pegboard: Reducer {
 }
 
 extension Pegboard.State {
-  var isFirstMove: Bool {
-    pegs.filter(\.isRemoved).isEmpty
-  }
-  var potentialMoves: Int {
-    isFirstMove ? pegs.count : pegs.map(potentialMoves).reduce(0, +)
-  }
-
   private enum Direction: CaseIterable {
     case left
     case leftUp
@@ -75,7 +68,7 @@ extension Pegboard.State {
     case right
     case rightUp
     case rightDown
-  }
+  }  
   
   private static func makePegs() -> IdentifiedArrayOf<Peg> {
     (0..<5).map { row in
@@ -85,6 +78,10 @@ extension Pegboard.State {
     }
     .flatMap { $0 }
     .identified
+  }
+  
+  var isFirstMove: Bool {
+    pegs.filter(\.isRemoved).isEmpty
   }
   
   func peg(between a: Peg, and b: Peg) -> Peg? {
@@ -106,6 +103,10 @@ extension Pegboard.State {
     case .rightUp: pegs[id: [peg.row-offset, peg.col]]
     case .rightDown: pegs[id: [peg.row+offset, peg.col+offset]]
     }
+  }
+  
+  var potentialMoves: Int {
+    isFirstMove ? pegs.count : pegs.map(potentialMoves).reduce(0, +)
   }
   
   private func potentialMoves(for peg: Peg) -> Int {
