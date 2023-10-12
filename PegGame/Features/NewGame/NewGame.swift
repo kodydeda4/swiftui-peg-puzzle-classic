@@ -203,7 +203,7 @@ struct NewGameView: View {
 
 private struct Header: View {
   let store: StoreOf<NewGame>
-  
+
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       VStack(spacing: 0) {
@@ -241,14 +241,12 @@ private struct Header: View {
           .foregroundColor(.accentColor)
           .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
           .background {
-            VStack {
-              Spacer()
-              ProgressView(
-                value: CGFloat(viewStore.score),
-                total: CGFloat(viewStore.maxScore)
-              )
-              .animation(.default, value: viewStore.score)
-            }
+            ProgressView(
+              value: CGFloat(viewStore.score),
+              total: CGFloat(viewStore.maxScore)
+            )
+            .progressViewStyle(GradientProgressStyle())
+            .animation(.default, value: viewStore.score)
           }
       }
       .frame(height: 50)
@@ -331,6 +329,21 @@ private struct Footer: View {
           .foregroundColor(Color(.separator))
       }
     }
+  }
+}
+
+struct GradientProgressStyle: ProgressViewStyle {
+  func makeBody(configuration: Configuration) -> some View {
+    GeometryReader { geometry in
+      Rectangle()
+        .fill(Color.accentColor)
+        .frame(
+          maxWidth: geometry.size.width * CGFloat(configuration.fractionCompleted ?? 0),
+          maxHeight: .infinity
+        )
+        .animation(.easeInOut, value: configuration.fractionCompleted)
+    }
+    .frame(maxHeight: .infinity)
   }
 }
 
