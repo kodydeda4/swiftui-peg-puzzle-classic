@@ -246,7 +246,7 @@ private struct Header: View {
               total: CGFloat(viewStore.maxScore)
             )
             .progressViewStyle(GradientProgressStyle())
-            .animation(.default, value: viewStore.score)
+            .opacity(0.25)
           }
       }
       .frame(height: 50)
