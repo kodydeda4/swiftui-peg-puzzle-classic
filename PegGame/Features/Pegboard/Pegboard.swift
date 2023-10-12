@@ -3,7 +3,7 @@ import SwiftUI
 
 struct Pegboard: Reducer {
   struct State: Equatable {
-    var pegs = Peg.grid()
+    var pegs = makePegs()
     var selection: Peg?
   }
   enum Action: Equatable {
@@ -79,6 +79,16 @@ private extension Pegboard.State {
     case rightDown
   }
   
+  private static func makePegs() -> IdentifiedArrayOf<Peg> {
+    (0..<5).map { row in
+      (0..<row+1).map { col in
+        Peg(row: row, col: col)
+      }
+    }
+    .flatMap { $0 }
+    .identified
+  }
+  
   func peg(between a: Peg, and b: Peg) -> Peg? {
     pegs[id: [a.row+((a.row-b.row) * -1/2), a.col+((a.col-b.col) * -1/2)]]
   }
@@ -123,7 +133,7 @@ struct PegboardView: View {
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       VStack {
-        ForEach(0..<5) { row in
+        ForEach(0..<viewStore.pegs.last!.row+1) { row in
           HStack {
             ForEach(0..<row+1) { col in
               pegView(peg: viewStore.pegs[id: [row, col]]!)

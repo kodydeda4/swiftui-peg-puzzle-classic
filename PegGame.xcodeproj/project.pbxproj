@@ -111,6 +111,7 @@
 		33B78C192AC733FA005FC780 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				33E6E35B2ABE2AB000B76E4A /* Preview Content */,
 				33E6E3552ABE2AAF00B76E4A /* Main.swift */,
 				33E6E3592ABE2AB000B76E4A /* Assets.xcassets */,
 			);
@@ -178,12 +179,11 @@
 		33E6E3542ABE2AAF00B76E4A /* PegGame */ = {
 			isa = PBXGroup;
 			children = (
-				33B78C212AC7386E005FC780 /* SwiftUI */,
 				33B78C1A2AC73401005FC780 /* Dependencies */,
 				33B78C182AC733F4005FC780 /* Features */,
 				33B78C1E2AC7346B005FC780 /* Models */,
-				33E6E35B2ABE2AB000B76E4A /* Preview Content */,
 				33B78C192AC733FA005FC780 /* Resources */,
+				33B78C212AC7386E005FC780 /* SwiftUI */,
 				33B78C1B2AC7341A005FC780 /* Util */,
 			);
 			path = PegGame;
@@ -415,7 +415,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PegGame/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"PegGame/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -445,7 +445,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PegGame/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"PegGame/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
