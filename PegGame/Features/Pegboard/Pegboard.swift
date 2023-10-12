@@ -42,7 +42,7 @@ struct Pegboard: Reducer {
         !start.isRemoved,
         !middle.isRemoved,
         end.isRemoved,
-        state.peg(acrossFrom: start).contains(end)
+        state.pegs(acrossFrom: start).contains(end)
       else {
         state.selection = nil
         return .none
@@ -67,9 +67,7 @@ extension Pegboard.State {
   var potentialMoves: Int {
     isFirstMove ? pegs.count : pegs.map(potentialMoves).reduce(0, +)
   }
-}
 
-private extension Pegboard.State {
   private enum Direction: CaseIterable {
     case left
     case leftUp
@@ -93,7 +91,7 @@ private extension Pegboard.State {
     pegs[id: [a.row+((a.row-b.row) * -1/2), a.col+((a.col-b.col) * -1/2)]]
   }
   
-  func peg(acrossFrom peg: Peg) -> [Peg] {
+  func pegs(acrossFrom peg: Peg) -> [Peg] {
     Direction.allCases.compactMap {
       self.peg(direction: $0, of: peg, offset: 2)
     }
