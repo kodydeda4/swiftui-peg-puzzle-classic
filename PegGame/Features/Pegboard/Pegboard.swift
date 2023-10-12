@@ -68,7 +68,7 @@ extension Pegboard.State {
     case right
     case rightUp
     case rightDown
-  }  
+  }
   
   private static func makePegs() -> IdentifiedArrayOf<Peg> {
     (0..<5).map { row in
@@ -96,12 +96,12 @@ extension Pegboard.State {
   
   private func peg(direction: Direction, of peg: Peg, offset: Int) -> Peg? {
     switch direction {
-    case .left: pegs[id: [peg.row, peg.col-offset]]
-    case .leftUp: pegs[id: [peg.row-offset, peg.col-offset]]
-    case .leftDown: pegs[id: [peg.row+offset, peg.col]]
-    case .right: pegs[id: [peg.row, peg.col+offset]]
-    case .rightUp: pegs[id: [peg.row-offset, peg.col]]
-    case .rightDown: pegs[id: [peg.row+offset, peg.col+offset]]
+    case .left      : pegs[id: [peg.row, peg.col-offset]]
+    case .leftUp    : pegs[id: [peg.row-offset, peg.col-offset]]
+    case .leftDown  : pegs[id: [peg.row+offset, peg.col]]
+    case .right     : pegs[id: [peg.row, peg.col+offset]]
+    case .rightUp   : pegs[id: [peg.row-offset, peg.col]]
+    case .rightDown : pegs[id: [peg.row+offset, peg.col+offset]]
     }
   }
   
