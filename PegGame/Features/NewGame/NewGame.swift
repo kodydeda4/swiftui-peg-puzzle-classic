@@ -22,7 +22,7 @@ struct NewGame: Reducer {
       case pauseButtonTapped
       case quitButtonTapped
       case undoButtonTapped
-      case redoButtonTapped
+      case restartButtonTapped
       case newGameButtonTapped
     }
   }
@@ -58,7 +58,8 @@ struct NewGame: Reducer {
           }
           return .none
           
-        case .redoButtonTapped:
+        case .restartButtonTapped:
+          state.destination = .restartAlert()
           return .none
           
         case .newGameButtonTapped:
@@ -101,10 +102,21 @@ struct NewGame: Reducer {
           secondsElapsed: state.secondsElapsed
         ))
         return .send(.toggleIsPaused)
+        
+      case let .destination(.presented(action)):
+        switch action {
+        
+        case .gameOver(.newGameButtonTapped):
+          state = State()
+          return .none
           
-      case .destination(.presented(.gameOver(.newGameButtonTapped))):
-        state = State()
-        return .none
+        case .restartAlert(.yesButtonTapped):
+          state = State()
+          return .none
+          
+        default:
+          return .none
+      }
         
       case .pegboard, .destination:
         return .none
@@ -118,9 +130,15 @@ struct NewGame: Reducer {
   struct Destination: Reducer {
     enum State: Equatable {
       case gameOver(GameOver.State)
+      case restartAlert(AlertState<Action.RestartAlert> = .init())
     }
     enum Action: Equatable {
       case gameOver(GameOver.Action)
+      case restartAlert(RestartAlert)
+      
+      enum RestartAlert: Equatable {
+        case yesButtonTapped
+      }
     }
     var body: some ReducerOf<Self> {
       Scope(state: /State.gameOver, action: /Action.gameOver) {
@@ -130,26 +148,48 @@ struct NewGame: Reducer {
   }
 }
 
+extension AlertState where Action == NewGame.Destination.Action.RestartAlert {
+  init() {
+    self = Self {
+      TextState("Restart?")
+    } actions: {
+      ButtonState(role: .cancel) {
+        TextState("Cancel")
+      }
+      ButtonState(role: .destructive, action: .yesButtonTapped) {
+        TextState("Yes")
+      }
+    } message: {
+      TextState("Restart the game?")
+    }
+  }
+}
+
 private extension NewGame.State {
+  var isFirstMove: Bool {
+    pegboardHistory.isEmpty
+  }
   var isPaused: Bool {
-    !isTimerEnabled && !pegboardHistory.isEmpty
+    !isFirstMove && !isTimerEnabled
   }
   var isGameOver: Bool {
     pegboardCurrent.potentialMoves == 0
   }
   var isUndoButtonDisabled: Bool {
-    isPaused || pegboardHistory.isEmpty
+    isFirstMove || isPaused
   }
   var isPauseButtonDisabled: Bool {
-    isGameOver || pegboardHistory.isEmpty
+    isFirstMove || isGameOver
   }
-  var isRedoButtonDisabled: Bool {
-    isPaused
+  var isRestartButtonDisabled: Bool {
+    isFirstMove
   }
   var maxScore: Int {
     (pegboardCurrent.pegs.count - 1) * 150
   }
 }
+
+
 
 // MARK: - SwiftUI
 
@@ -187,11 +227,13 @@ struct NewGameView: View {
             }
           }
         }
+        .alert(
+          store: store.scope(state: \.$destination, action: NewGame.Action.destination),
+          state: /NewGame.Destination.State.restartAlert,
+          action: NewGame.Destination.Action.restartAlert
+        )
         .sheet(
-          store: store.scope(
-            state: \.$destination,
-            action: NewGame.Action.destination
-          ),
+          store: store.scope(state: \.$destination, action: NewGame.Action.destination),
           state: /NewGame.Destination.State.gameOver,
           action: NewGame.Destination.Action.gameOver,
           content: GameOverSheet.init(store:)
@@ -289,13 +331,13 @@ private struct Footer: View {
             }
             .disabled(viewStore.isPauseButtonDisabled)
             
-            Button(action: { viewStore.send(.redoButtonTapped) }) {
+            Button(action: { viewStore.send(.restartButtonTapped) }) {
               ThiccButtonLabel(
-                title: "Redo",
-                systemImage: "arrow.uturn.forward"
+                title: "Restart",
+                systemImage: ""
               )
             }
-            .disabled(viewStore.isRedoButtonDisabled)
+            .disabled(viewStore.isRestartButtonDisabled)
           }
           .buttonStyle(.plain)
           .padding(.bottom)
