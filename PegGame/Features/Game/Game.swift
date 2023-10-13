@@ -221,8 +221,39 @@ private struct Header: View {
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
       VStack(spacing: 0) {
-        VStack {
-          score
+        HStack(spacing: 0) {
+          Text("Score")
+            .bold()
+            .frame(width: 50, alignment: .leading)
+            .frame(maxHeight: .infinity)
+            .padding()
+            .background { Color.accentColor.opacity(0.15) }
+          
+          Rectangle()
+            .frame(width: 0.25)
+            .foregroundColor(.accentColor)
+          
+          Text(viewStore.score.description)
+            .padding(.trailing)
+            .foregroundColor(.accentColor)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+            .background {
+              ProgressView(
+                value: CGFloat(viewStore.score),
+                total: CGFloat(viewStore.maxScore)
+              )
+              .progressViewStyle(GradientProgressStyle())
+              .opacity(0.25)
+            }
+        }
+        .frame(height: 50)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background { Color.accentColor.opacity(0.25) }
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+          RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .strokeBorder()
+            .foregroundColor(.accentColor)
         }
         .padding()
         
@@ -232,45 +263,6 @@ private struct Header: View {
         Color(.systemGray)
           .opacity(0.1)
           .ignoresSafeArea(edges: .top)
-      }
-    }
-  }
-  
-  private var score: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      HStack(spacing: 0) {
-        Text("Score")
-          .bold()
-          .frame(width: 50, alignment: .leading)
-          .frame(maxHeight: .infinity)
-          .padding()
-          .background { Color.accentColor.opacity(0.15) }
-        
-        Rectangle()
-          .frame(width: 0.25)
-          .foregroundColor(.accentColor)
-        
-        Text(viewStore.score.description)
-          .padding(.trailing)
-          .foregroundColor(.accentColor)
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-          .background {
-            ProgressView(
-              value: CGFloat(viewStore.score),
-              total: CGFloat(viewStore.maxScore)
-            )
-            .progressViewStyle(GradientProgressStyle())
-            .opacity(0.25)
-          }
-      }
-      .frame(height: 50)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background { Color.accentColor.opacity(0.25) }
-      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-          .strokeBorder()
-          .foregroundColor(.accentColor)
       }
     }
   }
@@ -284,8 +276,22 @@ private struct Footer: View {
       VStack(spacing: 0) {
         Divider()
         VStack {
-          seconds
-          
+          HStack {
+            Text("Seconds")
+              .bold()
+              .frame(width: 70, alignment: .leading)
+              .padding()
+              .background { Color(.systemGray5) }
+            Text(viewStore.secondsElapsed.description)
+          }
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .background { Color(.systemGray6) }
+          .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+          .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+              .strokeBorder()
+              .foregroundColor(Color(.separator))
+          }
           HStack {
             Button(action: { viewStore.send(.undoButtonTapped) }) {
               ThiccButtonLabel(
@@ -320,27 +326,6 @@ private struct Footer: View {
         Color(.systemGray)
           .opacity(0.1)
           .ignoresSafeArea(edges: .bottom)
-      }
-    }
-  }
-  
-  private var seconds: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      HStack {
-        Text("Seconds")
-          .bold()
-          .frame(width: 70, alignment: .leading)
-          .padding()
-          .background { Color(.systemGray5) }
-        Text(viewStore.secondsElapsed.description)
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background { Color(.systemGray6) }
-      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-          .strokeBorder()
-          .foregroundColor(Color(.separator))
       }
     }
   }
