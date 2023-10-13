@@ -10,6 +10,7 @@ struct NewGame: Reducer {
     var isTimerEnabled = false
     @PresentationState var destination: Destination.State?
   }
+  
   enum Action: Equatable {
     case view(View)
     case pegboard(Pegboard.Action)
@@ -19,7 +20,6 @@ struct NewGame: Reducer {
     case gameOver
     
     enum View {
-      case exitButtonTapped
       case undoButtonTapped
       case pauseButtonTapped
       case restartButtonTapped
@@ -29,7 +29,6 @@ struct NewGame: Reducer {
   private enum CancelID { case timer }
   
   @Dependency(\.continuousClock) var clock
-  @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
     Scope(state: \.pegboardCurrent, action: /Action.pegboard) {
@@ -40,10 +39,7 @@ struct NewGame: Reducer {
       
       case let .view(action):
         switch action {
-                    
-        case .exitButtonTapped:
-          return .run { _ in await self.dismiss() }
-          
+                              
         case .undoButtonTapped:
           state.score -= 150
           state.pegboardHistory.removeLast()
@@ -181,8 +177,6 @@ private extension NewGame.State {
   }
 }
 
-
-
 // MARK: - SwiftUI
 
 struct NewGameView: View {
@@ -203,19 +197,8 @@ struct NewGameView: View {
           
           Footer(store: store)
         }
-        .navigationTitle("New Game")
+        .navigationTitle("Peggy")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItem(placement: .navigationBarTrailing) {
-            Menu {
-              Button(action: { viewStore.send(.exitButtonTapped) }) {
-                Label("Exit", systemImage: "xmark.circle")
-              }
-            } label: {
-              Image(systemName: "ellipsis.circle")
-            }
-          }
-        }
         .alert(
           store: store.scope(state: \.$destination, action: NewGame.Action.destination),
           state: /NewGame.Destination.State.restartAlert,
