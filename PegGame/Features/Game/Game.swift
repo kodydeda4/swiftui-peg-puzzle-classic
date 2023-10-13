@@ -1,7 +1,7 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct NewGame: Reducer {
+struct Game: Reducer {
   struct State: Equatable {
     var pegboardCurrent = Pegboard.State()
     var pegboardHistory = [Pegboard.State]()
@@ -136,7 +136,7 @@ struct NewGame: Reducer {
   }
 }
 
-extension AlertState where Action == NewGame.Destination.Action.RestartAlert {
+extension AlertState where Action == Game.Destination.Action.RestartAlert {
   init() {
     self = Self {
       TextState("Restart?")
@@ -153,7 +153,7 @@ extension AlertState where Action == NewGame.Destination.Action.RestartAlert {
   }
 }
 
-private extension NewGame.State {
+private extension Game.State {
   var isFirstMove: Bool {
     pegboardHistory.isEmpty
   }
@@ -179,8 +179,8 @@ private extension NewGame.State {
 
 // MARK: - SwiftUI
 
-struct NewGameView: View {
-  let store: StoreOf<NewGame>
+struct GameView: View {
+  let store: StoreOf<Game>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -200,14 +200,14 @@ struct NewGameView: View {
         .navigationTitle("Peggy")
         .navigationBarTitleDisplayMode(.inline)
         .alert(
-          store: store.scope(state: \.$destination, action: NewGame.Action.destination),
-          state: /NewGame.Destination.State.restartAlert,
-          action: NewGame.Destination.Action.restartAlert
+          store: store.scope(state: \.$destination, action: Game.Action.destination),
+          state: /Game.Destination.State.restartAlert,
+          action: Game.Destination.Action.restartAlert
         )
         .sheet(
-          store: store.scope(state: \.$destination, action: NewGame.Action.destination),
-          state: /NewGame.Destination.State.gameOver,
-          action: NewGame.Destination.Action.gameOver,
+          store: store.scope(state: \.$destination, action: Game.Action.destination),
+          state: /Game.Destination.State.gameOver,
+          action: Game.Destination.Action.gameOver,
           content: GameOverSheet.init(store:)
         )
       }
@@ -216,7 +216,7 @@ struct NewGameView: View {
 }
 
 private struct Header: View {
-  let store: StoreOf<NewGame>
+  let store: StoreOf<Game>
 
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -277,7 +277,7 @@ private struct Header: View {
 }
 
 private struct Footer: View {
-  let store: StoreOf<NewGame>
+  let store: StoreOf<Game>
   
   var body: some View {
     WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
@@ -388,8 +388,8 @@ private struct ThiccButtonLabel: View {
 // MARK: - SwiftUI Previews
 
 #Preview {
-  NewGameView(store: Store(
-    initialState: NewGame.State(),
-    reducer: NewGame.init
+  GameView(store: Store(
+    initialState: Game.State(),
+    reducer: Game.init
   ))
 }

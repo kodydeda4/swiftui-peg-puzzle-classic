@@ -3,14 +3,14 @@ import ComposableArchitecture
 
 struct AppReducer: Reducer {
   struct State: Equatable {
-    var game = NewGame.State()
+    var game = Game.State()
   }
   enum Action: Equatable {
-    case game(NewGame.Action)
+    case game(Game.Action)
   }
   var body: some ReducerOf<Self> {
     Scope(state: \.game, action: /Action.game) {
-      NewGame()
+      Game()
     }
   }
 }
@@ -22,7 +22,7 @@ struct AppView: View {
 
   var body: some View {
     NavigationStack {
-      NewGameView(store: store.scope(
+      GameView(store: store.scope(
         state: \.game,
         action: { .game($0) }
       ))
