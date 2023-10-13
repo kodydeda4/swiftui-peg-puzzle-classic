@@ -106,11 +106,8 @@ struct NewGame: Reducer {
       case let .destination(.presented(action)):
         switch action {
         
-        case .gameOver(.newGameButtonTapped):
-          state = State()
-          return .none
-          
-        case .restartAlert(.yesButtonTapped):
+        case .gameOver(.newGameButtonTapped), 
+            .restartAlert(.yesButtonTapped):
           state = State()
           return .none
           
@@ -216,11 +213,8 @@ struct NewGameView: View {
         .toolbar {
           ToolbarItem(placement: .navigationBarTrailing) {
             Menu {
-              Button(action: { viewStore.send(.newGameButtonTapped) }) {
-                Text("New Game")
-              }
               Button(action: { viewStore.send(.quitButtonTapped) }) {
-                Text("Quit")
+                Label("Exit", systemImage: "xmark.circle")
               }
             } label: {
               Image(systemName: "ellipsis.circle")
