@@ -19,11 +19,10 @@ struct NewGame: Reducer {
     case gameOver
     
     enum View {
-      case pauseButtonTapped
-      case quitButtonTapped
+      case exitButtonTapped
       case undoButtonTapped
+      case pauseButtonTapped
       case restartButtonTapped
-      case newGameButtonTapped
     }
   }
   
@@ -41,11 +40,8 @@ struct NewGame: Reducer {
       
       case let .view(action):
         switch action {
-          
-        case .pauseButtonTapped:
-          return .send(.toggleIsPaused)
-          
-        case .quitButtonTapped:
+                    
+        case .exitButtonTapped:
           return .run { _ in await self.dismiss() }
           
         case .undoButtonTapped:
@@ -58,13 +54,12 @@ struct NewGame: Reducer {
           }
           return .none
           
+        case .pauseButtonTapped:
+          return .send(.toggleIsPaused)
+          
         case .restartButtonTapped:
           state.destination = .restartAlert()
           return .none
-          
-        case .newGameButtonTapped:
-          state = State()
-          return .cancel(id: CancelID.timer)
         }
         
       case .pegboard(.delegate(.didComplete)):
@@ -109,7 +104,7 @@ struct NewGame: Reducer {
         case .gameOver(.newGameButtonTapped), 
             .restartAlert(.yesButtonTapped):
           state = State()
-          return .none
+          return .cancel(id: CancelID.timer)
           
         default:
           return .none
@@ -213,7 +208,7 @@ struct NewGameView: View {
         .toolbar {
           ToolbarItem(placement: .navigationBarTrailing) {
             Menu {
-              Button(action: { viewStore.send(.quitButtonTapped) }) {
+              Button(action: { viewStore.send(.exitButtonTapped) }) {
                 Label("Exit", systemImage: "xmark.circle")
               }
             } label: {
