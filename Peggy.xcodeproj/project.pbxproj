@@ -30,7 +30,7 @@
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
 		33B78C232AC73882005FC780 /* RoundedRectangleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedRectangleButtonStyle.swift; sourceTree = "<group>"; };
-		33E6E3522ABE2AAF00B76E4A /* PegGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PegGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33E6E3522ABE2AAF00B76E4A /* Peggy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Peggy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33E6E3552ABE2AAF00B76E4A /* Main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Main.swift; sourceTree = "<group>"; };
 		33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReducer.swift; sourceTree = "<group>"; };
 		33E6E3592ABE2AB000B76E4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -163,7 +163,7 @@
 		33E6E3492ABE2AAF00B76E4A = {
 			isa = PBXGroup;
 			children = (
-				33E6E3542ABE2AAF00B76E4A /* PegGame */,
+				33E6E3542ABE2AAF00B76E4A /* Peggy */,
 				33E6E3532ABE2AAF00B76E4A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -171,12 +171,12 @@
 		33E6E3532ABE2AAF00B76E4A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				33E6E3522ABE2AAF00B76E4A /* PegGame.app */,
+				33E6E3522ABE2AAF00B76E4A /* Peggy.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		33E6E3542ABE2AAF00B76E4A /* PegGame */ = {
+		33E6E3542ABE2AAF00B76E4A /* Peggy */ = {
 			isa = PBXGroup;
 			children = (
 				33B78C1A2AC73401005FC780 /* Dependencies */,
@@ -186,7 +186,7 @@
 				33B78C212AC7386E005FC780 /* SwiftUI */,
 				33B78C1B2AC7341A005FC780 /* Util */,
 			);
-			path = PegGame;
+			path = Peggy;
 			sourceTree = "<group>";
 		};
 		33E6E35B2ABE2AB000B76E4A /* Preview Content */ = {
@@ -200,9 +200,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		33E6E3512ABE2AAF00B76E4A /* PegGame */ = {
+		33E6E3512ABE2AAF00B76E4A /* Peggy */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 33E6E3602ABE2AB000B76E4A /* Build configuration list for PBXNativeTarget "PegGame" */;
+			buildConfigurationList = 33E6E3602ABE2AB000B76E4A /* Build configuration list for PBXNativeTarget "Peggy" */;
 			buildPhases = (
 				33E6E34E2ABE2AAF00B76E4A /* Sources */,
 				33E6E34F2ABE2AAF00B76E4A /* Frameworks */,
@@ -212,12 +212,12 @@
 			);
 			dependencies = (
 			);
-			name = PegGame;
+			name = Peggy;
 			packageProductDependencies = (
 				33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */,
 			);
 			productName = PegGame;
-			productReference = 33E6E3522ABE2AAF00B76E4A /* PegGame.app */;
+			productReference = 33E6E3522ABE2AAF00B76E4A /* Peggy.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -235,7 +235,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 33E6E34D2ABE2AAF00B76E4A /* Build configuration list for PBXProject "PegGame" */;
+			buildConfigurationList = 33E6E34D2ABE2AAF00B76E4A /* Build configuration list for PBXProject "Peggy" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -251,7 +251,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				33E6E3512ABE2AAF00B76E4A /* PegGame */,
+				33E6E3512ABE2AAF00B76E4A /* Peggy */,
 			);
 		};
 /* End PBXProject section */
@@ -415,7 +415,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PegGame/Resources/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Peggy/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -430,7 +430,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.deda.PegGame;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deda.Peggy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -445,7 +445,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"PegGame/Resources/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Peggy/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -460,7 +460,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.deda.PegGame;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deda.Peggy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -471,7 +471,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		33E6E34D2ABE2AAF00B76E4A /* Build configuration list for PBXProject "PegGame" */ = {
+		33E6E34D2ABE2AAF00B76E4A /* Build configuration list for PBXProject "Peggy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33E6E35E2ABE2AB000B76E4A /* Debug */,
@@ -480,7 +480,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		33E6E3602ABE2AB000B76E4A /* Build configuration list for PBXNativeTarget "PegGame" */ = {
+		33E6E3602ABE2AB000B76E4A /* Build configuration list for PBXNativeTarget "Peggy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33E6E3612ABE2AB000B76E4A /* Debug */,
