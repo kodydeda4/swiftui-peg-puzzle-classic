@@ -242,7 +242,7 @@ private struct Header: View {
                 value: CGFloat(viewStore.score),
                 total: CGFloat(viewStore.maxScore)
               )
-              .progressViewStyle(GradientProgressStyle())
+              .progressViewStyle(ScoreProgressStyle())
               .opacity(0.25)
             }
         }
@@ -294,7 +294,7 @@ private struct Footer: View {
           }
           HStack {
             Button(action: { viewStore.send(.undoButtonTapped) }) {
-              ThiccButtonLabel(
+              ButtonLabel(
                 title: "Undo",
                 systemImage: "arrow.uturn.backward"
               )
@@ -302,7 +302,7 @@ private struct Footer: View {
             .disabled(viewStore.isUndoButtonDisabled)
             
             Button(action: { viewStore.send(.pauseButtonTapped) }) {
-              ThiccButtonLabel(
+              ButtonLabel(
                 title: viewStore.isPaused ? "Play" : "Pause",
                 systemImage: viewStore.isPaused ? "play" : "pause"
               )
@@ -310,7 +310,7 @@ private struct Footer: View {
             .disabled(viewStore.isPauseButtonDisabled)
             
             Button(action: { viewStore.send(.restartButtonTapped) }) {
-              ThiccButtonLabel(
+              ButtonLabel(
                 title: "Restart",
                 systemImage: ""
               )
@@ -331,7 +331,7 @@ private struct Footer: View {
   }
 }
 
-struct GradientProgressStyle: ProgressViewStyle {
+private struct ScoreProgressStyle: ProgressViewStyle {
   func makeBody(configuration: Configuration) -> some View {
     GeometryReader { geometry in
       Rectangle()
@@ -346,7 +346,7 @@ struct GradientProgressStyle: ProgressViewStyle {
   }
 }
 
-private struct ThiccButtonLabel: View {
+private struct ButtonLabel: View {
   let title: String
   let systemImage: String
   
