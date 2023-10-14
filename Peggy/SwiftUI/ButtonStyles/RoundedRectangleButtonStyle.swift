@@ -24,11 +24,9 @@ struct RoundedRectangleButtonStyle: ButtonStyle {
         style: .continuous
       ))
       .animation(.default, value: configuration.isPressed)
-      .onChange(of: configuration.isPressed) {
-        if configuration.isPressed {
-          if let onPress = onPress {
-            onPress()
-          }
+      .onChange(of: configuration.isPressed) { isPressed in
+        if let onPress, isPressed {
+          onPress()
         }
       }
   }
