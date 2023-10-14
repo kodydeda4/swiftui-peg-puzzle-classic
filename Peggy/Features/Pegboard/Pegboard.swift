@@ -85,7 +85,10 @@ extension Pegboard.State {
   }
   
   func peg(between a: Peg, and b: Peg) -> Peg? {
-    pegs[id: [a.row+((a.row-b.row) * -1/2), a.col+((a.col-b.col) * -1/2)]]
+    pegs[id: [
+      a.row+((a.row-b.row) * -1/2),
+      a.col+((a.col-b.col) * -1/2)
+    ]]
   }
   
   func pegs(acrossFrom peg: Peg) -> [Peg] {
@@ -132,9 +135,9 @@ struct PegboardView: View {
   var body: some View {
     WithViewStore(store, observe: { $0 }) { viewStore in
       VStack {
-        ForEach(0..<viewStore.pegs.last!.row+1) { row in
+        ForEach(0..<viewStore.pegs.last!.row+1, id: \.self) { row in
           HStack {
-            ForEach(0..<row+1) { col in
+            ForEach(0..<row+1, id: \.self) { col in
               pegView(peg: viewStore.pegs[id: [row, col]]!)
             }
           }
