@@ -8,7 +8,7 @@
 
 ## About
 
-[Peg Puzzle Classic](https://apps.apple.com/us/app/peg-puzzle-classic/id6469359729) is an open-source game available for iOS, iPadOS, and macOS. Challenge your logic and strategy skills as you jump pegs over each other, attempting to leave only one peg on the board. With a user-friendly interface and various difficulty levels, this app offers a nostalgic and engaging puzzle experience suitable for all ages. Can you master the art of leaving just one peg behind? Download now and embrace the Peg Game Challenge!"
+[Peg Puzzle Classic](https://apps.apple.com/us/app/peg-puzzle-classic/id6469359729) is an open-source game available for iOS, iPadOS, and macOS. Challenge your logic and strategy skills as you jump pegs over each other, attempting to leave only one peg on the board. This nostalgic and engaging puzzle experience is suitable for all ages. Can you master the art of leaving just one peg behind? Download now and embrace the Peg Game Challenge!
 
 ## Source Code
 
