@@ -1,10 +1,10 @@
 # Peg Puzzle Classic
 
-![Untitled](https://github.com/kodydeda4/Peggy/assets/45678211/f49b9a4c-acaa-4b5e-90bb-2da01a503f68)
+![Untitled](https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/9991a8fa-cd5e-467a-9dc0-daf3975d7494)
 
-<img width="225" src="https://github.com/kodydeda4/Peggy/assets/45678211/7511572d-11a9-4dbd-b769-4c8f9450045f"/>
-<img width="225" src="https://github.com/kodydeda4/Peggy/assets/45678211/391a0d4b-99d1-4391-a34f-0c14ca5147a4"/>
-<img width="225" src="https://github.com/kodydeda4/Peggy/assets/45678211/2e7faf5c-0de4-4c65-85e5-32c8c84a3492"/>
+<img width="225" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/c6d02a78-438b-489a-b1b3-1ca5f5c456f6"/>
+<img width="225" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/802c45ff-e4eb-4448-b317-c3167f4c7263"/>
+<img width="225" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/271df723-a8a0-4bff-8f66-22b26aa4644f"/>
 
 ## About
 
