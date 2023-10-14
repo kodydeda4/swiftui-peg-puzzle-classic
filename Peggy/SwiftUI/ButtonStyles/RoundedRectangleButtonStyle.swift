@@ -34,12 +34,10 @@ struct RoundedRectangleButtonStyle: ButtonStyle {
 
 // MARK: - SwiftUI Previews
 
-struct Button_RoundedRectangleButtonStyle_Previews: PreviewProvider {
-  static var previews: some View {
-    Button("Click Me") {
-      
-    }
-    .buttonStyle(RoundedRectangleButtonStyle())
-    .padding()
+#Preview {
+  Button("Click Me") {
+    //...
   }
+  .buttonStyle(RoundedRectangleButtonStyle())
+  .padding()
 }
