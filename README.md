@@ -16,13 +16,18 @@ This app was written using [SwiftUI](https://developer.apple.com/documentation/s
 
 ## Project Structure
 
-1. Dependencies
-2. Features
-3. Models
-4. Resources
-5. SwiftUI
-6. Util
+The project follows a simple structure, isolating features, dependencies, models, resources, swiftui, and util files.
+
+```
+Src
+├── Dependencies
+└── Features
+└── Models
+└── Resources
+└── SwiftUI
+└── Util
+```
 
 ## Final Thoughts
 
-Thank you.
+✌️ Feedback, contributions, and thoughts greatly appreciated. Thanks!
