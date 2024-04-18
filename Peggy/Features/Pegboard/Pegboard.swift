@@ -30,10 +30,12 @@ struct Pegboard {
         state.selection = nil
         return .send(.delegate(.didComplete))
       }
+      
       if state.selection == nil {
         state.selection = selection
         return .none
       }
+      
       if state.selection == selection  {
         state.selection = nil
         return .none
