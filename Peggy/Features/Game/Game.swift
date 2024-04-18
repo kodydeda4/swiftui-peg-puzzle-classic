@@ -7,7 +7,6 @@ struct Game {
   struct State: Equatable {
     var pegboardCurrent = Pegboard.State()
     var pegboardHistory = [Pegboard.State]()
-    var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
     @Presents var destination: Destination.State?
@@ -43,7 +42,6 @@ struct Game {
         switch action {
           
         case .undoButtonTapped:
-          state.score -= 150
           state.pegboardHistory.removeLast()
           state.pegboardCurrent = state.pegboardHistory.last ?? .init()
           if state.pegboardHistory.isEmpty {
@@ -61,7 +59,6 @@ struct Game {
         }
         
       case .pegboard(.delegate(.didComplete)):
-        state.score += 150
         state.pegboardHistory.append(state.pegboardCurrent)
         
         if state.isGameOver {

@@ -2,6 +2,9 @@ import SwiftUI
 import ComposableArchitecture
 
 extension Game.State {
+  var score: Int {
+    pegboardHistory.count * 150
+  }
   var isFirstMove: Bool {
     pegboardHistory.isEmpty
   }
