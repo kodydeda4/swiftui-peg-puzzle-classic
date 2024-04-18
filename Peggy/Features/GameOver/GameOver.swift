@@ -1,27 +1,40 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct GameOver: Reducer {
+@Reducer
+struct GameOver {
+  @ObservableState
   struct State: Equatable {
     let score: Int
     let maxScore: Int
     let secondsElapsed: Int
   }
-  enum Action: Equatable {
-    case doneButtonTapped
-    case newGameButtonTapped
+  
+  enum Action: ViewAction {
+    case view(View)
+    
+    enum View {
+      case doneButtonTapped
+      case newGameButtonTapped
+    }
   }
+  
   @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
         
-      case .doneButtonTapped:
-        return .run { _ in await self.dismiss() }
-        
-      case .newGameButtonTapped:
-        return .run { _ in await self.dismiss() }
+      case let .view(action):
+        switch action {
+          
+        case .doneButtonTapped:
+          return .run { _ in await self.dismiss() }
+          
+        case .newGameButtonTapped:
+          return .run { _ in await self.dismiss() }
+          
+        }
       }
     }
   }
@@ -29,37 +42,36 @@ struct GameOver: Reducer {
 
 // MARK: - SwiftUI
 
+@ViewAction(for: GameOver.self)
 struct GameOverSheet: View {
-  let store: StoreOf<GameOver>
+  @Bindable var store: StoreOf<GameOver>
   
   var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      NavigationStack {
-        Form {
-          Section("Results") {
-            HStack {
-              Text("🎉 Score").bold()
-              Text("\(viewStore.score) / \(viewStore.maxScore)")
-            }
-            HStack {
-              Text("⏰ Time").bold()
-              Text("\(viewStore.secondsElapsed)s")
-            }
+    NavigationStack {
+      Form {
+        Section("Results") {
+          HStack {
+            Text("🎉 Score").bold()
+            Text("\(store.score) / \(store.maxScore)")
+          }
+          HStack {
+            Text("⏰ Time").bold()
+            Text("\(store.secondsElapsed)s")
           }
         }
-        .navigationTitle("Game Over")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationOverlay {
-          Button("New Game") {
-            viewStore.send(.newGameButtonTapped)
-          }
-          .buttonStyle(RoundedRectangleButtonStyle())
+      }
+      .navigationTitle("Game Over")
+      .navigationBarTitleDisplayMode(.inline)
+      .navigationOverlay {
+        Button("New Game") {
+          send(.newGameButtonTapped)
         }
-        .toolbar {
-          ToolbarItem(placement: .primaryAction) {
-            Button("Done") {
-              viewStore.send(.doneButtonTapped)
-            }
+        .buttonStyle(RoundedRectangleButtonStyle())
+      }
+      .toolbar {
+        ToolbarItem(placement: .primaryAction) {
+          Button("Done") {
+            send(.doneButtonTapped)
           }
         }
       }

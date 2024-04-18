@@ -1,17 +1,19 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct Game: Reducer {
+@Reducer
+struct Game {
+  @ObservableState
   struct State: Equatable {
     var pegboardCurrent = Pegboard.State()
     var pegboardHistory = [Pegboard.State]()
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
-    @PresentationState var destination: Destination.State?
+    @Presents var destination: Destination.State?
   }
   
-  enum Action: Equatable {
+  enum Action: ViewAction {
     case view(View)
     case pegboard(Pegboard.Action)
     case destination(PresentationAction<Destination.Action>)
@@ -31,15 +33,15 @@ struct Game: Reducer {
   @Dependency(\.continuousClock) var clock
   
   var body: some ReducerOf<Self> {
-    Scope(state: \.pegboardCurrent, action: /Action.pegboard) {
+    Scope(state: \.pegboardCurrent, action: \.pegboard) {
       Pegboard()
     }
     Reduce { state, action in
       switch action {
-      
+        
       case let .view(action):
         switch action {
-                              
+          
         case .undoButtonTapped:
           state.score -= 150
           state.pegboardHistory.removeLast()
@@ -54,14 +56,14 @@ struct Game: Reducer {
           return .send(.toggleIsPaused)
           
         case .restartButtonTapped:
-          state.destination = .restartAlert()
+          state.destination = .resetAlert(.init())
           return .none
         }
         
       case .pegboard(.delegate(.didComplete)):
         state.score += 150
         state.pegboardHistory.append(state.pegboardCurrent)
-          
+        
         if state.isGameOver {
           return .run { send in
             try await self.clock.sleep(for: .seconds(1))
@@ -96,47 +98,37 @@ struct Game: Reducer {
         
       case let .destination(.presented(action)):
         switch action {
-        
-        case .gameOver(.newGameButtonTapped), 
-            .restartAlert(.yesButtonTapped):
+          
+        case .gameOver(.view(.newGameButtonTapped)),
+            .resetAlert(.confirm):
           state = State()
           return .cancel(id: CancelID.timer)
           
         default:
           return .none
-      }
+        }
         
       case .pegboard, .destination:
         return .none
       }
     }
-    .ifLet(\.$destination, action: /Action.destination) {
-      Destination()
-    }
+    .ifLet(\.$destination, action: \.destination)
   }
   
-  struct Destination: Reducer {
-    enum State: Equatable {
-      case gameOver(GameOver.State)
-      case restartAlert(AlertState<Action.RestartAlert> = .init())
-    }
-    enum Action: Equatable {
-      case gameOver(GameOver.Action)
-      case restartAlert(RestartAlert)
-      
-      enum RestartAlert: Equatable {
-        case yesButtonTapped
-      }
-    }
-    var body: some ReducerOf<Self> {
-      Scope(state: /State.gameOver, action: /Action.gameOver) {
-        GameOver()
-      }
+  @Reducer(state: .equatable)
+  enum Destination {
+    case gameOver(GameOver)
+    case resetAlert(AlertState<ResetAlert>)
+    
+    @CasePathable
+    enum ResetAlert: Equatable {
+      case confirm
     }
   }
 }
 
-extension AlertState where Action == Game.Destination.Action.RestartAlert {
+
+extension AlertState where Action == Game.Destination.ResetAlert {
   init() {
     self = Self {
       TextState("Restart?")
@@ -144,7 +136,7 @@ extension AlertState where Action == Game.Destination.Action.RestartAlert {
       ButtonState(role: .cancel) {
         TextState("Cancel")
       }
-      ButtonState(role: .destructive, action: .yesButtonTapped) {
+      ButtonState(role: .destructive, action: .confirm) {
         TextState("Yes")
       }
     } message: {
@@ -153,180 +145,139 @@ extension AlertState where Action == Game.Destination.Action.RestartAlert {
   }
 }
 
-private extension Game.State {
-  var isFirstMove: Bool {
-    pegboardHistory.isEmpty
-  }
-  var isPaused: Bool {
-    !isFirstMove && !isTimerEnabled
-  }
-  var isGameOver: Bool {
-    pegboardCurrent.potentialMoves == 0
-  }
-  var isUndoButtonDisabled: Bool {
-    isFirstMove || isPaused
-  }
-  var isPauseButtonDisabled: Bool {
-    isFirstMove || isGameOver
-  }
-  var isRestartButtonDisabled: Bool {
-    isFirstMove
-  }
-  var maxScore: Int {
-    (pegboardCurrent.pegs.count - 1) * 150
-  }
-}
-
 // MARK: - SwiftUI
 
+@ViewAction(for: Game.self)
 struct GameView: View {
-  let store: StoreOf<Game>
+  @Bindable var store: StoreOf<Game>
   
   var body: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      NavigationStack {
-        VStack {
-          Header(store: store)
-          
-          PegboardView(store: store.scope(
-            state: \.pegboardCurrent,
-            action: { .pegboard($0) }
-          ))
+    NavigationStack {
+      VStack {
+        header
+        
+        PegboardView(store: store.scope(state: \.pegboardCurrent, action: \.pegboard))
           .frame(maxHeight: .infinity)
-          .disabled(viewStore.isGameOver || viewStore.isPaused)
-          
-          Footer(store: store)
-        }
-        .navigationTitle("Peggy")
-        .navigationBarTitleDisplayMode(.inline)
-        .alert(
-          store: store.scope(state: \.$destination, action: Game.Action.destination),
-          state: /Game.Destination.State.restartAlert,
-          action: Game.Destination.Action.restartAlert
-        )
-        .sheet(
-          store: store.scope(state: \.$destination, action: Game.Action.destination),
-          state: /Game.Destination.State.gameOver,
-          action: Game.Destination.Action.gameOver,
-          content: GameOverSheet.init(store:)
-        )
+          .disabled(store.isGameOver || store.isPaused)
+        
+        footer
+      }
+      .navigationTitle("Peggy")
+      .navigationBarTitleDisplayMode(.inline)
+      .alert($store.scope(
+        state: \.destination?.resetAlert,
+        action: \.destination.resetAlert
+      ))
+      .sheet(item: $store.scope(
+        state: \.destination?.gameOver,
+        action: \.destination.gameOver
+      )) { store in
+        GameOverSheet(store: store)
       }
     }
   }
-}
+  
+ @MainActor private var header: some View {
+    VStack(spacing: 0) {
+      HStack(spacing: 0) {
+        Text("Score")
+          .bold()
+          .frame(width: 50, alignment: .leading)
+          .frame(maxHeight: .infinity)
+          .padding()
+          .background { Color.accentColor.opacity(0.15) }
+        
+        Rectangle()
+          .frame(width: 0.25)
+          .foregroundColor(.accentColor)
+        
+        Text(store.score.description)
+          .padding(.trailing)
+          .foregroundColor(.accentColor)
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+          .background {
+            ProgressView(
+              value: CGFloat(store.score),
+              total: CGFloat(store.maxScore)
+            )
+            .progressViewStyle(ScoreProgressStyle())
+            .opacity(0.25)
+          }
+      }
+      .frame(height: 50)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background { Color.accentColor.opacity(0.25) }
+      .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+          .strokeBorder()
+          .foregroundColor(.accentColor)
+      }
+      .padding()
+      
+      Divider()
+    }
+    .background {
+      Color(.systemGray)
+        .opacity(0.1)
+        .ignoresSafeArea(edges: .top)
+    }
+  }
 
-private struct Header: View {
-  let store: StoreOf<Game>
-
-  var body: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      VStack(spacing: 0) {
-        HStack(spacing: 0) {
-          Text("Score")
+  @MainActor private var footer: some View {
+    VStack(spacing: 0) {
+      Divider()
+      VStack {
+        HStack {
+          Text("Seconds")
             .bold()
-            .frame(width: 50, alignment: .leading)
-            .frame(maxHeight: .infinity)
+            .frame(width: 70, alignment: .leading)
             .padding()
-            .background { Color.accentColor.opacity(0.15) }
-          
-          Rectangle()
-            .frame(width: 0.25)
-            .foregroundColor(.accentColor)
-          
-          Text(viewStore.score.description)
-            .padding(.trailing)
-            .foregroundColor(.accentColor)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-            .background {
-              ProgressView(
-                value: CGFloat(viewStore.score),
-                total: CGFloat(viewStore.maxScore)
-              )
-              .progressViewStyle(ScoreProgressStyle())
-              .opacity(0.25)
-            }
+            .background { Color(.systemGray5) }
+          Text(store.secondsElapsed.description)
         }
-        .frame(height: 50)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background { Color.accentColor.opacity(0.25) }
+        .background { Color(.systemGray6) }
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay {
           RoundedRectangle(cornerRadius: 12, style: .continuous)
             .strokeBorder()
-            .foregroundColor(.accentColor)
+            .foregroundColor(Color(.separator))
         }
-        .padding()
-        
-        Divider()
+        HStack {
+          Button(action: { send(.undoButtonTapped) }) {
+            ButtonLabel(
+              title: "Undo",
+              systemImage: "arrow.uturn.backward"
+            )
+          }
+          .disabled(store.isUndoButtonDisabled)
+          
+          Button(action: { send(.pauseButtonTapped) }) {
+            ButtonLabel(
+              title: store.isPaused ? "Play" : "Pause",
+              systemImage: store.isPaused ? "play" : "pause"
+            )
+          }
+          .disabled(store.isPauseButtonDisabled)
+          
+          Button(action: { send(.restartButtonTapped) }) {
+            ButtonLabel(
+              title: "Restart",
+              systemImage: ""
+            )
+          }
+          .disabled(store.isRestartButtonDisabled)
+        }
+        .buttonStyle(.plain)
+        .padding(.bottom)
       }
-      .background {
-        Color(.systemGray)
-          .opacity(0.1)
-          .ignoresSafeArea(edges: .top)
-      }
+      .padding()
     }
-  }
-}
-
-private struct Footer: View {
-  let store: StoreOf<Game>
-  
-  var body: some View {
-    WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-      VStack(spacing: 0) {
-        Divider()
-        VStack {
-          HStack {
-            Text("Seconds")
-              .bold()
-              .frame(width: 70, alignment: .leading)
-              .padding()
-              .background { Color(.systemGray5) }
-            Text(viewStore.secondsElapsed.description)
-          }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .background { Color(.systemGray6) }
-          .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-          .overlay {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-              .strokeBorder()
-              .foregroundColor(Color(.separator))
-          }
-          HStack {
-            Button(action: { viewStore.send(.undoButtonTapped) }) {
-              ButtonLabel(
-                title: "Undo",
-                systemImage: "arrow.uturn.backward"
-              )
-            }
-            .disabled(viewStore.isUndoButtonDisabled)
-            
-            Button(action: { viewStore.send(.pauseButtonTapped) }) {
-              ButtonLabel(
-                title: viewStore.isPaused ? "Play" : "Pause",
-                systemImage: viewStore.isPaused ? "play" : "pause"
-              )
-            }
-            .disabled(viewStore.isPauseButtonDisabled)
-            
-            Button(action: { viewStore.send(.restartButtonTapped) }) {
-              ButtonLabel(
-                title: "Restart",
-                systemImage: ""
-              )
-            }
-            .disabled(viewStore.isRestartButtonDisabled)
-          }
-          .buttonStyle(.plain)
-          .padding(.bottom)
-        }
-        .padding()
-      }
-      .background {
-        Color(.systemGray)
-          .opacity(0.1)
-          .ignoresSafeArea(edges: .bottom)
-      }
+    .background {
+      Color(.systemGray)
+        .opacity(0.1)
+        .ignoresSafeArea(edges: .bottom)
     }
   }
 }
