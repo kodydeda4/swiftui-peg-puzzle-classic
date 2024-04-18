@@ -56,7 +56,7 @@ struct Game {
           return .send(.toggleIsPaused)
           
         case .restartButtonTapped:
-          state.destination = .resetAlert(.init())
+          state.destination = .restartAlert(.init())
           return .none
         }
         
@@ -100,7 +100,7 @@ struct Game {
         switch action {
           
         case .gameOver(.view(.newGameButtonTapped)),
-            .resetAlert(.confirm):
+            .restartAlert(.confirm):
           state = State()
           return .cancel(id: CancelID.timer)
           
@@ -118,17 +118,17 @@ struct Game {
   @Reducer(state: .equatable)
   enum Destination {
     case gameOver(GameOver)
-    case resetAlert(AlertState<ResetAlert>)
+    case restartAlert(AlertState<RestartAlert>)
     
     @CasePathable
-    enum ResetAlert: Equatable {
+    enum RestartAlert: Equatable {
       case confirm
     }
   }
 }
 
 
-extension AlertState where Action == Game.Destination.ResetAlert {
+extension AlertState where Action == Game.Destination.RestartAlert {
   init() {
     self = Self {
       TextState("Restart?")
@@ -165,8 +165,8 @@ struct GameView: View {
       .navigationTitle("Peggy")
       .navigationBarTitleDisplayMode(.inline)
       .alert($store.scope(
-        state: \.destination?.resetAlert,
-        action: \.destination.resetAlert
+        state: \.destination?.restartAlert,
+        action: \.destination.restartAlert
       ))
       .sheet(item: $store.scope(
         state: \.destination?.gameOver,
