@@ -2,9 +2,9 @@
 
 ![Untitled](https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/9991a8fa-cd5e-467a-9dc0-daf3975d7494)
 
-<img width="225" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/c6d02a78-438b-489a-b1b3-1ca5f5c456f6"/>
-<img width="225" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/802c45ff-e4eb-4448-b317-c3167f4c7263"/>
-<img width="225" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/271df723-a8a0-4bff-8f66-22b26aa4644f"/>
+<img width="200" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/c6d02a78-438b-489a-b1b3-1ca5f5c456f6"/>
+<img width="200" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/802c45ff-e4eb-4448-b317-c3167f4c7263"/>
+<img width="200" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/271df723-a8a0-4bff-8f66-22b26aa4644f"/>
 
 ## About
 
