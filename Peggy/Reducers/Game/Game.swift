@@ -19,18 +19,22 @@ struct Game {
     case toggleIsPaused
     case timerTicked
     case gameOver
-    
+    case setDestination(Destination.State)
+
     enum View {
       case undoButtonTapped
       case pauseButtonTapped
       case restartButtonTapped
+      case finishButtonTapped
+      case instructionsButtonTapped
     }
   }
   
   private enum CancelID { case timer }
   
   @Dependency(\.continuousClock) var clock
-  
+  @Dependency(\.dismiss) var dismiss
+
   var body: some ReducerOf<Self> {
     Scope(state: \.pegboardCurrent, action: \.pegboard) {
       Pegboard()
@@ -56,7 +60,17 @@ struct Game {
           
         case .restartButtonTapped:
           state.destination = .restartAlert(.init())
-          return .none
+          return .send(.toggleIsPaused)
+
+        case .finishButtonTapped:
+          return .run { send in
+            await send(.toggleIsPaused)
+            await send(.setDestination(.exitAlert(.init())))
+          }
+          
+        case .instructionsButtonTapped:
+          state.destination = .instructions(Instructions.State())
+          return .send(.toggleIsPaused)
         }
         
       case .pegboard(.delegate(.didComplete)):
@@ -87,6 +101,10 @@ struct Game {
         state.secondsElapsed += 1
         return .none
         
+      case let .setDestination(value):
+        state.destination = value
+        return .none
+        
       case .gameOver:
         state.destination = .gameOver(.init(
           score: state.score,
@@ -98,10 +116,26 @@ struct Game {
       case let .destination(.presented(action)):
         switch action {
           
-        case .gameOver(.view(.newGameButtonTapped)),
-            .restartAlert(.yesButtonTapped):
+        case .gameOver(.view(.newGameButtonTapped)):
           state = State()
           return .cancel(id: CancelID.timer)
+          
+        case .restartAlert(.confirm):
+          state = State()
+          return .cancel(id: CancelID.timer)
+        
+        case .exitAlert(.confirm):
+          return .run { _ in await self.dismiss() }
+          
+        default:
+          return .none
+        }
+        
+      case .destination(.dismiss):
+        switch state.destination {
+          
+        case .instructions, .exitAlert, .restartAlert:
+          return .send(.toggleIsPaused)
           
         default:
           return .none
@@ -116,16 +150,38 @@ struct Game {
   
   @Reducer(state: .equatable)
   enum Destination {
-    case restartAlert(AlertState<RestartAlert>)
+    case instructions(Instructions)
     case gameOver(GameOver)
+    case exitAlert(AlertState<ExitAlert>)
+    case restartAlert(AlertState<RestartAlert>)
+
+    @CasePathable
+    enum ExitAlert: Equatable {
+      case confirm
+    }
     
     @CasePathable
     enum RestartAlert: Equatable {
-      case yesButtonTapped
+      case confirm
     }
   }
 }
 
+extension AlertState where Action == Game.Destination.ExitAlert {
+  init() {
+    self = Self {
+      TextState("Exit?")
+    } actions: {
+      ButtonState(role: .cancel) {
+        TextState("Cancel")
+      }
+      ButtonState(role: .destructive, action: .confirm) {
+        TextState("Yes")
+      }
+    }
+  }
+}
+  
 extension AlertState where Action == Game.Destination.RestartAlert {
   init() {
     self = Self {
@@ -134,7 +190,7 @@ extension AlertState where Action == Game.Destination.RestartAlert {
       ButtonState(role: .cancel) {
         TextState("Cancel")
       }
-      ButtonState(role: .destructive, action: .yesButtonTapped) {
+      ButtonState(role: .destructive, action: .confirm) {
         TextState("Yes")
       }
     } message: {
@@ -166,6 +222,22 @@ struct GameFullscreenCover: View {
       }
       .navigationTitle("Peggy")
       .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        Menu {
+          Button("Finish") {
+            send(.finishButtonTapped)
+          }
+          Button("Instructions") {
+            send(.instructionsButtonTapped)
+          }
+        } label: {
+          Image(systemName: "ellipsis.circle")
+        }
+      }
+      .alert($store.scope(
+        state: \.destination?.exitAlert,
+        action: \.destination.exitAlert
+      ))
       .alert($store.scope(
         state: \.destination?.restartAlert,
         action: \.destination.restartAlert
@@ -175,6 +247,12 @@ struct GameFullscreenCover: View {
         action: \.destination.gameOver
       )) { store in
         GameOverSheet(store: store)
+      }
+      .sheet(item: $store.scope(
+        state: \.destination?.instructions,
+        action: \.destination.instructions
+      )) { store in
+        InstructionsSheet(store: store)
       }
     }
   }
