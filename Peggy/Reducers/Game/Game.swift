@@ -147,7 +147,7 @@ extension AlertState where Action == Game.Destination.RestartAlert {
 // MARK: - SwiftUI
 
 @ViewAction(for: Game.self)
-struct GameView: View {
+struct GameFullscreenCover: View {
   @Bindable var store: StoreOf<Game>
   
   var body: some View {
@@ -326,8 +326,7 @@ private struct ButtonLabel: View {
 // MARK: - SwiftUI Previews
 
 #Preview {
-  GameView(store: Store(
-    initialState: Game.State(),
-    reducer: Game.init
-  ))
+  GameFullscreenCover(store: Store(initialState: Game.State()) {
+    Game()
+  })
 }

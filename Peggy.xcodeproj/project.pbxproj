@@ -10,6 +10,7 @@
 		333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608922AD72C32000984B6 /* IdentifiedCollections+.swift */; };
 		333608992AD73BC7000984B6 /* Pegboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608982AD73BC7000984B6 /* Pegboard.swift */; };
 		3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */; };
+		337C52BD2BE2DA01003C211B /* Instructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 337C52BC2BE2DA01003C211B /* Instructions.swift */; };
 		338937132BE2CEBC008837A5 /* Game+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338937122BE2CEBC008837A5 /* Game+Extensions.swift */; };
 		338937152BE2CF48008837A5 /* Pegboard+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338937142BE2CF48008837A5 /* Pegboard+Extensions.swift */; };
 		33B78C172AC732D0005FC780 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* Game.swift */; };
@@ -28,6 +29,7 @@
 		333608922AD72C32000984B6 /* IdentifiedCollections+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IdentifiedCollections+.swift"; sourceTree = "<group>"; };
 		333608982AD73BC7000984B6 /* Pegboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pegboard.swift; sourceTree = "<group>"; };
 		3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+navigationOverlay.swift"; sourceTree = "<group>"; };
+		337C52BC2BE2DA01003C211B /* Instructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instructions.swift; sourceTree = "<group>"; };
 		338937122BE2CEBC008837A5 /* Game+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Extensions.swift"; sourceTree = "<group>"; };
 		338937142BE2CF48008837A5 /* Pegboard+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pegboard+Extensions.swift"; sourceTree = "<group>"; };
 		33B78C162AC732D0005FC780 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
@@ -103,12 +105,21 @@
 			path = ViewModifiers;
 			sourceTree = "<group>";
 		};
+		337C52BB2BE2D9F8003C211B /* Instructions */ = {
+			isa = PBXGroup;
+			children = (
+				337C52BC2BE2DA01003C211B /* Instructions.swift */,
+			);
+			path = Instructions;
+			sourceTree = "<group>";
+		};
 		33B78C182AC733F4005FC780 /* Reducers */ = {
 			isa = PBXGroup;
 			children = (
 				333608962AD73B9D000984B6 /* AppReducer */,
 				333608972AD73BA3000984B6 /* Game */,
 				3336089B2AD74050000984B6 /* GameOver */,
+				337C52BB2BE2D9F8003C211B /* Instructions */,
 				3336089A2AD73FFC000984B6 /* Pegboard */,
 			);
 			path = Reducers;
@@ -283,6 +294,7 @@
 				3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */,
 				333608992AD73BC7000984B6 /* Pegboard.swift in Sources */,
 				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
+				337C52BD2BE2DA01003C211B /* Instructions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

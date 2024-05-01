@@ -87,9 +87,10 @@ struct GameOverSheet: View {
         score: 150,
         maxScore: 1300,
         secondsElapsed: 10
-      ),
-      reducer: GameOver.init
-    ))
+      )
+    ) {
+      GameOver()
+    })
   }
 }
 
