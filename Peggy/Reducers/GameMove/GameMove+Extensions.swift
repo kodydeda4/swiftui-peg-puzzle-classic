@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-extension Pegboard.State {
+extension GameMove.State {
   enum Direction: CaseIterable {
     case left
     case leftUp

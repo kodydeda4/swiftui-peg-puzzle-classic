@@ -2,13 +2,13 @@ import ComposableArchitecture
 
 extension Game.State {
   var isFirstMove: Bool {
-    pegboardHistory.isEmpty
+    moveHistory.isEmpty
   }
   var isPaused: Bool {
     !isFirstMove && !isTimerEnabled
   }
   var isGameOver: Bool {
-    pegboardCurrent.potentialMoves == 0
+    moveCurrent.potentialMoves == 0
   }
   var isUndoButtonDisabled: Bool {
     isFirstMove || isPaused
@@ -20,6 +20,6 @@ extension Game.State {
     isFirstMove
   }
   var maxScore: Int {
-    (pegboardCurrent.pegs.count - 1) * 150
+    (moveCurrent.pegs.count - 1) * 150
   }
 }

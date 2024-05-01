@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct Pegboard {
+struct GameMove {
   @ObservableState
   struct State: Equatable {
     var pegs = makePegs()
@@ -69,9 +69,9 @@ struct Pegboard {
 
 // MARK: - SwiftUI
 
-@ViewAction(for: Pegboard.self)
-struct PegboardView: View {
-  @Bindable var store: StoreOf<Pegboard>
+@ViewAction(for: GameMove.self)
+struct GameMoveView: View {
+  @Bindable var store: StoreOf<GameMove>
   
   var body: some View {
     VStack {
@@ -103,7 +103,7 @@ struct PegboardView: View {
 // MARK: - SwiftUI Previews
 
 #Preview {
-  PegboardView(store: Store(initialState: Pegboard.State()) {
-    Pegboard()
+  GameMoveView(store: Store(initialState: GameMove.State()) {
+    GameMove()
   })
 }

@@ -5,8 +5,8 @@ import ComposableArchitecture
 struct Game {
   @ObservableState
   struct State: Equatable {
-    var pegboardCurrent = Pegboard.State()
-    var pegboardHistory = [Pegboard.State]()
+    var moveCurrent = GameMove.State()
+    var moveHistory = [GameMove.State]()
     var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
@@ -14,7 +14,7 @@ struct Game {
   }
   enum Action: ViewAction {
     case view(View)
-    case pegboard(Pegboard.Action)
+    case pegboard(GameMove.Action)
     case destination(PresentationAction<Destination.Action>)
     case toggleIsPaused
     case timerTicked
@@ -36,8 +36,8 @@ struct Game {
   @Dependency(\.dismiss) var dismiss
 
   var body: some ReducerOf<Self> {
-    Scope(state: \.pegboardCurrent, action: \.pegboard) {
-      Pegboard()
+    Scope(state: \.moveCurrent, action: \.pegboard) {
+      GameMove()
     }
     Reduce { state, action in
       switch action {
@@ -47,9 +47,9 @@ struct Game {
           
         case .undoButtonTapped:
           state.score -= 150
-          state.pegboardHistory.removeLast()
-          state.pegboardCurrent = state.pegboardHistory.last ?? .init()
-          if state.pegboardHistory.isEmpty {
+          state.moveHistory.removeLast()
+          state.moveCurrent = state.moveHistory.last ?? .init()
+          if state.moveHistory.isEmpty {
             state = State()
             return .cancel(id: CancelID.timer)
           }
@@ -75,14 +75,14 @@ struct Game {
         
       case .pegboard(.delegate(.didComplete)):
         state.score += 150
-        state.pegboardHistory.append(state.pegboardCurrent)
+        state.moveHistory.append(state.moveCurrent)
         
         if state.isGameOver {
           return .run { send in
             try await self.clock.sleep(for: .seconds(1))
             await send(.gameOver)
           }
-        } else if state.pegboardHistory.count == 1 {
+        } else if state.moveHistory.count == 1 {
           return .send(.toggleIsPaused)
         }
         return .none
@@ -211,8 +211,8 @@ struct GameFullscreenCover: View {
       VStack {
         header
         
-        PegboardView(store: store.scope(
-          state: \.pegboardCurrent,
+        GameMoveView(store: store.scope(
+          state: \.moveCurrent,
           action: \.pegboard
         ))
         .frame(maxHeight: .infinity)
