@@ -42,10 +42,19 @@ struct InstructionsSheet: View {
   var body: some View {
     NavigationStack {
       List {
+        Section("1. Getting Started") {
+          Text("Tap any peg to remove it and begin the game.")
+        }
+        .listRowSeparator(.hidden, edges: .bottom)
         
+        Section("2. Game Moves") {
+          Text("Jump across pegs by tapping over one other into empty spaces until only a single peg remains.")
+        }
+        .listRowSeparator(.hidden, edges: .bottom)
       }
       .navigationTitle("Instructions")
       .navigationBarTitleDisplayMode(.inline)
+      .listStyle(.plain)
       .toolbar {
         Button("Dismiss") {
           send(.dismissButtonTapped)
