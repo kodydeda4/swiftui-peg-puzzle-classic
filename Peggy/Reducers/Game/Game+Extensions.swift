@@ -1,6 +1,9 @@
 import ComposableArchitecture
 
 extension Game.State {
+  var score: Int { 
+    moveCurrent.pegs.filter(\.isRemoved).count * 150
+  }
   var isFirstMove: Bool {
     moveHistory.isEmpty
   }

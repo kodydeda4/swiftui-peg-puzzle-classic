@@ -7,7 +7,6 @@ struct Game {
   struct State: Equatable {
     var moveCurrent = GameMove.State()
     var moveHistory = [GameMove.State]()
-    var score = 0
     var secondsElapsed = 0
     var isTimerEnabled = false
     @Presents var destination: Destination.State?
@@ -46,7 +45,6 @@ struct Game {
         switch action {
           
         case .undoButtonTapped:
-          state.score -= 150
           state.moveHistory.removeLast()
           state.moveCurrent = state.moveHistory.last ?? .init()
           if state.moveHistory.isEmpty {
@@ -74,15 +72,15 @@ struct Game {
         }
         
       case .pegboard(.delegate(.didComplete)):
-        state.score += 150
         state.moveHistory.append(state.moveCurrent)
         
-        if state.isGameOver {
+        guard !state.isGameOver else {
           return .run { send in
             try await self.clock.sleep(for: .seconds(1))
             await send(.gameOver)
           }
-        } else if state.moveHistory.count == 1 {
+        }
+        guard state.moveHistory.count != 1 else {
           return .send(.toggleIsPaused)
         }
         return .none
