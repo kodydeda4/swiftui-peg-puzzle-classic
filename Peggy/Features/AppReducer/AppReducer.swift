@@ -1,15 +1,17 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct AppReducer: Reducer {
+@Reducer
+struct AppReducer {
+  @ObservableState
   struct State: Equatable {
     var game = Game.State()
   }
-  enum Action: Equatable {
+  enum Action {
     case game(Game.Action)
   }
   var body: some ReducerOf<Self> {
-    Scope(state: \.game, action: /Action.game) {
+    Scope(state: \.game, action: \.game) {
       Game()
     }
   }
@@ -18,13 +20,13 @@ struct AppReducer: Reducer {
 // MARK: - SwiftUI
 
 struct AppView: View {
-  let store: StoreOf<AppReducer>
+  @Bindable var store: StoreOf<AppReducer>
 
   var body: some View {
     NavigationStack {
       GameView(store: store.scope(
         state: \.game,
-        action: { .game($0) }
+        action: \.game
       ))
     }
   }
@@ -33,8 +35,7 @@ struct AppView: View {
 // MARK: - SwiftUI Previews
 
 #Preview {
-  AppView(store: Store(
-    initialState: AppReducer.State(),
-    reducer: AppReducer.init
-  ))
+  AppView(store: Store(initialState: AppReducer.State()) {
+    AppReducer()
+  })
 }
