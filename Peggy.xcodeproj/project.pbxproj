@@ -50,13 +50,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		33316E212ACAEFFB00CB5E49 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		333608962AD73B9D000984B6 /* AppReducer */ = {
 			isa = PBXGroup;
 			children = (
@@ -118,13 +111,6 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		33B78C1A2AC73401005FC780 /* Dependencies */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Dependencies;
-			sourceTree = "<group>";
-		};
 		33B78C1B2AC7341A005FC780 /* Util */ = {
 			isa = PBXGroup;
 			children = (
@@ -146,7 +132,6 @@
 			isa = PBXGroup;
 			children = (
 				3336089C2AD742B5000984B6 /* ViewModifiers */,
-				33316E212ACAEFFB00CB5E49 /* Views */,
 				33B78C222AC73874005FC780 /* ButtonStyles */,
 			);
 			path = SwiftUI;
@@ -179,7 +164,6 @@
 		33E6E3542ABE2AAF00B76E4A /* Peggy */ = {
 			isa = PBXGroup;
 			children = (
-				33B78C1A2AC73401005FC780 /* Dependencies */,
 				33B78C182AC733F4005FC780 /* Features */,
 				33B78C1E2AC7346B005FC780 /* Models */,
 				33B78C192AC733FA005FC780 /* Resources */,
@@ -424,7 +408,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -454,7 +438,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -496,8 +480,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
+				kind = exactVersion;
+				version = 1.17.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

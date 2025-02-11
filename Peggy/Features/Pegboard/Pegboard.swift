@@ -1,15 +1,20 @@
 import ComposableArchitecture
 import SwiftUI
 
+@Reducer
 struct Pegboard: Reducer {
+  @ObservableState
   struct State: Equatable {
     var pegs = makePegs()
     var selection: Peg?
   }
-  enum Action: Equatable {
-    case move(Peg)
+  enum Action: ViewAction {
+    case view(View)
     case delegate(Delegate)
     
+    enum View {
+      case move(Peg)
+    }
     enum Delegate: Equatable {
       case didComplete
     }
@@ -17,7 +22,7 @@ struct Pegboard: Reducer {
   func reduce(into state: inout State, action: Action) -> Effect<Action> {
     switch action {
       
-    case let .move(selection):
+    case let .view(.move(selection)):
       UIImpactFeedbackGenerator(style: .soft).impactOccurred()
       
       if state.isFirstMove {
@@ -129,17 +134,16 @@ extension Pegboard.State {
 
 // MARK: - SwiftUI
 
+@ViewAction(for: Pegboard.self)
 struct PegboardView: View {
-  let store: StoreOf<Pegboard>
+  @Bindable var store: StoreOf<Pegboard>
   
   var body: some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      VStack {
-        ForEach(0..<viewStore.pegs.last!.row+1, id: \.self) { row in
-          HStack {
-            ForEach(0..<row+1, id: \.self) { col in
-              pegView(peg: viewStore.pegs[id: [row, col]]!)
-            }
+    VStack {
+      ForEach(0..<store.pegs.last!.row+1, id: \.self) { row in
+        HStack {
+          ForEach(0..<row+1, id: \.self) { col in
+            pegView(peg: store.pegs[id: [row, col]]!)
           }
         }
       }
@@ -147,25 +151,22 @@ struct PegboardView: View {
   }
   
   private func pegView(peg: Peg) -> some View {
-    WithViewStore(store, observe: { $0 }) { viewStore in
-      Button(action: { viewStore.send(.move(peg)) }) {
-        Circle()
-          .foregroundColor(viewStore.selection == peg ? .accentColor : Color(.systemGray))
-          .frame(width: 50, height: 50)
-          .opacity(!peg.isRemoved ? 1 : 0.25)
-          .transition(.scale)
-      }
-      .buttonStyle(.plain)
-      .animation(.default, value: viewStore.selection)
+    Button(action: { send(.move(peg)) }) {
+      Circle()
+        .foregroundColor(store.selection == peg ? .accentColor : Color(.systemGray))
+        .frame(width: 50, height: 50)
+        .opacity(!peg.isRemoved ? 1 : 0.25)
+        .transition(.scale)
     }
+    .buttonStyle(.plain)
+    .animation(.default, value: store.selection)
   }
 }
 
 // MARK: - SwiftUI Previews
 
 #Preview {
-  PegboardView(store: Store(
-    initialState: Pegboard.State(),
-    reducer: Pegboard.init
-  ))
+  PegboardView(store: Store(initialState: Pegboard.State()) {
+    Pegboard()
+  })
 }
