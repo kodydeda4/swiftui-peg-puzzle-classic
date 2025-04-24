@@ -1,4 +1,4 @@
-import SwiftUI
+import SwiftUIG
 import ComposableArchitecture
 
 @Reducer
@@ -366,3 +366,4 @@ private struct ButtonLabel: View {
     reducer: Game.init
   ))
 }
+
