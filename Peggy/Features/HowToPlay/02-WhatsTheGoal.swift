@@ -5,15 +5,15 @@ import ComposableArchitecture
 struct WhatsTheGoal {
   @ObservableState
   struct State: Equatable {}
-
+  
   public enum Action: ViewAction {
     case view(View)
     
     enum View {
-//      case continueButtonTapped
+      //      case continueButtonTapped
     }
   }
-
+  
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
@@ -21,8 +21,8 @@ struct WhatsTheGoal {
       case let .view(action):
         switch action {
           
-//        case .continueButtonTapped:
-//          return .none
+          //        case .continueButtonTapped:
+          //          return .none
         }
       }
     }
@@ -36,19 +36,25 @@ struct WhatsTheGoalView: View {
   @Bindable var store: StoreOf<WhatsTheGoal>
   
   var body: some View {
-    VStack {
-      Text("What's the Goal?")
-        .bold()
-      Text("Jump pegs over each other and remove them — try to leave only one peg on the board.")
+    VStack(spacing: 0) {
+      VStack {
+        Color.pink
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
       
+      HowToPlayWrapperView(
+        title: "What's the Goal?",
+        subtitle: "Jump pegs over each other and remove them — try to leave only one peg on the board."
+      )
+    }
+    .howToPlayDefaultViewModifiers()
+    .navigationOverlay {
       NavigationLink(
         "Continue",
         state: HowToPlay.Path.State.page3(HowToJump.State())
       )
       .buttonStyle(RoundedRectangleButtonStyle())
     }
-    .navigationTitle("How to Play")
-    .navigationBarTitleDisplayMode(.inline)
   }
 }
 

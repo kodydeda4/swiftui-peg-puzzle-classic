@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		330B0AA12DBFDD33008B6AE1 /* Build.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330B0AA02DBFDD33008B6AE1 /* Build.swift */; };
+		330B0AA12DBFDD33008B6AE1 /* BuildClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330B0AA02DBFDD33008B6AE1 /* BuildClient.swift */; };
 		330B0AA42DBFDD71008B6AE1 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA32DBFDD71008B6AE1 /* Tagged */; };
 		330B0AA62DBFDD71008B6AE1 /* TaggedMoney in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA52DBFDD71008B6AE1 /* TaggedMoney */; };
 		330B0AA82DBFDD71008B6AE1 /* TaggedTime in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA72DBFDD71008B6AE1 /* TaggedTime */; };
@@ -39,7 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		330B0AA02DBFDD33008B6AE1 /* Build.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Build.swift; sourceTree = "<group>"; };
+		330B0AA02DBFDD33008B6AE1 /* BuildClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildClient.swift; sourceTree = "<group>"; };
 		332AC8372DBFBC1C00BFFE87 /* _HowToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _HowToPlay.swift; sourceTree = "<group>"; };
 		333608922AD72C32000984B6 /* IdentifiedCollections+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IdentifiedCollections+.swift"; sourceTree = "<group>"; };
 		333608982AD73BC7000984B6 /* Pegboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pegboard.swift; sourceTree = "<group>"; };
@@ -85,7 +85,7 @@
 		330B0A9F2DBFDD2B008B6AE1 /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				330B0AA02DBFDD33008B6AE1 /* Build.swift */,
+				330B0AA02DBFDD33008B6AE1 /* BuildClient.swift */,
 			);
 			path = Clients;
 			sourceTree = "<group>";
@@ -342,7 +342,7 @@
 				339059E22DBFED5A000F9904 /* 02-WhatsTheGoal.swift in Sources */,
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
-				330B0AA12DBFDD33008B6AE1 /* Build.swift in Sources */,
+				330B0AA12DBFDD33008B6AE1 /* BuildClient.swift in Sources */,
 				33F2C8D52AD606A7004574A2 /* GameOver.swift in Sources */,
 				33905A302DC01032000F9904 /* 06-QuickTips.swift in Sources */,
 				33B78C172AC732D0005FC780 /* Game.swift in Sources */,

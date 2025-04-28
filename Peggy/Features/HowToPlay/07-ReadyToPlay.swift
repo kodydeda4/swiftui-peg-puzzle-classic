@@ -4,8 +4,10 @@ import ComposableArchitecture
 @Reducer
 struct ReadyToPlay {
   @ObservableState
-  struct State: Equatable {}
-
+  struct State: Equatable {
+    @Shared(.appEvent) var appEvent
+  }
+  
   public enum Action: ViewAction {
     case view(View)
     
@@ -13,7 +15,7 @@ struct ReadyToPlay {
       case finishButtonTapped
     }
   }
-
+  
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
@@ -22,12 +24,26 @@ struct ReadyToPlay {
         switch action {
           
         case .finishButtonTapped:
+          state.$appEvent.withLock {
+            $0 = .startPlayingButtonTapped
+          }
           return .none
         }
       }
     }
   }
 }
+
+extension SharedReaderKey where Self == InMemoryKey<AppEvent?>.Default {
+  static var appEvent: Self {
+    Self[.inMemory("appEvent"), default: .none]
+  }
+}
+
+enum AppEvent {
+  case startPlayingButtonTapped
+}
+
 
 // MARK: - SwiftUI
 
@@ -36,18 +52,24 @@ struct ReadyToPlayView: View {
   @Bindable var store: StoreOf<ReadyToPlay>
   
   var body: some View {
-    VStack {
-      Text("Ready to Jump In?")
-        .bold()
-      Text("Let's start your first game!")
-      
+    VStack(spacing: 0) {
+      VStack {
+        Color.purple
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+      HowToPlayWrapperView(
+        title: "Ready to Jump In",
+        subtitle: "Let's start your first game!"
+      )
+    }
+    .howToPlayDefaultViewModifiers()
+    .navigationOverlay {
       Button("Finish") {
         send(.finishButtonTapped)
       }
       .buttonStyle(RoundedRectangleButtonStyle())
     }
-    .navigationTitle("How to Play")
-    .navigationBarTitleDisplayMode(.inline)
   }
 }
 

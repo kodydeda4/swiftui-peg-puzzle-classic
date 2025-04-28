@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
+import Combine
 
 @Reducer
 struct AppReducer {
@@ -8,11 +9,14 @@ struct AppReducer {
   struct State: Equatable {
     @Presents var destination: Destination.State?
     @Shared(.build) var build
+    @Shared(.appEvent) var appEvent
+    var cancellables: Set<AnyCancellable> = []
   }
   
   public enum Action: ViewAction {
     case view(View)
     case destination(PresentationAction<Destination.Action>)
+    case appEvent(AppEvent?)
     
     enum View {
       case task
@@ -27,7 +31,12 @@ struct AppReducer {
     Reduce { state, action in
       switch action {
         
-      case .destination:
+      case .appEvent(.startPlayingButtonTapped):
+        state.destination = .game(Game.State())
+        state.$appEvent.withLock { $0 = .none }
+        return .none
+        
+      case .destination, .appEvent:
         return .none
         
       case let .view(action):
@@ -37,7 +46,9 @@ struct AppReducer {
           state.$build.withLock {
             $0 = Build(version: build.version())
           }
-          return .none
+          return .publisher {
+            state.$appEvent.publisher.map(Action.appEvent)
+          }
           
         case .playButtonTapped:
           state.destination = .game(Game.State())
