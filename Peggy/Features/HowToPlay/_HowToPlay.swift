@@ -37,6 +37,7 @@ struct HowToPlay {
         switch action {
           
         case .confirm:
+          state.destination = .none
           state.$hasCompletedHowToPlay.withLock { $0 = true }
           return .run { _ in await self.dismiss() }
           
