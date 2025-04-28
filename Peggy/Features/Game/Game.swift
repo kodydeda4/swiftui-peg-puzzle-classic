@@ -1,4 +1,4 @@
-import SwiftUIG
+import SwiftUI
 import ComposableArchitecture
 
 @Reducer
@@ -25,38 +25,36 @@ struct Game {
       case undoButtonTapped
       case pauseButtonTapped
       case restartButtonTapped
+      case dismissButtonTapped
     }
   }
   
   private enum CancelID { case timer }
   
   @Dependency(\.continuousClock) var clock
-  
+  @Dependency(\.dismiss) var dismiss
+
   var body: some ReducerOf<Self> {
     Scope(state: \.pegboardCurrent, action: \.pegboard) {
       Pegboard()
     }
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
         
-      case let .view(action):
+      case let .destination(.presented(action)):
         switch action {
           
-        case .undoButtonTapped:
-          state.score -= 150
-          state.pegboardHistory.removeLast()
-          state.pegboardCurrent = state.pegboardHistory.last ?? .init()
-          if state.pegboardHistory.isEmpty {
-            state = State()
-            return .cancel(id: CancelID.timer)
-          }
-          return .none
+        case .gameOver(.view(.newGameButtonTapped)),
+            .restartAlert(.yesButtonTapped):
+          state = State()
+          return .cancel(id: CancelID.timer)
           
-        case .pauseButtonTapped:
-          return .send(.toggleIsPaused)
+        case .exitGameAlert(.yesButtonTapped):
+          return .run { _ in await self.dismiss() }
           
-        case .restartButtonTapped:
-          state.destination = .restartAlert(.init())
+        default:
           return .none
         }
         
@@ -89,28 +87,45 @@ struct Game {
         return .none
         
       case .gameOver:
-        state.destination = .gameOver(.init(
+        state.destination = .gameOver(GameOver.State(
           score: state.score,
           maxScore: state.maxScore,
           secondsElapsed: state.secondsElapsed
         ))
         return .send(.toggleIsPaused)
         
-      case let .destination(.presented(action)):
+      case .pegboard,
+          .destination:
+        return .none
+        
+      case let .view(action):
         switch action {
           
-          //@DEDA
-        case .gameOver(.view(.newGameButtonTapped)),
-            .restartAlert(.yesButtonTapped):
-          state = State()
-          return .cancel(id: CancelID.timer)
-          
-        default:
+        case .undoButtonTapped:
+          state.score -= 150
+          state.pegboardHistory.removeLast()
+          state.pegboardCurrent = state.pegboardHistory.last ?? .init()
+          if state.pegboardHistory.isEmpty {
+            state = State()
+            return .cancel(id: CancelID.timer)
+          }
           return .none
+          
+        case .pauseButtonTapped:
+          return .send(.toggleIsPaused)
+          
+        case .restartButtonTapped:
+          state.destination = .restartAlert(
+            AlertState<Destination.RestartAlert>()
+          )
+          return state.isPaused ? .none : .send(.toggleIsPaused)
+          
+        case .dismissButtonTapped:
+          state.destination = .exitGameAlert(
+            AlertState<Destination.ExitGameAlert>()
+          )
+          return state.isPaused ? .none : .send(.toggleIsPaused)
         }
-        
-      case .pegboard, .destination:
-        return .none
       }
     }
     .ifLet(\.$destination, action: \.destination)
@@ -120,9 +135,15 @@ struct Game {
   enum Destination {
     case gameOver(GameOver)
     case restartAlert(AlertState<RestartAlert>)
-    
+    case exitGameAlert(AlertState<ExitGameAlert>)
+
     @CasePathable
     enum RestartAlert {
+      case yesButtonTapped
+    }
+    
+    @CasePathable
+    enum ExitGameAlert {
       case yesButtonTapped
     }
   }
@@ -141,6 +162,21 @@ extension AlertState where Action == Game.Destination.RestartAlert {
       }
     } message: {
       TextState("Restart the game?")
+    }
+  }
+}
+
+extension AlertState where Action == Game.Destination.ExitGameAlert {
+  init() {
+    self = Self {
+      TextState("Exit Game?")
+    } actions: {
+      ButtonState(role: .cancel) {
+        TextState("Cancel")
+      }
+      ButtonState(role: .destructive, action: .yesButtonTapped) {
+        TextState("Yes")
+      }
     }
   }
 }
@@ -195,11 +231,20 @@ struct GameView: View {
         state: \.$destination.restartAlert,
         action: \.destination.restartAlert
       ))
+      .alert(store: store.scope(
+        state: \.$destination.exitGameAlert,
+        action: \.destination.exitGameAlert
+      ))
       .sheet(item: $store.scope(
         state: \.destination?.gameOver,
         action: \.destination.gameOver
       )) { store in
         GameOverSheet(store: store)
+      }
+      .toolbar {
+        Button(action: { send(.dismissButtonTapped) }) {
+          Image(systemName: "xmark.circle")
+        }
       }
     }
   }
@@ -361,9 +406,8 @@ private struct ButtonLabel: View {
 // MARK: - SwiftUI Previews
 
 #Preview {
-  GameView(store: Store(
-    initialState: Game.State(),
-    reducer: Game.init
-  ))
+  GameView(store: Store(initialState: Game.State()) {
+    Game()
+  })
 }
 

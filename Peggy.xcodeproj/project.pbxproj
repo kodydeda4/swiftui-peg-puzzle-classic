@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		332AC8382DBFBC1C00BFFE87 /* HowToPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */; };
 		333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608922AD72C32000984B6 /* IdentifiedCollections+.swift */; };
 		333608992AD73BC7000984B6 /* Pegboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608982AD73BC7000984B6 /* Pegboard.swift */; };
 		3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HowToPlay.swift; sourceTree = "<group>"; };
 		333608922AD72C32000984B6 /* IdentifiedCollections+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IdentifiedCollections+.swift"; sourceTree = "<group>"; };
 		333608982AD73BC7000984B6 /* Pegboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pegboard.swift; sourceTree = "<group>"; };
 		3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+navigationOverlay.swift"; sourceTree = "<group>"; };
@@ -50,6 +52,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		332AC8362DBFBC1300BFFE87 /* HowToPlay */ = {
+			isa = PBXGroup;
+			children = (
+				332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */,
+			);
+			path = HowToPlay;
+			sourceTree = "<group>";
+		};
 		333608962AD73B9D000984B6 /* AppReducer */ = {
 			isa = PBXGroup;
 			children = (
@@ -93,6 +103,7 @@
 		33B78C182AC733F4005FC780 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				332AC8362DBFBC1300BFFE87 /* HowToPlay */,
 				333608962AD73B9D000984B6 /* AppReducer */,
 				333608972AD73BA3000984B6 /* Game */,
 				3336089B2AD74050000984B6 /* GameOver */,
@@ -263,6 +274,7 @@
 				33B78C172AC732D0005FC780 /* Game.swift in Sources */,
 				33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */,
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
+				332AC8382DBFBC1C00BFFE87 /* HowToPlay.swift in Sources */,
 				333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */,
 				3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */,
 				333608992AD73BC7000984B6 /* Pegboard.swift in Sources */,
