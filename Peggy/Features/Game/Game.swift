@@ -243,7 +243,8 @@ struct GameView: View {
       }
       .toolbar {
         Button(action: { send(.dismissButtonTapped) }) {
-          Image(systemName: "xmark.circle")
+          Image(systemName: "xmark.circle.fill")
+            .foregroundColor(Color(.systemGray2))
         }
       }
     }
