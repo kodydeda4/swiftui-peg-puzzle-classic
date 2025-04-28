@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		330B0AA12DBFDD33008B6AE1 /* Build.swift in Sources */ = {isa = PBXBuildFile; fileRef = 330B0AA02DBFDD33008B6AE1 /* Build.swift */; };
+		330B0AA42DBFDD71008B6AE1 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA32DBFDD71008B6AE1 /* Tagged */; };
+		330B0AA62DBFDD71008B6AE1 /* TaggedMoney in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA52DBFDD71008B6AE1 /* TaggedMoney */; };
+		330B0AA82DBFDD71008B6AE1 /* TaggedTime in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA72DBFDD71008B6AE1 /* TaggedTime */; };
 		332AC8382DBFBC1C00BFFE87 /* HowToPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */; };
 		333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608922AD72C32000984B6 /* IdentifiedCollections+.swift */; };
 		333608992AD73BC7000984B6 /* Pegboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608982AD73BC7000984B6 /* Pegboard.swift */; };
 		3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */; };
+		339059DE2DBFE475000F9904 /* @Shared(.build).swift in Sources */ = {isa = PBXBuildFile; fileRef = 339059DD2DBFE475000F9904 /* @Shared(.build).swift */; };
 		33B78C172AC732D0005FC780 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* Game.swift */; };
 		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
 		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
@@ -24,10 +29,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		330B0AA02DBFDD33008B6AE1 /* Build.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Build.swift; sourceTree = "<group>"; };
 		332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HowToPlay.swift; sourceTree = "<group>"; };
 		333608922AD72C32000984B6 /* IdentifiedCollections+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IdentifiedCollections+.swift"; sourceTree = "<group>"; };
 		333608982AD73BC7000984B6 /* Pegboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pegboard.swift; sourceTree = "<group>"; };
 		3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+navigationOverlay.swift"; sourceTree = "<group>"; };
+		339059DD2DBFE475000F9904 /* @Shared(.build).swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Shared(.build).swift"; sourceTree = "<group>"; };
 		33B78C162AC732D0005FC780 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
@@ -45,13 +52,24 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				330B0AA42DBFDD71008B6AE1 /* Tagged in Frameworks */,
+				330B0AA82DBFDD71008B6AE1 /* TaggedTime in Frameworks */,
 				33E6E3652ABE2EFD00B76E4A /* ComposableArchitecture in Frameworks */,
+				330B0AA62DBFDD71008B6AE1 /* TaggedMoney in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		330B0A9F2DBFDD2B008B6AE1 /* Clients */ = {
+			isa = PBXGroup;
+			children = (
+				330B0AA02DBFDD33008B6AE1 /* Build.swift */,
+			);
+			path = Clients;
+			sourceTree = "<group>";
+		};
 		332AC8362DBFBC1300BFFE87 /* HowToPlay */ = {
 			isa = PBXGroup;
 			children = (
@@ -100,6 +118,26 @@
 			path = ViewModifiers;
 			sourceTree = "<group>";
 		};
+		339059DB2DBFE393000F9904 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				339059DC2DBFE46A000F9904 /* Sharing */,
+				33B78C1E2AC7346B005FC780 /* Models */,
+				33B78C192AC733FA005FC780 /* Resources */,
+				33B78C212AC7386E005FC780 /* DesignSystem */,
+				33B78C1B2AC7341A005FC780 /* Extensions */,
+			);
+			path = Libraries;
+			sourceTree = "<group>";
+		};
+		339059DC2DBFE46A000F9904 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				339059DD2DBFE475000F9904 /* @Shared(.build).swift */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
 		33B78C182AC733F4005FC780 /* Features */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,13 +160,13 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		33B78C1B2AC7341A005FC780 /* Util */ = {
+		33B78C1B2AC7341A005FC780 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
 				33B78C1C2AC73426005FC780 /* Collection+.swift */,
 				333608922AD72C32000984B6 /* IdentifiedCollections+.swift */,
 			);
-			path = Util;
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		33B78C1E2AC7346B005FC780 /* Models */ = {
@@ -139,13 +177,13 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		33B78C212AC7386E005FC780 /* SwiftUI */ = {
+		33B78C212AC7386E005FC780 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
 				3336089C2AD742B5000984B6 /* ViewModifiers */,
 				33B78C222AC73874005FC780 /* ButtonStyles */,
 			);
-			path = SwiftUI;
+			path = DesignSystem;
 			sourceTree = "<group>";
 		};
 		33B78C222AC73874005FC780 /* ButtonStyles */ = {
@@ -175,11 +213,9 @@
 		33E6E3542ABE2AAF00B76E4A /* Peggy */ = {
 			isa = PBXGroup;
 			children = (
+				339059DB2DBFE393000F9904 /* Libraries */,
+				330B0A9F2DBFDD2B008B6AE1 /* Clients */,
 				33B78C182AC733F4005FC780 /* Features */,
-				33B78C1E2AC7346B005FC780 /* Models */,
-				33B78C192AC733FA005FC780 /* Resources */,
-				33B78C212AC7386E005FC780 /* SwiftUI */,
-				33B78C1B2AC7341A005FC780 /* Util */,
 			);
 			path = Peggy;
 			sourceTree = "<group>";
@@ -210,6 +246,9 @@
 			name = Peggy;
 			packageProductDependencies = (
 				33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */,
+				330B0AA32DBFDD71008B6AE1 /* Tagged */,
+				330B0AA52DBFDD71008B6AE1 /* TaggedMoney */,
+				330B0AA72DBFDD71008B6AE1 /* TaggedTime */,
 			);
 			productName = PegGame;
 			productReference = 33E6E3522ABE2AAF00B76E4A /* Peggy.app */;
@@ -241,6 +280,7 @@
 			mainGroup = 33E6E3492ABE2AAF00B76E4A;
 			packageReferences = (
 				33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */,
 			);
 			productRefGroup = 33E6E3532ABE2AAF00B76E4A /* Products */;
 			projectDirPath = "";
@@ -270,6 +310,7 @@
 			files = (
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
+				330B0AA12DBFDD33008B6AE1 /* Build.swift in Sources */,
 				33F2C8D52AD606A7004574A2 /* GameOver.swift in Sources */,
 				33B78C172AC732D0005FC780 /* Game.swift in Sources */,
 				33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */,
@@ -278,6 +319,7 @@
 				333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */,
 				3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */,
 				333608992AD73BC7000984B6 /* Pegboard.swift in Sources */,
+				339059DE2DBFE475000F9904 /* @Shared(.build).swift in Sources */,
 				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -411,7 +453,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Peggy/Resources/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Peggy/Libraries/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -442,7 +484,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Peggy/Resources/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Peggy/Libraries/Resources/Preview Content\"";
 				DEVELOPMENT_TEAM = ME637H7ZM9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -490,6 +532,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-tagged";
+			requirement = {
+				kind = exactVersion;
+				version = 0.10.0;
+			};
+		};
 		33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -501,6 +551,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		330B0AA32DBFDD71008B6AE1 /* Tagged */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */;
+			productName = Tagged;
+		};
+		330B0AA52DBFDD71008B6AE1 /* TaggedMoney */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */;
+			productName = TaggedMoney;
+		};
+		330B0AA72DBFDD71008B6AE1 /* TaggedTime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */;
+			productName = TaggedTime;
+		};
 		33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;

@@ -1,23 +1,26 @@
 import SwiftUI
 import ComposableArchitecture
 
-// @DEDA You should animate the homescreen && integrate gamechanger.
-
 @Reducer
 struct AppReducer {
   @ObservableState
   struct State: Equatable {
+    @Shared(.build) var build
     @Presents var destination: Destination.State?
   }
+  
   public enum Action: ViewAction {
     case view(View)
     case destination(PresentationAction<Destination.Action>)
     
     enum View {
+      case task
       case playButtonTapped
       case howToPlayButtonTapped
     }
   }
+  
+  @Dependency(\.build) var build
   
   var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -28,6 +31,12 @@ struct AppReducer {
         
       case let .view(action):
         switch action {
+          
+        case .task:
+          state.$build.withLock {
+            $0 = Build(version: build.version())
+          }
+          return .none
           
         case .playButtonTapped:
           state.destination = .game(Game.State())
@@ -55,7 +64,7 @@ struct AppReducer {
 @ViewAction(for: AppReducer.self)
 struct AppView: View {
   @Bindable var store: StoreOf<AppReducer>
-
+  
   var body: some View {
     NavigationStack {
       VStack {
@@ -64,7 +73,7 @@ struct AppView: View {
           .bold()
           .padding(.top, 64)
         
-        Text("Version 1.0")
+        Text("Version: \(store.build.version.description)")
           .font(.title2)
           .foregroundStyle(.secondary)
         
@@ -90,6 +99,7 @@ struct AppView: View {
         ))
       }
       .padding()
+      .task { await send(.task).finish() }
       .fullScreenCover(item: $store.scope(
         state: \.destination?.game,
         action: \.destination.game
