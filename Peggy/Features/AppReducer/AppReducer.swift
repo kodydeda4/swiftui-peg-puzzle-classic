@@ -1,8 +1,7 @@
 import SwiftUI
 import ComposableArchitecture
 
-@Reducer
-struct AppReducer {
+@Reducer struct AppReducer {
   @ObservableState
   struct State: Equatable {
     @Shared(.build) var build
@@ -77,14 +76,16 @@ struct AppView: View {
           .font(.title2)
           .foregroundStyle(.secondary)
         
-        Circle()
-          .frame(
-            width:  150,
-            height: 150
-          )
+        Image(.logo)
+          .resizable()
+          .scaledToFit()
+          .frame(width: 150, height: 150)
+          .background {
+            Circle()
+              .foregroundColor(Color(.systemGray6))
+          }
           .padding()
-          .foregroundColor(Color(.systemGray5))
-        
+
         Button("Play") {
           send(.playButtonTapped)
         }
