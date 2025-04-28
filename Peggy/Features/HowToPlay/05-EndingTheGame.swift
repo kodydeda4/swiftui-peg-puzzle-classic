@@ -38,10 +38,15 @@ struct EndingTheGameView: View {
   var body: some View {
     VStack(spacing: 0) {
       VStack {
-        Color.red
+        Image(systemName: "flag.pattern.checkered")
+          .resizable()
+          .scaledToFit()
+          .foregroundColor(Color(.darkGray))
+          .frame(width: 200, height: 200)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      
+      .background { Color(.systemGray6) }
+
       HowToPlayWrapperView(
         title: "When the Game Ends",
         subtitle: "The game ends when no more valid moves are left. Fewer pegs = better score!"

@@ -38,9 +38,14 @@ struct QuickTipsView: View {
   var body: some View {
     VStack(spacing: 0) {
       VStack {
-        Color.orange
+        Image(systemName: "checkmark.seal.text.page")
+          .resizable()
+          .scaledToFit()
+          .foregroundColor(Color(.darkGray))
+          .frame(width: 200, height: 200)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background { Color(.systemGray6) }
 
       HowToPlayWrapperView(
         title: "Quick Tips for Success",

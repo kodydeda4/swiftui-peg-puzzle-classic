@@ -79,16 +79,9 @@ struct HowToJumpView: View {
       VStack {
         PegboardView(store: store.scope(state: \.pegboard, action: \.pegboard))
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-      .padding(.bottom, 32)
-      .background {
-        LinearGradient(
-          colors: [Color(.systemGray5), .clear],
-          startPoint: .bottom,
-          endPoint: .top
-        )
-      }
-      
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background { Color(.systemGray6) }
+
       HowToPlayWrapperView(
         title: "How to Jump",
         subtitle: "Select a peg, then jump it over a neighboring peg into an empty hole. The peg you jump over is removed."

@@ -38,9 +38,14 @@ struct ValidMovesView: View {
   var body: some View {
     VStack(spacing: 0) {
       VStack {
-        Color.blue
+        Image(systemName: "circle.bottomrighthalf.pattern.checkered")
+          .resizable()
+          .scaledToFit()
+          .foregroundColor(Color(.darkGray))
+          .frame(width: 200, height: 200)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background { Color(.systemGray6) }
 
       HowToPlayWrapperView(
         title: "Valid Moves Only",

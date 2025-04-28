@@ -38,10 +38,15 @@ struct WhatsTheGoalView: View {
   var body: some View {
     VStack(spacing: 0) {
       VStack {
-        Color.pink
+        Image(systemName: "grid")
+          .resizable()
+          .scaledToFit()
+          .foregroundColor(Color(.darkGray))
+          .frame(width: 200, height: 200)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      
+      .background { Color(.systemGray6) }
+
       HowToPlayWrapperView(
         title: "What's the Goal?",
         subtitle: "Jump pegs over each other and remove them — try to leave only one peg on the board."
