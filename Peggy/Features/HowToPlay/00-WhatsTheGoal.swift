@@ -2,7 +2,7 @@ import SwiftUI
 import ComposableArchitecture
 
 @Reducer
-struct ScreenA {
+struct WhatsTheGoal {
   @ObservableState
   struct State: Equatable {}
 
@@ -10,7 +10,7 @@ struct ScreenA {
     case view(View)
     
     enum View {
-      case finishButtonTapped
+      case continueButtonTapped
     }
   }
 
@@ -21,7 +21,7 @@ struct ScreenA {
       case let .view(action):
         switch action {
           
-        case .finishButtonTapped:
+        case .continueButtonTapped:
           return .none
         }
       }
@@ -31,16 +31,18 @@ struct ScreenA {
 
 // MARK: - SwiftUI
 
-@ViewAction(for: ScreenA.self)
-struct ScreenAView: View {
-  @Bindable var store: StoreOf<ScreenA>
+@ViewAction(for: WhatsTheGoal.self)
+struct WhatsTheGoalView: View {
+  @Bindable var store: StoreOf<WhatsTheGoal>
   
   var body: some View {
     VStack {
-      Text("This is a game")
+      Text("What's the Goal?")
+        .bold()
+      Text("Jump pegs over each other and remove them — try to leave only one peg on the board.")
       
-      Button("Finish") {
-        send(.finishButtonTapped)
+      Button("Continue") {
+        send(.continueButtonTapped)
       }
     }
     .navigationTitle("How to Play")
@@ -52,8 +54,8 @@ struct ScreenAView: View {
 
 #Preview {
   NavigationStack {
-    ScreenAView(store: Store(initialState: ScreenA.State()) {
-      ScreenA()
+    WhatsTheGoalView(store: Store(initialState: WhatsTheGoal.State()) {
+      WhatsTheGoal()
     })
   }
 }

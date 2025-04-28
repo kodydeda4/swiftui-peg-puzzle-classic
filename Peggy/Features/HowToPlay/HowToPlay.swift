@@ -6,7 +6,13 @@ struct HowToPlay {
   
   @Reducer(state: .equatable)
   enum Path {
-    case screenA(ScreenA)
+//    # 📄 Page 1: Welcome (self)
+    case whatsTheGoal(WhatsTheGoal)
+//    # 📄 Page 3: How to Jump
+//    # 📄 Page 4: Valid Moves
+//    # 📄 Page 5: Ending the Game
+//    # 📄 Page 6: Quick Tips
+    case readyToPlay(ReadyToPlay)
   }
   
   @ObservableState
@@ -30,7 +36,7 @@ struct HowToPlay {
     Reduce { state, action in
       switch action {
         
-      case .path(.element(id: _, action: .screenA(.view(.finishButtonTapped)))):
+      case .path(.element(id: _, action: .readyToPlay(.view(.finishButtonTapped)))):
         return .run { _ in await self.dismiss() }
         
       case .path:
@@ -40,7 +46,8 @@ struct HowToPlay {
         switch action {
           
         case .continueButtonTapped:
-          state.path.append(.screenA(ScreenA.State()))
+          state.path.append(.readyToPlay(ReadyToPlay.State()))
+//          state.path.append(.readyToPlay(ReadyToPlay.State()))
           return .none
           
         case .cancelButtonTapped:
@@ -63,20 +70,30 @@ struct HowToPlayView: View {
       path: $store.scope(state: \.path, action: \.path)
     ) {
       VStack {
+        Text("Welcome to the Peg Game!")
+          .bold()
+        Text("Learn the classic brain teaser — and become a Peg Game master!")
+        
         Button("Continue") {
           send(.continueButtonTapped)
-        }
-        Button("Cancel") {
-          send(.cancelButtonTapped)
         }
       }
       .navigationTitle("How to Play")
       .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        Button(action: { send(.cancelButtonTapped) }) {
+          Image(systemName: "xmark.circle.fill")
+            .foregroundColor(Color(.systemGray2))
+        }
+      }
     } destination: { store in
       switch store.case {
         
-      case let .screenA(store):
-        ScreenAView(store: store)
+      case let .whatsTheGoal(store: store):
+        WhatsTheGoalView(store: store)
+        
+      case let .readyToPlay(store):
+        ReadyToPlayView(store: store)
       }
     }
   }
