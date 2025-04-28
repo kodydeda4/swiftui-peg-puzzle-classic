@@ -26,6 +26,7 @@
 		33905A302DC01032000F9904 /* 06-QuickTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A2F2DC0102F000F9904 /* 06-QuickTips.swift */; };
 		33905A322DC01185000F9904 /* Game+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A312DC01185000F9904 /* Game+Header.swift */; };
 		33905A342DC011C9000F9904 /* Game+Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A332DC011C9000F9904 /* Game+Footer.swift */; };
+		33905A772DC03051000F9904 /* @Shared(.isOnboardingComplete).swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A762DC0304C000F9904 /* @Shared(.isOnboardingComplete).swift */; };
 		33B78C172AC732D0005FC780 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* Game.swift */; };
 		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
 		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
@@ -54,6 +55,7 @@
 		33905A2F2DC0102F000F9904 /* 06-QuickTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "06-QuickTips.swift"; sourceTree = "<group>"; };
 		33905A312DC01185000F9904 /* Game+Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Header.swift"; sourceTree = "<group>"; };
 		33905A332DC011C9000F9904 /* Game+Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Footer.swift"; sourceTree = "<group>"; };
+		33905A762DC0304C000F9904 /* @Shared(.isOnboardingComplete).swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Shared(.isOnboardingComplete).swift"; sourceTree = "<group>"; };
 		33B78C162AC732D0005FC780 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 		339059DC2DBFE46A000F9904 /* Sharing */ = {
 			isa = PBXGroup;
 			children = (
+				33905A762DC0304C000F9904 /* @Shared(.isOnboardingComplete).swift */,
 				339059DD2DBFE475000F9904 /* @Shared(.build).swift */,
 			);
 			path = Sharing;
@@ -352,6 +355,7 @@
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
 				33905A2C2DBFF9F6000F9904 /* 05-EndingTheGame.swift in Sources */,
 				33905A2E2DBFFA13000F9904 /* 01-Welcome.swift in Sources */,
+				33905A772DC03051000F9904 /* @Shared(.isOnboardingComplete).swift in Sources */,
 				332AC8382DBFBC1C00BFFE87 /* _HowToPlay.swift in Sources */,
 				333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */,
 				33905A2A2DBFF981000F9904 /* 04-ValidMoves.swift in Sources */,

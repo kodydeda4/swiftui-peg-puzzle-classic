@@ -46,11 +46,11 @@ struct Game {
         switch action {
           
         case .gameOver(.view(.newGameButtonTapped)),
-            .restartAlert(.yesButtonTapped):
+            .restartAlert(.confirm):
           state = State()
           return .cancel(id: CancelID.timer)
           
-        case .exitGameAlert(.yesButtonTapped):
+        case .exitGameAlert(.confirm):
           return .run { _ in await self.dismiss() }
           
         default:
@@ -141,12 +141,12 @@ extension Game {
     
     @CasePathable
     enum RestartAlert {
-      case yesButtonTapped
+      case confirm
     }
     
     @CasePathable
     enum ExitGameAlert {
-      case yesButtonTapped
+      case confirm
     }
   }
 }
@@ -159,7 +159,7 @@ extension AlertState where Action == Game.Destination.RestartAlert {
       ButtonState(role: .cancel) {
         TextState("Cancel")
       }
-      ButtonState(role: .destructive, action: .yesButtonTapped) {
+      ButtonState(role: .destructive, action: .confirm) {
         TextState("Yes")
       }
     } message: {
@@ -176,7 +176,7 @@ extension AlertState where Action == Game.Destination.ExitGameAlert {
       ButtonState(role: .cancel) {
         TextState("Cancel")
       }
-      ButtonState(role: .destructive, action: .yesButtonTapped) {
+      ButtonState(role: .destructive, action: .confirm) {
         TextState("Yes")
       }
     }

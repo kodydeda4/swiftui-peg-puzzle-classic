@@ -7,14 +7,17 @@ struct HowToPlay {
 
   @ObservableState
   struct State: Equatable {
+    @Presents var destination: Destination.State?
     var welcome = Welcome.State()
     var path = StackState<Path.State>()
+    @Shared(.hasCompletedHowToPlay) var hasCompletedHowToPlay
   }
   
   public enum Action: ViewAction {
     case view(View)
     case welcome(Welcome.Action)
     case path(StackActionOf<Path>)
+    case destination(PresentationAction<Destination.Action>)
     
     enum View {
       case skipButtonTapped
@@ -30,14 +33,33 @@ struct HowToPlay {
     Reduce { state, action in
       switch action {
         
-      case .welcome, .path:
+      case let .destination(.presented(.skipTutorialAlert(action))):
+        switch action {
+          
+        case .confirm:
+          state.$hasCompletedHowToPlay.withLock { $0 = true }
+          return .run { _ in await self.dismiss() }
+          
+        case .cancel:
+          return .none
+        }
+        
+      case .welcome, .path, .destination:
         return .none
 
       case let .view(action):
         switch action {
           
         case .skipButtonTapped:
-          return .run { _ in await self.dismiss() }
+          switch state.hasCompletedHowToPlay {
+            
+          case false:
+            state.destination = .skipTutorialAlert(.init())
+            return .none
+
+          case true:
+            return .run { _ in await self.dismiss() }
+          }
         }
       }
     }
@@ -46,6 +68,17 @@ struct HowToPlay {
 }
 
 extension HowToPlay {
+  
+  @Reducer(state: .equatable)
+  enum Destination {
+    case skipTutorialAlert(AlertState<SkipTutorialAlert>)
+    
+    @CasePathable
+    enum SkipTutorialAlert {
+      case confirm
+      case cancel
+    }
+  }
    
   @Reducer(state: .equatable)
   enum Path {
@@ -56,6 +89,23 @@ extension HowToPlay {
     case page6(QuickTips)
     case page7(ReadyToPlay)
   } 
+}
+
+extension AlertState where Action == HowToPlay.Destination.SkipTutorialAlert {
+  init() {
+    self = Self {
+      TextState("Skip Tutorial?")
+    } actions: {
+      ButtonState(action: .cancel) {
+        TextState("No, resume")
+      }
+      ButtonState(action: .confirm) {
+        TextState("Yes, skip")
+      }
+    } message: {
+      TextState("Are you sure you want to skip the tutorial?")
+    }
+  }
 }
 
 // MARK: - SwiftUI
@@ -71,6 +121,10 @@ struct HowToPlayView: View {
       destination: self.destination(store:)
     )
     .navigationTransition(.fade(.in).animation(.none))
+    .alert(store: self.store.scope(
+      state: \.$destination.skipTutorialAlert,
+      action: \.destination.skipTutorialAlert
+    ))
   }
   
   private func root() -> some View {
@@ -112,13 +166,12 @@ struct HowToPlayView: View {
   private func toolbar() -> some ToolbarContent {
     Group {
       ToolbarItem(placement: .topBarTrailing) {
-        Button {
+        Button("Skip") {
           send(.skipButtonTapped)
-        } label: {
-          Image(systemName: "xmark.circle.fill")
-            .foregroundColor(.secondary)
         }
+        .bold()
         .buttonStyle(.plain)
+        .foregroundColor(.accentColor)
       }
     }
   }

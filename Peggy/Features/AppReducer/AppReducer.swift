@@ -10,6 +10,7 @@ struct AppReducer {
     @Presents var destination: Destination.State?
     @Shared(.build) var build
     @Shared(.appEvent) var appEvent
+    @Shared(.hasCompletedHowToPlay) var hasCompletedHowToPlay
     var cancellables: Set<AnyCancellable> = []
   }
   
@@ -44,7 +45,11 @@ struct AppReducer {
           
         case .task:
           state.$build.withLock {
-            $0 = Build(version: build.version())
+            $0 = Build(version: self.build.version())
+          }
+          
+          if !state.hasCompletedHowToPlay {
+            state.destination = .howToPlay(HowToPlay.State())
           }
           return .publisher {
             state.$appEvent.publisher.map(Action.appEvent)
@@ -57,7 +62,6 @@ struct AppReducer {
         case .howToPlayButtonTapped:
           state.destination = .howToPlay(HowToPlay.State())
           return .none
-          
         }
       }
     }
