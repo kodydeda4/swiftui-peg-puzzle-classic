@@ -3,15 +3,23 @@ import ComposableArchitecture
 
 @Reducer
 struct HowToPlay {
+  
+  @Reducer(state: .equatable)
+  enum Path {
+    case screenA(ScreenA)
+  }
+  
   @ObservableState
   struct State: Equatable {
-    //...
+    var path = StackState<Path.State>()
   }
   
   public enum Action: ViewAction {
     case view(View)
+    case path(StackActionOf<Path>)
     
     enum View {
+      case continueButtonTapped
       case cancelButtonTapped
     }
   }
@@ -22,14 +30,25 @@ struct HowToPlay {
     Reduce { state, action in
       switch action {
         
+      case .path(.element(id: _, action: .screenA(.view(.finishButtonTapped)))):
+        return .run { _ in await self.dismiss() }
+        
+      case .path:
+        return .none
+
       case let .view(action):
         switch action {
+          
+        case .continueButtonTapped:
+          state.path.append(.screenA(ScreenA.State()))
+          return .none
           
         case .cancelButtonTapped:
           return .run { _ in await self.dismiss() }
         }
       }
     }
+    .forEach(\.path, action: \.path)
   }
 }
 
@@ -40,8 +59,25 @@ struct HowToPlayView: View {
   @Bindable var store: StoreOf<HowToPlay>
   
   var body: some View {
-    Button("Cancel") {
-      send(.cancelButtonTapped)
+    NavigationStack(
+      path: $store.scope(state: \.path, action: \.path)
+    ) {
+      VStack {
+        Button("Continue") {
+          send(.continueButtonTapped)
+        }
+        Button("Cancel") {
+          send(.cancelButtonTapped)
+        }
+      }
+      .navigationTitle("How to Play")
+      .navigationBarTitleDisplayMode(.inline)
+    } destination: { store in
+      switch store.case {
+        
+      case let .screenA(store):
+        ScreenAView(store: store)
+      }
     }
   }
 }

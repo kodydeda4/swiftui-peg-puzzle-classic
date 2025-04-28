@@ -1,7 +1,8 @@
 import SwiftUI
 import ComposableArchitecture
 
-@Reducer struct AppReducer {
+@Reducer
+struct AppReducer {
   @ObservableState
   struct State: Equatable {
     @Shared(.build) var build
