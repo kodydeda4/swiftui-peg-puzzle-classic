@@ -121,7 +121,7 @@ struct Game {
           
         case .dismissButtonTapped:
           state.destination = .exitGameAlert(
-            AlertState<Destination.ExitGameAlert>()
+            AlertState<Destination.QuitGameAlert>()
           )
           return state.isPaused ? .none : .send(.toggleIsPaused)
         }
@@ -137,7 +137,7 @@ extension Game {
   enum Destination {
     case gameOver(GameOver)
     case restartAlert(AlertState<RestartAlert>)
-    case exitGameAlert(AlertState<ExitGameAlert>)
+    case exitGameAlert(AlertState<QuitGameAlert>)
     
     @CasePathable
     enum RestartAlert {
@@ -145,7 +145,7 @@ extension Game {
     }
     
     @CasePathable
-    enum ExitGameAlert {
+    enum QuitGameAlert {
       case confirm
     }
   }
@@ -168,16 +168,16 @@ extension AlertState where Action == Game.Destination.RestartAlert {
   }
 }
 
-extension AlertState where Action == Game.Destination.ExitGameAlert {
+extension AlertState where Action == Game.Destination.QuitGameAlert {
   init() {
     self = Self {
-      TextState("Exit Game?")
+      TextState("Quit Game?")
     } actions: {
+      ButtonState(role: .destructive, action: .confirm) {
+        TextState("Quit")
+      }
       ButtonState(role: .cancel) {
         TextState("Cancel")
-      }
-      ButtonState(role: .destructive, action: .confirm) {
-        TextState("Yes")
       }
     }
   }

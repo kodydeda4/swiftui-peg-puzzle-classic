@@ -27,6 +27,8 @@
 		33905A322DC01185000F9904 /* Game+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A312DC01185000F9904 /* Game+Header.swift */; };
 		33905A342DC011C9000F9904 /* Game+Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A332DC011C9000F9904 /* Game+Footer.swift */; };
 		33905A772DC03051000F9904 /* @Shared(.isOnboardingComplete).swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A762DC0304C000F9904 /* @Shared(.isOnboardingComplete).swift */; };
+		33905A7A2DC03A0A000F9904 /* SettingsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A792DC03A08000F9904 /* SettingsFeature.swift */; };
+		33905A7C2DC03A24000F9904 /* @Shared(.userSettings).swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A7B2DC03A24000F9904 /* @Shared(.userSettings).swift */; };
 		33B78C172AC732D0005FC780 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* Game.swift */; };
 		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
 		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
@@ -56,6 +58,8 @@
 		33905A312DC01185000F9904 /* Game+Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Header.swift"; sourceTree = "<group>"; };
 		33905A332DC011C9000F9904 /* Game+Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Footer.swift"; sourceTree = "<group>"; };
 		33905A762DC0304C000F9904 /* @Shared(.isOnboardingComplete).swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Shared(.isOnboardingComplete).swift"; sourceTree = "<group>"; };
+		33905A792DC03A08000F9904 /* SettingsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsFeature.swift; sourceTree = "<group>"; };
+		33905A7B2DC03A24000F9904 /* @Shared(.userSettings).swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Shared(.userSettings).swift"; sourceTree = "<group>"; };
 		33B78C162AC732D0005FC780 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
@@ -107,12 +111,12 @@
 			path = HowToPlay;
 			sourceTree = "<group>";
 		};
-		333608962AD73B9D000984B6 /* AppReducer */ = {
+		333608962AD73B9D000984B6 /* AppFeature */ = {
 			isa = PBXGroup;
 			children = (
 				33E6E3572ABE2AAF00B76E4A /* AppReducer.swift */,
 			);
-			path = AppReducer;
+			path = AppFeature;
 			sourceTree = "<group>";
 		};
 		333608972AD73BA3000984B6 /* Game */ = {
@@ -165,15 +169,25 @@
 			isa = PBXGroup;
 			children = (
 				33905A762DC0304C000F9904 /* @Shared(.isOnboardingComplete).swift */,
+				33905A7B2DC03A24000F9904 /* @Shared(.userSettings).swift */,
 				339059DD2DBFE475000F9904 /* @Shared(.build).swift */,
 			);
 			path = Sharing;
 			sourceTree = "<group>";
 		};
+		33905A782DC039D8000F9904 /* SettingsFeature */ = {
+			isa = PBXGroup;
+			children = (
+				33905A792DC03A08000F9904 /* SettingsFeature.swift */,
+			);
+			path = SettingsFeature;
+			sourceTree = "<group>";
+		};
 		33B78C182AC733F4005FC780 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				333608962AD73B9D000984B6 /* AppReducer */,
+				33905A782DC039D8000F9904 /* SettingsFeature */,
+				333608962AD73B9D000984B6 /* AppFeature */,
 				333608972AD73BA3000984B6 /* Game */,
 				3336089B2AD74050000984B6 /* GameOver */,
 				332AC8362DBFBC1300BFFE87 /* HowToPlay */,
@@ -342,6 +356,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33905A7C2DC03A24000F9904 /* @Shared(.userSettings).swift in Sources */,
 				339059E22DBFED5A000F9904 /* 02-WhatsTheGoal.swift in Sources */,
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
@@ -363,6 +378,7 @@
 				333608992AD73BC7000984B6 /* Pegboard.swift in Sources */,
 				339059DE2DBFE475000F9904 /* @Shared(.build).swift in Sources */,
 				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
+				33905A7A2DC03A0A000F9904 /* SettingsFeature.swift in Sources */,
 				33905A342DC011C9000F9904 /* Game+Footer.swift in Sources */,
 				33905A322DC01185000F9904 /* Game+Header.swift in Sources */,
 			);

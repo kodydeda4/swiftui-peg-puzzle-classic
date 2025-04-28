@@ -5,8 +5,8 @@ import ComposableArchitecture
 struct Main: App {
   
   @MainActor
-  static let store = Store(initialState: AppReducer.State()) {
-    AppReducer()
+  static let store = Store(initialState: AppFeature.State()) {
+    AppFeature()
       ._printChanges()
   }
   

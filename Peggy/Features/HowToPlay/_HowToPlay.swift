@@ -137,7 +137,7 @@ struct HowToPlayView: View {
   }
   
   private func destination(
-    store: Store<HowToPlay.Path.State, HowToPlay.Path.Action>
+    store: StoreOf<HowToPlay.Path>
   ) -> some View {
     Group {
       switch store.case {
