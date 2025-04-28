@@ -41,6 +41,7 @@ struct HowToPlay {
           return .run { _ in await self.dismiss() }
           
         case .cancel:
+          state.destination = .none
           return .none
         }
         
