@@ -1,6 +1,8 @@
 import SwiftUI
 import ComposableArchitecture
 
+// @DEDA You should animate the homescreen && integrate gamechanger.
+
 @Reducer
 struct AppReducer {
   @ObservableState
