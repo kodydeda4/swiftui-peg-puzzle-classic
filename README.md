@@ -4,7 +4,7 @@ Challenge your logic and strategy skills as you jump pegs over each other, attem
 
 Available on the [AppStore](https://apps.apple.com/us/app/peg-puzzle-classic/id6469359729) now!
 
-[![IDD Camera App Store Badge](https://github.com/user-attachments/assets/25ef15ca-5a73-447b-affa-a0b26a1d7082)](https://apps.apple.com/us/app/peg-puzzle-classic/id6469359729)
+[![appstore-badge](https://github.com/user-attachments/assets/f795f0ec-e104-4983-a696-dd6d6c503705)](https://apps.apple.com/us/app/peg-puzzle-classic/id6469359729)
 
 <img width="200" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/c6d02a78-438b-489a-b1b3-1ca5f5c456f6"/>
 <img width="200" src="https://github.com/kodydeda4/PegPuzzleClassic/assets/45678211/802c45ff-e4eb-4448-b317-c3167f4c7263"/>
