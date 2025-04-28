@@ -2,7 +2,7 @@ import SwiftUI
 import ComposableArchitecture
 
 @Reducer
-struct WhatsTheGoal {
+struct ValidMoves {
   @ObservableState
   struct State: Equatable {}
 
@@ -31,19 +31,21 @@ struct WhatsTheGoal {
 
 // MARK: - SwiftUI
 
-@ViewAction(for: WhatsTheGoal.self)
-struct WhatsTheGoalView: View {
-  @Bindable var store: StoreOf<WhatsTheGoal>
+@ViewAction(for: ValidMoves.self)
+struct ValidMovesView: View {
+  @Bindable var store: StoreOf<ValidMoves>
   
   var body: some View {
     VStack {
-      Text("What's the Goal?")
+      Text("Valid Moves Only")
         .bold()
-      Text("Jump pegs over each other and remove them — try to leave only one peg on the board.")
+      Text("You can only jump horizontally or vertically — never diagonally.")
       
-      Button("Continue") {
-        send(.continueButtonTapped)
-      }
+      NavigationLink(
+        "Continue",
+        state: HowToPlay.Path.State.page5(EndingTheGame.State())
+      )
+      .buttonStyle(RoundedRectangleButtonStyle())
     }
     .navigationTitle("How to Play")
     .navigationBarTitleDisplayMode(.inline)
@@ -54,8 +56,8 @@ struct WhatsTheGoalView: View {
 
 #Preview {
   NavigationStack {
-    WhatsTheGoalView(store: Store(initialState: WhatsTheGoal.State()) {
-      WhatsTheGoal()
+    ValidMovesView(store: Store(initialState: ValidMoves.State()) {
+      ValidMoves()
     })
   }
 }

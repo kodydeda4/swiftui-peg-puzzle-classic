@@ -11,13 +11,21 @@
 		330B0AA42DBFDD71008B6AE1 /* Tagged in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA32DBFDD71008B6AE1 /* Tagged */; };
 		330B0AA62DBFDD71008B6AE1 /* TaggedMoney in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA52DBFDD71008B6AE1 /* TaggedMoney */; };
 		330B0AA82DBFDD71008B6AE1 /* TaggedTime in Frameworks */ = {isa = PBXBuildFile; productRef = 330B0AA72DBFDD71008B6AE1 /* TaggedTime */; };
-		332AC8382DBFBC1C00BFFE87 /* HowToPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */; };
+		332AC8382DBFBC1C00BFFE87 /* _HowToPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 332AC8372DBFBC1C00BFFE87 /* _HowToPlay.swift */; };
 		333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608922AD72C32000984B6 /* IdentifiedCollections+.swift */; };
 		333608992AD73BC7000984B6 /* Pegboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333608982AD73BC7000984B6 /* Pegboard.swift */; };
 		3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */; };
 		339059DE2DBFE475000F9904 /* @Shared(.build).swift in Sources */ = {isa = PBXBuildFile; fileRef = 339059DD2DBFE475000F9904 /* @Shared(.build).swift */; };
-		339059E02DBFEA16000F9904 /* 06-ReadyToPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339059DF2DBFEA16000F9904 /* 06-ReadyToPlay.swift */; };
-		339059E22DBFED5A000F9904 /* 00-WhatsTheGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339059E12DBFED56000F9904 /* 00-WhatsTheGoal.swift */; };
+		339059E02DBFEA16000F9904 /* 07-ReadyToPlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339059DF2DBFEA16000F9904 /* 07-ReadyToPlay.swift */; };
+		339059E22DBFED5A000F9904 /* 02-WhatsTheGoal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 339059E12DBFED56000F9904 /* 02-WhatsTheGoal.swift */; };
+		33905A262DBFF90D000F9904 /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = 33905A252DBFF90D000F9904 /* NavigationTransitions */; };
+		33905A282DBFF954000F9904 /* 03-HowToJump.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A272DBFF954000F9904 /* 03-HowToJump.swift */; };
+		33905A2A2DBFF981000F9904 /* 04-ValidMoves.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A292DBFF981000F9904 /* 04-ValidMoves.swift */; };
+		33905A2C2DBFF9F6000F9904 /* 05-EndingTheGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A2B2DBFF9F6000F9904 /* 05-EndingTheGame.swift */; };
+		33905A2E2DBFFA13000F9904 /* 01-Welcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A2D2DBFFA13000F9904 /* 01-Welcome.swift */; };
+		33905A302DC01032000F9904 /* 06-QuickTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A2F2DC0102F000F9904 /* 06-QuickTips.swift */; };
+		33905A322DC01185000F9904 /* Game+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A312DC01185000F9904 /* Game+Header.swift */; };
+		33905A342DC011C9000F9904 /* Game+Footer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33905A332DC011C9000F9904 /* Game+Footer.swift */; };
 		33B78C172AC732D0005FC780 /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C162AC732D0005FC780 /* Game.swift */; };
 		33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1C2AC73426005FC780 /* Collection+.swift */; };
 		33B78C202AC73471005FC780 /* Peg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B78C1F2AC73471005FC780 /* Peg.swift */; };
@@ -32,13 +40,20 @@
 
 /* Begin PBXFileReference section */
 		330B0AA02DBFDD33008B6AE1 /* Build.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Build.swift; sourceTree = "<group>"; };
-		332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HowToPlay.swift; sourceTree = "<group>"; };
+		332AC8372DBFBC1C00BFFE87 /* _HowToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = _HowToPlay.swift; sourceTree = "<group>"; };
 		333608922AD72C32000984B6 /* IdentifiedCollections+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IdentifiedCollections+.swift"; sourceTree = "<group>"; };
 		333608982AD73BC7000984B6 /* Pegboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pegboard.swift; sourceTree = "<group>"; };
 		3336089D2AD742C0000984B6 /* View+navigationOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+navigationOverlay.swift"; sourceTree = "<group>"; };
 		339059DD2DBFE475000F9904 /* @Shared(.build).swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Shared(.build).swift"; sourceTree = "<group>"; };
-		339059DF2DBFEA16000F9904 /* 06-ReadyToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "06-ReadyToPlay.swift"; sourceTree = "<group>"; };
-		339059E12DBFED56000F9904 /* 00-WhatsTheGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "00-WhatsTheGoal.swift"; sourceTree = "<group>"; };
+		339059DF2DBFEA16000F9904 /* 07-ReadyToPlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "07-ReadyToPlay.swift"; sourceTree = "<group>"; };
+		339059E12DBFED56000F9904 /* 02-WhatsTheGoal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "02-WhatsTheGoal.swift"; sourceTree = "<group>"; };
+		33905A272DBFF954000F9904 /* 03-HowToJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "03-HowToJump.swift"; sourceTree = "<group>"; };
+		33905A292DBFF981000F9904 /* 04-ValidMoves.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "04-ValidMoves.swift"; sourceTree = "<group>"; };
+		33905A2B2DBFF9F6000F9904 /* 05-EndingTheGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "05-EndingTheGame.swift"; sourceTree = "<group>"; };
+		33905A2D2DBFFA13000F9904 /* 01-Welcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "01-Welcome.swift"; sourceTree = "<group>"; };
+		33905A2F2DC0102F000F9904 /* 06-QuickTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "06-QuickTips.swift"; sourceTree = "<group>"; };
+		33905A312DC01185000F9904 /* Game+Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Header.swift"; sourceTree = "<group>"; };
+		33905A332DC011C9000F9904 /* Game+Footer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Game+Footer.swift"; sourceTree = "<group>"; };
 		33B78C162AC732D0005FC780 /* Game.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		33B78C1C2AC73426005FC780 /* Collection+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+.swift"; sourceTree = "<group>"; };
 		33B78C1F2AC73471005FC780 /* Peg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peg.swift; sourceTree = "<group>"; };
@@ -59,6 +74,7 @@
 				330B0AA42DBFDD71008B6AE1 /* Tagged in Frameworks */,
 				330B0AA82DBFDD71008B6AE1 /* TaggedTime in Frameworks */,
 				33E6E3652ABE2EFD00B76E4A /* ComposableArchitecture in Frameworks */,
+				33905A262DBFF90D000F9904 /* NavigationTransitions in Frameworks */,
 				330B0AA62DBFDD71008B6AE1 /* TaggedMoney in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,9 +93,14 @@
 		332AC8362DBFBC1300BFFE87 /* HowToPlay */ = {
 			isa = PBXGroup;
 			children = (
-				332AC8372DBFBC1C00BFFE87 /* HowToPlay.swift */,
-				339059E12DBFED56000F9904 /* 00-WhatsTheGoal.swift */,
-				339059DF2DBFEA16000F9904 /* 06-ReadyToPlay.swift */,
+				332AC8372DBFBC1C00BFFE87 /* _HowToPlay.swift */,
+				33905A2D2DBFFA13000F9904 /* 01-Welcome.swift */,
+				339059E12DBFED56000F9904 /* 02-WhatsTheGoal.swift */,
+				33905A272DBFF954000F9904 /* 03-HowToJump.swift */,
+				33905A292DBFF981000F9904 /* 04-ValidMoves.swift */,
+				33905A2B2DBFF9F6000F9904 /* 05-EndingTheGame.swift */,
+				33905A2F2DC0102F000F9904 /* 06-QuickTips.swift */,
+				339059DF2DBFEA16000F9904 /* 07-ReadyToPlay.swift */,
 			);
 			path = HowToPlay;
 			sourceTree = "<group>";
@@ -96,6 +117,8 @@
 			isa = PBXGroup;
 			children = (
 				33B78C162AC732D0005FC780 /* Game.swift */,
+				33905A312DC01185000F9904 /* Game+Header.swift */,
+				33905A332DC011C9000F9904 /* Game+Footer.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -147,10 +170,10 @@
 		33B78C182AC733F4005FC780 /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				332AC8362DBFBC1300BFFE87 /* HowToPlay */,
 				333608962AD73B9D000984B6 /* AppReducer */,
 				333608972AD73BA3000984B6 /* Game */,
 				3336089B2AD74050000984B6 /* GameOver */,
+				332AC8362DBFBC1300BFFE87 /* HowToPlay */,
 				3336089A2AD73FFC000984B6 /* Pegboard */,
 			);
 			path = Features;
@@ -219,9 +242,9 @@
 		33E6E3542ABE2AAF00B76E4A /* Peggy */ = {
 			isa = PBXGroup;
 			children = (
-				339059DB2DBFE393000F9904 /* Libraries */,
 				330B0A9F2DBFDD2B008B6AE1 /* Clients */,
 				33B78C182AC733F4005FC780 /* Features */,
+				339059DB2DBFE393000F9904 /* Libraries */,
 			);
 			path = Peggy;
 			sourceTree = "<group>";
@@ -255,6 +278,7 @@
 				330B0AA32DBFDD71008B6AE1 /* Tagged */,
 				330B0AA52DBFDD71008B6AE1 /* TaggedMoney */,
 				330B0AA72DBFDD71008B6AE1 /* TaggedTime */,
+				33905A252DBFF90D000F9904 /* NavigationTransitions */,
 			);
 			productName = PegGame;
 			productReference = 33E6E3522ABE2AAF00B76E4A /* Peggy.app */;
@@ -287,6 +311,7 @@
 			packageReferences = (
 				33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */,
+				33905A242DBFF90D000F9904 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
 			);
 			productRefGroup = 33E6E3532ABE2AAF00B76E4A /* Products */;
 			projectDirPath = "";
@@ -314,21 +339,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				339059E22DBFED5A000F9904 /* 00-WhatsTheGoal.swift in Sources */,
+				339059E22DBFED5A000F9904 /* 02-WhatsTheGoal.swift in Sources */,
 				33B78C202AC73471005FC780 /* Peg.swift in Sources */,
 				33E6E3582ABE2AAF00B76E4A /* AppReducer.swift in Sources */,
 				330B0AA12DBFDD33008B6AE1 /* Build.swift in Sources */,
 				33F2C8D52AD606A7004574A2 /* GameOver.swift in Sources */,
+				33905A302DC01032000F9904 /* 06-QuickTips.swift in Sources */,
 				33B78C172AC732D0005FC780 /* Game.swift in Sources */,
-				339059E02DBFEA16000F9904 /* 06-ReadyToPlay.swift in Sources */,
+				339059E02DBFEA16000F9904 /* 07-ReadyToPlay.swift in Sources */,
 				33B78C242AC73882005FC780 /* RoundedRectangleButtonStyle.swift in Sources */,
+				33905A282DBFF954000F9904 /* 03-HowToJump.swift in Sources */,
 				33E6E3562ABE2AAF00B76E4A /* Main.swift in Sources */,
-				332AC8382DBFBC1C00BFFE87 /* HowToPlay.swift in Sources */,
+				33905A2C2DBFF9F6000F9904 /* 05-EndingTheGame.swift in Sources */,
+				33905A2E2DBFFA13000F9904 /* 01-Welcome.swift in Sources */,
+				332AC8382DBFBC1C00BFFE87 /* _HowToPlay.swift in Sources */,
 				333608932AD72C32000984B6 /* IdentifiedCollections+.swift in Sources */,
+				33905A2A2DBFF981000F9904 /* 04-ValidMoves.swift in Sources */,
 				3336089E2AD742C0000984B6 /* View+navigationOverlay.swift in Sources */,
 				333608992AD73BC7000984B6 /* Pegboard.swift in Sources */,
 				339059DE2DBFE475000F9904 /* @Shared(.build).swift in Sources */,
 				33B78C1D2AC73426005FC780 /* Collection+.swift in Sources */,
+				33905A342DC011C9000F9904 /* Game+Footer.swift in Sources */,
+				33905A322DC01185000F9904 /* Game+Header.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,6 +580,14 @@
 				version = 0.10.0;
 			};
 		};
+		33905A242DBFF90D000F9904 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions";
+			requirement = {
+				kind = exactVersion;
+				version = 0.14.0;
+			};
+		};
 		33E6E3632ABE2EFD00B76E4A /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -573,6 +613,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 330B0AA22DBFDD71008B6AE1 /* XCRemoteSwiftPackageReference "swift-tagged" */;
 			productName = TaggedTime;
+		};
+		33905A252DBFF90D000F9904 /* NavigationTransitions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 33905A242DBFF90D000F9904 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */;
+			productName = NavigationTransitions;
 		};
 		33E6E3642ABE2EFD00B76E4A /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

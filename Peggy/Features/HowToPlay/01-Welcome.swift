@@ -2,7 +2,7 @@ import SwiftUI
 import ComposableArchitecture
 
 @Reducer
-struct ReadyToPlay {
+struct Welcome {
   @ObservableState
   struct State: Equatable {}
 
@@ -10,7 +10,7 @@ struct ReadyToPlay {
     case view(View)
     
     enum View {
-      case finishButtonTapped
+//      case continueButtonTapped
     }
   }
 
@@ -21,8 +21,8 @@ struct ReadyToPlay {
       case let .view(action):
         switch action {
           
-        case .finishButtonTapped:
-          return .none
+//        case .continueButtonTapped:
+//          return .none
         }
       }
     }
@@ -31,19 +31,21 @@ struct ReadyToPlay {
 
 // MARK: - SwiftUI
 
-@ViewAction(for: ReadyToPlay.self)
-struct ReadyToPlayView: View {
-  @Bindable var store: StoreOf<ReadyToPlay>
+@ViewAction(for: Welcome.self)
+struct WelcomeView: View {
+  @Bindable var store: StoreOf<Welcome>
   
   var body: some View {
     VStack {
-      Text("Ready to Jump In?")
+      Text("Welcome to Peg Puzzle Classic!")
         .bold()
-      Text("Let's start your first game!")
+      Text("Learn the classic brain teaser — and become a Peg Puzzle Master!")
       
-      Button("Finish") {
-        send(.finishButtonTapped)
-      }
+      NavigationLink(
+        "Continue",
+        state: HowToPlay.Path.State.page2(WhatsTheGoal.State())
+      )
+      .buttonStyle(RoundedRectangleButtonStyle())
     }
     .navigationTitle("How to Play")
     .navigationBarTitleDisplayMode(.inline)
@@ -54,8 +56,8 @@ struct ReadyToPlayView: View {
 
 #Preview {
   NavigationStack {
-    ReadyToPlayView(store: Store(initialState: ReadyToPlay.State()) {
-      ReadyToPlay()
+    WelcomeView(store: Store(initialState: Welcome.State()) {
+      Welcome()
     })
   }
 }

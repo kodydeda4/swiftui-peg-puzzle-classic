@@ -3,10 +3,11 @@ import ComposableArchitecture
 
 @Reducer
 struct AppReducer {
+
   @ObservableState
   struct State: Equatable {
-    @Shared(.build) var build
     @Presents var destination: Destination.State?
+    @Shared(.build) var build
   }
   
   public enum Action: ViewAction {
@@ -51,7 +52,10 @@ struct AppReducer {
     }
     .ifLet(\.$destination, action: \.destination)
   }
-  
+}
+
+extension AppReducer {
+      
   @Reducer(state: .equatable)
   enum Destination {
     case game(Game)
