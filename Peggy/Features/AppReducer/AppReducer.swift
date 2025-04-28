@@ -57,13 +57,37 @@ struct AppView: View {
   var body: some View {
     NavigationStack {
       VStack {
+        Text("Peg Puzzle Classic")
+          .font(.largeTitle)
+          .bold()
+          .padding(.top, 64)
+        
+        Text("Version 1.0")
+          .font(.title2)
+          .foregroundStyle(.secondary)
+        
+        Circle()
+          .frame(
+            width:  150,
+            height: 150
+          )
+          .padding()
+          .foregroundColor(Color(.systemGray5))
+        
         Button("Play") {
           send(.playButtonTapped)
         }
+        .buttonStyle(RoundedRectangleButtonStyle())
+        
         Button("How To Play") {
           send(.howToPlayButtonTapped)
         }
+        .buttonStyle(RoundedRectangleButtonStyle(
+          foregroundColor: .accentColor,
+          backgroundColor: Color(.systemGray5)
+        ))
       }
+      .padding()
       .fullScreenCover(item: $store.scope(
         state: \.destination?.game,
         action: \.destination.game
