@@ -227,7 +227,7 @@ struct GameView: View {
         
         self.footer
       }
-      .navigationTitle("Peggy")
+      .navigationTitle("Peg Puzzle Classic")
       .navigationBarTitleDisplayMode(.inline)
       .alert(store: store.scope(
         state: \.$destination.restartAlert,
