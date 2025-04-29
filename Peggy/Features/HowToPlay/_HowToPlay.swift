@@ -106,17 +106,6 @@ struct HowToPlay {
 extension HowToPlay {
   
   @Reducer(state: .equatable)
-  enum Destination {
-    case skipTutorialAlert(AlertState<SkipTutorialAlert>)
-    
-    @CasePathable
-    enum SkipTutorialAlert {
-      case confirm
-      case cancel
-    }
-  }
-  
-  @Reducer(state: .equatable)
   enum DestinationPath {
     case page1(Welcome)
     case page2(WhatsTheGoal)
@@ -125,6 +114,17 @@ extension HowToPlay {
     case page5(EndingTheGame)
     case page6(QuickTips)
     case page7(ReadyToPlay)
+  }
+  
+  @Reducer(state: .equatable)
+  enum Destination {
+    case skipTutorialAlert(AlertState<SkipTutorialAlert>)
+    
+    @CasePathable
+    enum SkipTutorialAlert {
+      case confirm
+      case cancel
+    }
   }
 }
 
