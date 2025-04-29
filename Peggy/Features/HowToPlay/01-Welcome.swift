@@ -11,7 +11,11 @@ struct Welcome {
   
   public enum Action: ViewAction {
     case view(View)
+    case delegate(Delegate)
     
+    enum Delegate {
+      case `continue`
+    }
     enum View {
       case continueButtonTapped
     }
@@ -21,11 +25,14 @@ struct Welcome {
     Reduce { state, action in
       switch action {
         
+      case .delegate:
+        return .none
+        
       case let .view(action):
         switch action {
           
         case .continueButtonTapped:
-          return .none
+          return .send(.delegate(.continue))
         }
       }
     }
@@ -52,7 +59,8 @@ struct WelcomeView: View {
           .padding()
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      
+      .background { Color(.systemGray6) }
+
       HowToPlayWrapperView(
         title: "Welcome to Peg Puzzle Classic!",
         subtitle: "Learn the classic brain teaser — and become a Peg Puzzle Master!"
@@ -60,10 +68,9 @@ struct WelcomeView: View {
     }
     .howToPlayDefaultViewModifiers()
     .navigationOverlay {
-      NavigationLink(
-        "Continue",
-        state: HowToPlay.Path.State.page2(WhatsTheGoal.State())
-      )
+      Button("Continue") {
+        send(.continueButtonTapped)
+      }
       .buttonStyle(RoundedRectangleButtonStyle())
     }
   }

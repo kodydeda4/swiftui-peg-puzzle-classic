@@ -3,12 +3,19 @@ import ComposableArchitecture
 
 @Reducer
 struct QuickTips {
-  @ObservableState
-  struct State: Equatable {}
   
+  @ObservableState
+  struct State: Equatable {
+    //...
+  }
+
   public enum Action: ViewAction {
     case view(View)
+    case delegate(Delegate)
     
+    enum Delegate {
+      case `continue`
+    }
     enum View {
       case continueButtonTapped
     }
@@ -18,11 +25,14 @@ struct QuickTips {
     Reduce { state, action in
       switch action {
         
+      case .delegate:
+        return .none
+        
       case let .view(action):
         switch action {
           
         case .continueButtonTapped:
-          return .none
+          return .send(.delegate(.continue))
         }
       }
     }
@@ -54,10 +64,9 @@ struct QuickTipsView: View {
     }
     .howToPlayDefaultViewModifiers()
     .navigationOverlay {
-      NavigationLink(
-        "Continue",
-        state: HowToPlay.Path.State.page7(ReadyToPlay.State())
-      )
+      Button("Continue") {
+        send(.continueButtonTapped)
+      }
       .buttonStyle(RoundedRectangleButtonStyle())
     }
   }

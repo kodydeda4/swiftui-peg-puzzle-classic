@@ -3,6 +3,7 @@ import ComposableArchitecture
 
 @Reducer
 struct ReadyToPlay {
+  
   @ObservableState
   struct State: Equatable {
     @Shared(.appEvent) var appEvent
@@ -10,7 +11,11 @@ struct ReadyToPlay {
   
   public enum Action: ViewAction {
     case view(View)
+    case delegate(Delegate)
     
+    enum Delegate {
+      case `continue`
+    }
     enum View {
       case finishButtonTapped
     }
@@ -20,6 +25,9 @@ struct ReadyToPlay {
     Reduce { state, action in
       switch action {
         
+      case .delegate:
+        return .none
+        
       case let .view(action):
         switch action {
           
@@ -27,7 +35,7 @@ struct ReadyToPlay {
           state.$appEvent.withLock {
             $0 = .startPlayingButtonTapped
           }
-          return .none
+          return .send(.delegate(.continue))
         }
       }
     }

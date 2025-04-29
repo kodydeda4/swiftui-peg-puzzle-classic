@@ -3,6 +3,7 @@ import ComposableArchitecture
 
 @Reducer
 struct HowToJump {
+  
   @ObservableState
   struct State: Equatable {
     var pegboard = Pegboard.State()
@@ -10,28 +11,33 @@ struct HowToJump {
   
   public enum Action: ViewAction {
     case view(View)
+    case delegate(Delegate)
     case pegboard(Pegboard.Action)
-    
+
+    enum Delegate {
+      case `continue`
+    }
     enum View {
       case continueButtonTapped
     }
   }
   
   var body: some Reducer<State, Action> {
-    Scope(state: \.pegboard, action: \.pegboard) {
-      Pegboard()
-    }
+    Scope(state: \.pegboard, action: \.pegboard) { Pegboard() }
     Reduce { state, action in
       switch action {
         
       case .pegboard:
         return .none
         
+      case .delegate:
+        return .none
+        
       case let .view(action):
         switch action {
           
         case .continueButtonTapped:
-          return .none
+          return .send(.delegate(.continue))
         }
       }
     }
@@ -89,10 +95,9 @@ struct HowToJumpView: View {
     }
     .howToPlayDefaultViewModifiers()
     .navigationOverlay {
-      NavigationLink(
-        "Continue",
-        state: HowToPlay.Path.State.page4(ValidMoves.State())
-      )
+      Button("Continue") {
+        send(.continueButtonTapped)
+      }
       .buttonStyle(RoundedRectangleButtonStyle())
     }
   }

@@ -2,22 +2,24 @@ import SwiftUI
 import NavigationTransitions
 import ComposableArchitecture
 
+// Note:
+// Yes, I know this uses two destinations instead of path.
+// I don't want to use NavigationStack because I don't want the animations or gestures.
+
 @Reducer
 struct HowToPlay {
 
   @ObservableState
   struct State: Equatable {
     @Presents var destination: Destination.State?
-    var welcome = Welcome.State()
-    var path = StackState<Path.State>()
+    @Presents var destinationPath: DestinationPath.State? = .page1(Welcome.State())
     @Shared(.hasCompletedHowToPlay) var hasCompletedHowToPlay
   }
   
   public enum Action: ViewAction {
     case view(View)
-    case welcome(Welcome.Action)
-    case path(StackActionOf<Path>)
     case destination(PresentationAction<Destination.Action>)
+    case destinationPath(PresentationAction<DestinationPath.Action>)
     
     enum View {
       case skipButtonTapped
@@ -27,9 +29,6 @@ struct HowToPlay {
   @Dependency(\.dismiss) var dismiss
   
   var body: some ReducerOf<Self> {
-    Scope(state: \.welcome, action: \.welcome) {
-      Welcome()
-    }
     Reduce { state, action in
       switch action {
         
@@ -46,8 +45,42 @@ struct HowToPlay {
           return .none
         }
         
-      case .welcome, .path, .destination:
+      case .destinationPath(.dismiss), .destination(.dismiss):
         return .none
+        
+      case let .destinationPath(.presented(action)):
+        switch action {
+          
+        case .page1(.delegate(.continue)):
+          state.destinationPath = .page2(.init())
+          return .none
+          
+        case .page2(.delegate(.continue)):
+          state.destinationPath = .page3(.init())
+          return .none
+          
+        case .page3(.delegate(.continue)):
+          state.destinationPath = .page4(.init())
+          return .none
+          
+        case .page4(.delegate(.continue)):
+          state.destinationPath = .page5(.init())
+          return .none
+          
+        case .page5(.delegate(.continue)):
+          state.destinationPath = .page6(.init())
+          return .none
+          
+        case .page6(.delegate(.continue)):
+          state.destinationPath = .page7(.init())
+          return .none
+          
+        case .page7(.delegate(.continue)):
+          return .none
+          
+        default:
+          return .none
+        }
 
       case let .view(action):
         switch action {
@@ -65,7 +98,8 @@ struct HowToPlay {
         }
       }
     }
-    .forEach(\.path, action: \.path)
+    .ifLet(\.$destination, action: \.destination)
+    .ifLet(\.$destinationPath, action: \.destinationPath)
   }
 }
 
@@ -81,16 +115,17 @@ extension HowToPlay {
       case cancel
     }
   }
-   
+  
   @Reducer(state: .equatable)
-  enum Path {
+  enum DestinationPath {
+    case page1(Welcome)
     case page2(WhatsTheGoal)
     case page3(HowToJump)
     case page4(ValidMoves)
     case page5(EndingTheGame)
     case page6(QuickTips)
     case page7(ReadyToPlay)
-  } 
+  }
 }
 
 extension AlertState where Action == HowToPlay.Destination.SkipTutorialAlert {
@@ -117,52 +152,44 @@ struct HowToPlayView: View {
   @Bindable var store: StoreOf<HowToPlay>
     
   var body: some View {
-    NavigationStack(
-      path: $store.scope(state: \.path, action: \.path),
-      root: self.root,
-      destination: self.destination(store:)
-    )
-    .navigationTransition(.fade(.in).animation(.none))
-    .alert(store: self.store.scope(
-      state: \.$destination.skipTutorialAlert,
-      action: \.destination.skipTutorialAlert
-    ))
-  }
-  
-  private func root() -> some View {
-    WelcomeView(store: store.scope(
-      state: \.welcome,
-      action: \.welcome
-    ))
-    .toolbar(content: self.toolbar)
-  }
-  
-  private func destination(
-    store: StoreOf<HowToPlay.Path>
-  ) -> some View {
-    Group {
-      switch store.case {
-        
-      case let .page2(store: store):
-        WhatsTheGoalView(store: store)
-
-      case let .page3(store: store):
-        HowToJumpView(store: store)
-
-      case let .page4(store: store):
-        ValidMovesView(store: store)
-
-      case let .page5(store: store):
-        EndingTheGameView(store: store)
-
-      case let .page6(store: store):
-        QuickTipsView(store: store)
-
-      case let .page7(store):
-        ReadyToPlayView(store: store)
+    NavigationStack {
+      Group {
+        switch store.scope(
+          state: \.destinationPath,
+          action: \.destinationPath.presented
+        )?.case {
+          
+        case let .page1(store):
+          WelcomeView(store: store)
+          
+        case let .page2(store):
+          WhatsTheGoalView(store: store)
+          
+        case let .page3(store):
+          HowToJumpView(store: store)
+          
+        case let .page4(store):
+          ValidMovesView(store: store)
+          
+        case let .page5(store):
+          EndingTheGameView(store: store)
+          
+        case let .page6(store):
+          QuickTipsView(store: store)
+          
+        case let .page7(store):
+          ReadyToPlayView(store: store)
+          
+        case .none:
+          fatalError("Can't be none.")
+        }
       }
+      .alert(store: self.store.scope(
+        state: \.$destination.skipTutorialAlert,
+        action: \.destination.skipTutorialAlert
+      ))
+      .toolbar(content: self.toolbar)
     }
-    .toolbar(content: self.toolbar)
   }
   
   private func toolbar() -> some ToolbarContent {

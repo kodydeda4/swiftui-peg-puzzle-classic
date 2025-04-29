@@ -3,14 +3,21 @@ import ComposableArchitecture
 
 @Reducer
 struct WhatsTheGoal {
+  
   @ObservableState
-  struct State: Equatable {}
+  struct State: Equatable {
+    //...
+  }
   
   public enum Action: ViewAction {
     case view(View)
+    case delegate(Delegate)
     
+    enum Delegate {
+      case `continue`
+    }
     enum View {
-      //      case continueButtonTapped
+      case continueButtonTapped
     }
   }
   
@@ -18,17 +25,19 @@ struct WhatsTheGoal {
     Reduce { state, action in
       switch action {
         
+      case .delegate:
+        return .none
+        
       case let .view(action):
         switch action {
           
-          //        case .continueButtonTapped:
-          //          return .none
+        case .continueButtonTapped:
+          return .send(.delegate(.continue))
         }
       }
     }
   }
 }
-
 // MARK: - SwiftUI
 
 @ViewAction(for: WhatsTheGoal.self)
@@ -54,10 +63,9 @@ struct WhatsTheGoalView: View {
     }
     .howToPlayDefaultViewModifiers()
     .navigationOverlay {
-      NavigationLink(
-        "Continue",
-        state: HowToPlay.Path.State.page3(HowToJump.State())
-      )
+      Button("Continue") {
+        send(.continueButtonTapped)
+      }
       .buttonStyle(RoundedRectangleButtonStyle())
     }
   }
