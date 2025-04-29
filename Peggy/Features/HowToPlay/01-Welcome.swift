@@ -54,7 +54,7 @@ struct WelcomeView: View {
           .frame(width: 150, height: 150)
           .background {
             Circle()
-              .foregroundColor(Color(.systemGray6))
+              .foregroundColor(Color(.systemGray5))
           }
           .padding()
       }
